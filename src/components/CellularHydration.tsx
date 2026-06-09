@@ -149,7 +149,7 @@ export function CellularHydration() {
           <CompareCard
             tone="bright"
             icon={<Waves size={16} />}
-            label="HPE DDW"
+            label="MDRN-LIFE DDW"
             title="Crosses the membrane. Powers the mitochondria."
             metrics={[
             {
@@ -158,7 +158,7 @@ export function CellularHydration() {
             },
             {
               k: 'D content',
-              v: '<25 ppm'
+              v: '5 ppm'
             },
             {
               k: 'ATP yield',

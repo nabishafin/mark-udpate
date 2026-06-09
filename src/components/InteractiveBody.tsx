@@ -38,6 +38,10 @@ const HOTSPOT_POSITIONS: Record<
     x: 50,
     y: 13
   },
+  mouth: {
+    x: 50,
+    y: 17
+  },
   heart: {
     x: 50.5,
     y: 28
@@ -58,10 +62,6 @@ const HOTSPOT_POSITIONS: Record<
     x: 52,
     y: 42
   },
-  spine: {
-    x: 50,
-    y: 34
-  },
   joints: {
     x: 48.5,
     y: 72
@@ -70,7 +70,11 @@ const HOTSPOT_POSITIONS: Record<
     x: 42,
     y: 42
   },
-  nervous: {
+  skin: {
+    x: 62,
+    y: 36
+  },
+  mitochondria: {
     x: 48.5,
     y: 58
   }
@@ -108,7 +112,7 @@ export function InteractiveBody({ onSelect, active }: Props) {
 
       {/* HOLOGRAPHIC BODY VIDEO + HOTSPOTS */}
       <div
-        className="relative w-full max-w-6xl mx-auto hpe-breathe"
+        className="relative hpe-body-stage max-w-none lg:max-w-6xl mx-auto hpe-breathe"
         style={{
           aspectRatio: '16 / 9',
           filter: 'drop-shadow(0 0 40px rgba(63,184,255,0.4))'

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mdrn-Life DDW">
+  <rect width="64" height="64" rx="14" fill="#050608"/>
+  <path d="M32 8c9 9 16 17 16 29 0 10-7 17-16 17S16 47 16 37C16 25 23 17 32 8Z" fill="#3FB8FF" opacity=".18" stroke="#3FB8FF" stroke-width="3"/>
+  <path d="M24 38c5 4 12 4 17-1" fill="none" stroke="#F0D27A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="31" r="6" fill="#5EE6B5"/>
+</svg>

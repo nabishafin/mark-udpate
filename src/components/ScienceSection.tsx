@@ -7,7 +7,7 @@ const PILLARS = [
   icon: Atom,
   label: 'Deuterium Depletion',
   title: 'Lighter water, lighter cells',
-  body: 'We strip heavy hydrogen isotopes (deuterium) from water down to <25 ppm — well below the 150 ppm found in standard drinking water. Lighter water moves through mitochondrial ATP synthase faster.'
+  body: 'Mdrn-Life DDW is positioned at 5 ppm deuterium, well below the roughly 150 ppm found in standard drinking water. The lower deuterium target supports the brand story around cellular hydration and mitochondrial efficiency.'
 },
 {
   icon: Cpu,
@@ -363,7 +363,7 @@ function MoleculeViz() {
             fontFamily="Geist Mono"
             letterSpacing="2">
             
-            HPE DDW · ≤25 PPM D
+            MDRN-LIFE DDW - 5 PPM D
           </text>
           <rect x="0" y="6" width="50" height="3" fill="#3FB8FF" />
         </g>

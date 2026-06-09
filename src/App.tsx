@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
 import { ScienceSection } from './components/ScienceSection';
+import { LabTesting } from './components/LabTesting';
 import { OxidativeStress } from './components/OxidativeStress';
 import { CellularHydration } from './components/CellularHydration';
 import { OrganShowcase } from './components/OrganShowcase';
@@ -38,6 +39,7 @@ export function App() {
           activeId={activeOrgan?.id ?? null} />
         
         <ScienceSection />
+        <LabTesting />
         <OxidativeStress />
         <CellularHydration />
         <OrganShowcase onSelectOrgan={handleSelectOrgan} />
