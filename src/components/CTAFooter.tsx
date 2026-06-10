@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Hexagon, Instagram, Twitter, Youtube } from 'lucide-react';
+import { ArrowRight, Hexagon, Instagram, Music2, Youtube } from 'lucide-react';
 import { Particles } from './Particles';
 
 export function CTAFooter() {
   return (
-    <footer className="relative overflow-hidden">
+    <footer id="contact" className="relative overflow-hidden">
       <section className="hpe-section relative">
         <div className="absolute inset-0 hpe-grid opacity-30" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[700px] hpe-glow-cyan opacity-40" />
@@ -73,10 +73,17 @@ export function CTAFooter() {
               PET Plastic bottles.
             </p>
             <div className="mt-4 flex gap-2">
-              {[Instagram, Twitter, Youtube].map((Icon, i) => (
+              {[
+                { Icon: Instagram, href: 'https://www.instagram.com/modernlifewater/', label: 'Instagram' },
+                { Icon: Music2, href: 'https://www.tiktok.com/@modernlifeddw', label: 'TikTok' },
+                { Icon: Youtube, href: 'https://www.youtube.com/channel/UC19CpjpBOs1SxrAr47eX-xg', label: 'YouTube' },
+              ].map(({ Icon, href, label }) => (
                 <a
-                  key={i}
-                  href="#"
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
                   className="w-9 h-9 rounded-lg hpe-glass flex items-center justify-center text-white/60 hover:text-cyan-300 transition"
                 >
                   <Icon size={14} />
@@ -108,8 +115,8 @@ export function CTAFooter() {
           <FooterCol
             title="Company"
             links={[
-              ['Research', '#science'],
-              ['Contact', 'https://mdrnlifeddw.com/pages/contact'],
+              ['Research', '#research'],
+              ['Contact', '#contact'],
               ['Privacy', 'https://mdrnlifeddw.com/policies/privacy-policy'],
               ['Terms', 'https://mdrnlifeddw.com/policies/terms-of-service'],
             ]}

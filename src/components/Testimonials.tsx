@@ -47,7 +47,7 @@ const VALIDATORS = [
 
 export function Testimonials() {
   return (
-    <section id="story" className="hpe-section relative overflow-hidden">
+    <section id="research" className="hpe-section relative overflow-hidden">
       <div className="absolute inset-0 hpe-grid opacity-30" />
       <div className="absolute top-0 right-0 w-[600px] h-[600px] hpe-glow-cyan opacity-25" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] hpe-glow-gold opacity-20" />

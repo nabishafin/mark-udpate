@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Particles } from './Particles';
 export function OxidativeStress() {
   return (
-    <section className="hpe-section relative overflow-hidden">
+    <section id="benefits" className="hpe-section relative overflow-hidden">
       <div className="absolute inset-0 hpe-grid opacity-30" />
       <div className="absolute top-1/2 right-0 w-[700px] h-[700px] hpe-glow-gold opacity-30" />
       <Particles count={22} color="rgba(240,210,122,0.5)" />

@@ -53,7 +53,7 @@ test('app exposes the lab testing credibility page content from the client SEO b
 test('body navigation returns users to the full hero section', () => {
   const nav = file('src/components/Nav.tsx');
 
-  assert.match(nav, /\{\s*label:\s*'Body',\s*href:\s*'#top'\s*\}/);
+  assert.match(nav, /\{\s*label:\s*'Explore the Body',\s*href:\s*'#top'\s*\}/);
 });
 
 test('hero explore body CTA keeps users at the full hero section', () => {
@@ -99,4 +99,88 @@ test('mobile body interaction uses a side drawer instead of full-screen overlay'
   assert.match(file('src/index.css'), /\.hpe-body-stage\s*\{\s*flex:\s*0 0 auto;\s*width:\s*clamp\(680px,\s*352vw,\s*760px\);\s*\}/);
   assert.match(panel, /right-3 bottom-3 w-\[78vw\] max-w-\[330px\]/);
   assert.doesNotMatch(panel, /w-\[calc\(100%-2rem\)\]/);
+});
+
+test('navigation follows the client supplied IA and keeps shop/contact paths explicit', () => {
+  const nav = file('src/components/Nav.tsx');
+
+  for (const label of [
+    'Home',
+    'Explore the Body',
+    'The Science',
+    'Benefits',
+    'Athletes & Recovery',
+    'Healthy Aging',
+    'Shop',
+    'Research',
+    'Contact',
+  ]) {
+    assert.match(nav, new RegExp(`label:\\s*'${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
+  }
+
+  assert.match(nav, /href:\s*'#products'/);
+  assert.match(nav, /href:\s*'#contact'/);
+});
+
+test('hero uses a cleaner premium background instead of the rejected grid and particle pattern', () => {
+  const hero = file('src/components/Hero.tsx');
+  const body = file('src/components/InteractiveBody.tsx');
+  const css = file('src/index.css');
+
+  assert.match(hero, /hpe-hero-premium/);
+  assert.match(hero, /hpe-hero-liquid/);
+  assert.doesNotMatch(hero, /hpe-grid/);
+  assert.doesNotMatch(hero, /<Particles/);
+  assert.doesNotMatch(hero, /hpe-hero-waterline/);
+  assert.doesNotMatch(body, /hpe-glow-cyan|hpeOrbit|hpeScan|Orbiting rings|Ambient backdrop glow/);
+  assert.match(body, /hpe-body-clean-stage/);
+  assert.match(css, /\.hpe-hero-premium/);
+  assert.match(css, /\.hpe-body-clean-stage/);
+});
+
+test('products route all commerce actions through Shopify-safe checkout handoff helpers', () => {
+  const products = file('src/components/Products.tsx');
+  const shopify = file('src/lib/shopify.ts');
+  const tracking = file('src/lib/tracking.ts');
+
+  assert.match(products, /getShopifyLinks/);
+  assert.match(products, /trackCommerceEvent\('product_viewed'/);
+  assert.match(products, /Buy Now/);
+  assert.match(products, /Add to Cart/);
+  assert.match(products, /Subscribe/);
+  assert.doesNotMatch(products, /setTimeout\(\(\) => setAdding\(null\)/);
+
+  assert.match(shopify, /VITE_SHOPIFY_STORE_DOMAIN/);
+  assert.match(shopify, /\/cart\/\$\{variantId\}:\$\{quantity\}/);
+  assert.match(shopify, /channel=buy_button/);
+  assert.match(shopify, /subscriptionCheckoutUrl/);
+
+  for (const phrase of ['Meta Pixel', 'Google Analytics 4', 'TikTok Pixel', 'Klaviyo']) {
+    assert.match(tracking, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+});
+
+test('developer handoff documents required Shopify, tracking, subscription, and social inputs', () => {
+  const doc = file('docs/shopify-integration-handoff.md');
+
+  for (const phrase of [
+    'Shopify store domain',
+    'variant ID',
+    'Buy Button',
+    'Storefront API',
+    'Meta Pixel',
+    'Google Analytics 4',
+    'Google Ads',
+    'TikTok Pixel',
+    'Klaviyo',
+    'Recharge',
+    'Appstle',
+    'Skio',
+    'Shopify Subscriptions',
+    'Instagram',
+    'TikTok',
+    'YouTube',
+  ]) {
+    assert.match(doc, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+  }
 });

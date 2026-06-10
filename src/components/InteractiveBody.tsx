@@ -85,37 +85,12 @@ export function InteractiveBody({ onSelect, active }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Ambient backdrop glow */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="hpe-glow-cyan w-[110%] h-[110%] opacity-60" />
-      </div>
-
-      {/* Orbiting rings */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div
-          className="rounded-full border border-cyan-400/10"
-          style={{
-            width: '88%',
-            height: '88%',
-            animation: 'hpeOrbit 60s linear infinite'
-          }} />
-        
-        <div
-          className="absolute rounded-full border border-cyan-400/10 border-dashed"
-          style={{
-            width: '72%',
-            height: '72%',
-            animation: 'hpeOrbit 90s linear infinite reverse'
-          }} />
-        
-      </div>
-
       {/* HOLOGRAPHIC BODY VIDEO + HOTSPOTS */}
       <div
-        className="relative hpe-body-stage max-w-none lg:max-w-6xl mx-auto hpe-breathe"
+        className="relative hpe-body-stage hpe-body-clean-stage max-w-none lg:max-w-6xl mx-auto hpe-breathe"
         style={{
           aspectRatio: '16 / 9',
-          filter: 'drop-shadow(0 0 40px rgba(63,184,255,0.4))'
+          filter: 'drop-shadow(0 26px 50px rgba(0,0,0,0.42))'
         }}>
         
         {/* Seamless looping video */}
@@ -130,18 +105,6 @@ export function InteractiveBody({ onSelect, active }: Props) {
             mixBlendMode: 'screen',
             filter: 'saturate(1.15) brightness(1.08) contrast(1.05)'
           }} />
-        
-
-        {/* Scan line over body */}
-        <div
-          className="absolute left-[20%] right-[20%] h-px pointer-events-none"
-          style={{
-            background:
-            'linear-gradient(90deg, transparent, rgba(63,184,255,0.9), transparent)',
-            boxShadow: '0 0 20px rgba(63,184,255,0.8)',
-            animation: 'hpeScan 8s linear infinite'
-          }} />
-        
 
         {/* Connecting Line to Active Card */}
         {active && HOTSPOT_POSITIONS[active] &&

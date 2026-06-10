@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { InteractiveBody } from './InteractiveBody';
-import { Particles } from './Particles';
 import { Organ } from './organData';
 
 type Props = {
@@ -11,11 +10,8 @@ type Props = {
 
 export function Hero({ onSelectOrgan, activeId }: Props) {
   return (
-    <section id="top" className="relative min-h-screen w-full overflow-hidden pt-28 pb-12">
-      <div className="absolute inset-0 hpe-grid opacity-50" />
-      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[900px] hpe-glow-cyan opacity-50" />
-      <div className="absolute -bottom-40 right-0 w-[600px] h-[600px] hpe-glow-gold opacity-30" />
-      <Particles count={40} />
+    <section id="top" className="relative min-h-screen w-full overflow-hidden pt-28 pb-12 hpe-hero-premium">
+      <div className="absolute inset-0 hpe-hero-liquid" />
 
       <div className="relative z-10 w-full px-6 flex flex-col items-center min-h-[calc(100vh-7rem)] justify-center">
         <div

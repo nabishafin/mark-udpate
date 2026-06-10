@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ExternalLink, Plus, Sparkles } from 'lucide-react';
+import { ExternalLink, Plus, RefreshCw, ShoppingCart, Sparkles } from 'lucide-react';
 import { Particles } from './Particles';
+import { getShopifyLinks, ShopifyProductConfig } from '../lib/shopify';
+import { trackCommerceEvent } from '../lib/tracking';
 
-type Product = {
+type Product = ShopifyProductConfig & {
   id: string;
   badge: string;
   name: string;
@@ -11,7 +13,6 @@ type Product = {
   description: string;
   price: string;
   volume: string;
-  href: string;
   spec: {
     k: string;
     v: string;
@@ -29,7 +30,9 @@ const PRODUCTS: Product[] = [
       'The client-approved 5 ppm deuterium-depleted water format for buyers who prefer glass packaging and the most premium shelf presentation.',
     price: 'From $86.65',
     volume: 'Glass bottles',
-    href: 'https://mdrnlifeddw.com/products/mdrn-life-ddw',
+    productUrl: 'https://mdrnlifeddw.com/products/mdrn-life-ddw',
+    variantId: import.meta.env.VITE_SHOPIFY_GLASS_VARIANT_ID,
+    subscriptionCheckoutUrl: import.meta.env.VITE_SHOPIFY_GLASS_SUBSCRIPTION_CHECKOUT_URL,
     spec: [
       { k: 'Deuterium', v: '5 ppm' },
       { k: 'Packaging', v: 'Glass' },
@@ -46,7 +49,9 @@ const PRODUCTS: Product[] = [
       'The same single-concentration Mdrn-Life DDW in PET plastic bottles for convenience, shipping efficiency, and everyday protocol use.',
     price: 'From $80.65',
     volume: 'PET plastic bottles',
-    href: 'https://mdrnlifeddw.com/products/mdrn-life-ddw-pet-plastic?variant=41122368749602',
+    productUrl: 'https://mdrnlifeddw.com/products/mdrn-life-ddw-pet-plastic?variant=41122368749602',
+    variantId: import.meta.env.VITE_SHOPIFY_PET_VARIANT_ID || '41122368749602',
+    subscriptionCheckoutUrl: import.meta.env.VITE_SHOPIFY_PET_SUBSCRIPTION_CHECKOUT_URL,
     spec: [
       { k: 'Deuterium', v: '5 ppm' },
       { k: 'Packaging', v: 'PET Plastic' },
@@ -57,7 +62,17 @@ const PRODUCTS: Product[] = [
 ];
 
 export function Products() {
-  const [adding, setAdding] = useState<string | null>(null);
+  useEffect(() => {
+    PRODUCTS.forEach((product) => {
+      trackCommerceEvent('product_viewed', {
+        productId: product.id,
+        productName: product.name,
+        value: product.price,
+        variantId: product.variantId,
+        checkoutReady: Boolean(product.variantId),
+      });
+    });
+  }, []);
 
   return (
     <section id="products" className="hpe-section relative overflow-hidden">
@@ -94,11 +109,6 @@ export function Products() {
               key={product.id}
               product={product}
               delay={i * 0.1}
-              adding={adding === product.id}
-              onAdd={() => {
-                setAdding(product.id);
-                setTimeout(() => setAdding(null), 1800);
-              }}
             />
           ))}
         </div>
@@ -110,15 +120,21 @@ export function Products() {
 function ProductCard({
   product,
   delay,
-  adding,
-  onAdd,
 }: {
   product: Product;
   delay: number;
-  adding: boolean;
-  onAdd: () => void;
 }) {
   const isGold = product.accent === 'gold';
+  const links = getShopifyLinks(product);
+  const trackAction = (eventName: 'added_to_cart' | 'started_checkout' | 'subscription_started_intent') => {
+    trackCommerceEvent(eventName, {
+      productId: product.id,
+      productName: product.name,
+      value: product.price,
+      variantId: product.variantId,
+      checkoutReady: links.isCheckoutReady,
+    });
+  };
 
   return (
     <motion.div
@@ -184,7 +200,7 @@ function ProductCard({
             </div>
           </div>
           <a
-            href={product.href}
+            href={links.productUrl}
             target="_blank"
             rel="noreferrer"
             className="hpe-btn-ghost rounded-xl px-4 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2"
@@ -194,25 +210,50 @@ function ProductCard({
           </a>
         </div>
 
-        <button
-          onClick={onAdd}
-          disabled={adding}
-          className={`mt-5 rounded-xl px-4 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2 transition ${
-            isGold ? 'hpe-btn-ghost' : 'hpe-btn-primary'
-          }`}
+        <div className="mt-5 grid sm:grid-cols-2 gap-3">
+          <a
+            href={links.buyNowUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => trackAction('started_checkout')}
+            className={`${isGold ? 'hpe-btn-ghost' : 'hpe-btn-primary'} rounded-xl px-4 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2`}
+          >
+            <ShoppingCart size={14} />
+            Buy Now
+          </a>
+          <a
+            href={links.addToCartUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => trackAction('added_to_cart')}
+            className="hpe-btn-ghost rounded-xl px-4 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2"
+          >
+            <Plus size={14} />
+            Add to Cart
+          </a>
+        </div>
+
+        <a
+          href={links.subscriptionCheckoutUrl}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => trackAction('subscription_started_intent')}
+          className="mt-3 rounded-xl px-4 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2 border border-white/10 bg-white/[0.03] text-white/75 hover:text-white hover:border-cyan-300/40 transition"
         >
-          {adding ? (
-            <>
-              <Check size={14} />
-              Added to Cart
-            </>
-          ) : (
-            <>
-              <Plus size={14} />
-              Add to Cart
-            </>
-          )}
-        </button>
+          <RefreshCw size={14} />
+          Subscribe
+          <span className="sr-only">
+            {links.subscriptionCheckoutUrl === product.productUrl
+              ? ' - subscription checkout URL required from Shopify'
+              : ''}
+          </span>
+        </a>
+
+        {!links.isCheckoutReady && (
+          <p className="mt-3 text-[11px] leading-relaxed text-white/40">
+            Shopify checkout link is ready to activate when the final variant ID is provided.
+          </p>
+        )}
       </div>
     </motion.div>
   );

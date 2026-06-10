@@ -26,7 +26,7 @@ const STEPS = [
 
 export function CellularHydration() {
   return (
-    <section className="hpe-section relative overflow-hidden">
+    <section id="athletes-recovery" className="hpe-section relative overflow-hidden">
       <div className="absolute inset-0 hpe-grid opacity-30" />
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] hpe-glow-cyan opacity-30" />
       <Particles count={28} />

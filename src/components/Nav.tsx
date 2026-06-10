@@ -3,11 +3,15 @@ import { motion } from 'framer-motion';
 import { Hexagon } from 'lucide-react';
 
 const LINKS = [
-  { label: 'Body', href: '#top' },
-  { label: 'Science', href: '#science' },
-  { label: 'Lab Testing', href: '#science/lab-testing' },
-  { label: 'Systems', href: '#systems' },
-  { label: 'Products', href: '#products' },
+  { label: 'Home', href: '#top' },
+  { label: 'Explore the Body', href: '#top' },
+  { label: 'The Science', href: '#science' },
+  { label: 'Benefits', href: '#benefits' },
+  { label: 'Athletes & Recovery', href: '#athletes-recovery' },
+  { label: 'Healthy Aging', href: '#systems' },
+  { label: 'Shop', href: '#products' },
+  { label: 'Research', href: '#research' },
+  { label: 'Contact', href: '#contact' },
 ];
 
 export function Nav() {
@@ -52,15 +56,15 @@ export function Nav() {
             </div>
           </a>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1 max-w-[min(66vw,780px)] overflow-x-auto hpe-no-scrollbar">
             {LINKS.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                className="px-3 py-1.5 text-sm text-white/70 hover:text-white rounded-lg transition relative group"
+                className="shrink-0 px-2.5 py-1.5 text-[12px] text-white/70 hover:text-white rounded-lg transition relative group"
               >
                 {l.label}
-                <span className="absolute left-3 right-3 bottom-1 h-px bg-cyan-400/0 group-hover:bg-cyan-400/60 transition-all" />
+                <span className="absolute left-2.5 right-2.5 bottom-1 h-px bg-cyan-400/0 group-hover:bg-cyan-400/60 transition-all" />
               </a>
             ))}
           </div>
