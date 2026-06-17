@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { InteractiveBody } from './InteractiveBody';
 import { Organ } from './organData';
 
@@ -27,17 +27,17 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.05]">
-            <span className="hpe-text-chrome">Explore Hydration</span>
+            <span className="hpe-text-chrome">Every Cell Needs Energy.</span>
             <br />
-            <span className="text-white/70">at the</span>{' '}
+            <span className="text-white/70">Every System Needs</span>{' '}
             <span style={{ color: '#3FB8FF', textShadow: '0 0 24px rgba(63,184,255,0.5)' }}>
-              Cellular Level
+              Hydration.
             </span>
           </h1>
 
           <p className="mt-3 text-white/65 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-            Independently verified 5 ppm deuterium-depleted water, made for
-            cellular hydration, recovery support, and everyday longevity routines.
+            Explore how advanced deuterium-depleted hydration supports the brain, joints, gut,
+            energy production, recovery, and healthy aging.
           </p>
         </div>
 
@@ -68,22 +68,6 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           >
             <SpecBlock label="FORMATS" value="2" unit="bottle types" />
             <SpecBlock label="ORIGIN" value="US" unit="made" />
-          </div>
-        </div>
-
-        <div
-          className={`w-full flex flex-col items-center gap-6 transition-all duration-700 ease-in-out z-20 ${
-            activeId ? 'opacity-0 h-0 overflow-hidden scale-95' : 'opacity-100 h-auto scale-100 mt-2'
-          }`}
-        >
-          <div className="flex flex-wrap gap-3 justify-center">
-            <a href="#top" className="hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
-              Explore the Body
-              <ArrowRight size={14} />
-            </a>
-            <a href="#science/lab-testing" className="hpe-btn-ghost rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
-              View Lab Testing
-            </a>
           </div>
         </div>
       </div>

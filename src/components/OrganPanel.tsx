@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, ChevronLeft, ChevronRight, Droplets, ShieldCheck, X, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CircleDot, X } from 'lucide-react';
 import { Organ, ORGANS } from './organData';
 import { Particles } from './Particles';
 
@@ -89,61 +89,53 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
             </div>
 
             <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span
-                  className="inline-block w-1.5 h-1.5 rounded-full"
-                  style={{ background: color.stroke, boxShadow: `0 0 8px ${color.stroke}` }}
-                />
-                <div className="hpe-hud-label tracking-widest" style={{ color: color.stroke }}>
-                  {organ.bodySystem}
-                </div>
-              </div>
               <h2 id="organ-title" className="text-3xl sm:text-4xl font-medium text-white leading-tight tracking-tight">
                 {organ.name}
               </h2>
               <p className="mt-2 text-white/60 text-sm">{organ.tagline}</p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
-              {organ.metrics.map((m) => (
-                <div key={m.label} className="bg-white/5 border border-white/10 rounded-xl px-3 py-3 backdrop-blur-md">
-                  <div className="hpe-hud-label mb-1.5" style={{ fontSize: 9, color: color.stroke }}>
-                    {m.label}
-                  </div>
-                  <div className="font-mono text-white text-lg leading-none">
-                    {m.value}
-                    {m.unit && <span className="text-white/40 text-[10px] ml-1">{m.unit}</span>}
-                  </div>
-                </div>
+            {organ.image && <OrganImage color={color} image={organ.image} />}
+
+            <div className="mt-8 space-y-5">
+              <div className="space-y-3">
+                {organ.sidePanelCopy.map((paragraph) => (
+                  <p key={paragraph} className="text-white/75 text-sm leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+
+              {organ.supportIntro && organ.supportBullets && (
+                <PanelBlock title={organ.supportIntro} color={color.stroke}>
+                  <BulletList items={organ.supportBullets} color={color.stroke} />
+                </PanelBlock>
+              )}
+
+              {organ.riskIntro && organ.riskBullets && (
+                <PanelBlock title={organ.riskIntro} color={color.stroke}>
+                  <BulletList items={organ.riskBullets} color={color.stroke} />
+                </PanelBlock>
+              )}
+
+              {organ.closingCopy?.map((paragraph) => (
+                <p key={paragraph} className="text-white/75 text-sm leading-relaxed">
+                  {paragraph}
+                </p>
               ))}
             </div>
 
-            <OrganVisualization color={color} id={organ.id} />
-
-            <div className="mt-8 space-y-6">
-              <PanelSection icon={<Activity size={14} />} title="Scientific Overview" color={color.stroke}>
-                {organ.description}
-              </PanelSection>
-              <PanelSection icon={<Droplets size={14} />} title="Hydration Impact" color={color.stroke}>
-                {organ.hydrationImpact}
-              </PanelSection>
-              <PanelSection icon={<ShieldCheck size={14} />} title="Oxidative Balance" color={color.stroke}>
-                {organ.oxidativeImpact}
-              </PanelSection>
-              <PanelSection icon={<Zap size={14} />} title="Recovery & Performance" color={color.stroke}>
-                {organ.recovery}
-              </PanelSection>
-            </div>
-
-            <div className="mt-8">
-              <a
-                href="#products"
-                onClick={onClose}
-                className="w-full hpe-btn-primary rounded-xl px-5 py-3.5 text-sm font-medium tracking-wide flex items-center justify-center shadow-lg"
-              >
-                {organ.microCta} →
-              </a>
-            </div>
+            {organ.microCta && (
+              <div className="mt-8">
+                <a
+                  href="/products"
+                  onClick={onClose}
+                  className="w-full hpe-btn-primary rounded-xl px-5 py-3.5 text-sm font-medium tracking-wide flex items-center justify-center shadow-lg"
+                >
+                  {organ.microCta} →
+                </a>
+              </div>
+            )}
           </div>
         </motion.aside>
       )}
@@ -163,13 +155,11 @@ function IconButton({ label, onClick, children }: { label: string; onClick: () =
   );
 }
 
-function PanelSection({
-  icon,
+function PanelBlock({
   title,
   color,
   children,
 }: {
-  icon: React.ReactNode;
   title: string;
   color: string;
   children: React.ReactNode;
@@ -177,63 +167,56 @@ function PanelSection({
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
-        <span style={{ color }}>{icon}</span>
+        <CircleDot size={13} style={{ color }} />
         <div className="hpe-hud-label" style={{ color }}>
           {title}
         </div>
       </div>
-      <p className="text-white/75 text-sm leading-relaxed">{children}</p>
+      <div className="space-y-3">{children}</div>
     </div>
   );
 }
 
-function OrganVisualization({ color, id }: { color: { stroke: string; glow: string; soft: string }; id: string }) {
+function BulletList({ items, color }: { items: string[]; color: string }) {
   return (
-    <div className="mt-6 relative h-40 rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+    <ul className="space-y-2">
+      {items.map((item) => (
+        <li key={item} className="flex gap-2 text-white/75 text-sm leading-relaxed">
+          <span className="mt-2 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function OrganImage({
+  color,
+  image,
+}: {
+  color: { stroke: string; glow: string; soft: string };
+  image: NonNullable<Organ['image']>;
+}) {
+  return (
+    <figure className="mt-6 relative h-48 rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
       <div
-        className="absolute inset-0"
-        style={{ background: `radial-gradient(circle at 50% 60%, ${color.soft}, transparent 70%)` }}
-      />
-      <div
-        className="absolute left-0 right-0 h-px"
+        className="absolute inset-0 z-10 pointer-events-none"
         style={{
-          background: `linear-gradient(90deg, transparent, ${color.stroke}, transparent)`,
-          animation: 'hpeScan 4s linear infinite',
-          boxShadow: `0 0 16px ${color.stroke}`,
+          background: `linear-gradient(180deg, rgba(3,5,8,0.05), rgba(3,5,8,0.28)), radial-gradient(circle at 50% 40%, transparent 35%, ${color.soft} 100%)`,
+          boxShadow: `inset 0 0 0 1px ${color.soft}`,
         }}
       />
-
-      <svg viewBox="0 0 400 160" className="absolute inset-0 w-full h-full">
-        <defs>
-          <filter id={`viz-glow-${id}`}>
-            <feGaussianBlur stdDeviation="2" />
-          </filter>
-        </defs>
-        <path
-          d="M0 80 Q50 50 100 80 T200 80 T300 80 T400 80"
-          fill="none"
-          stroke={color.stroke}
-          strokeWidth="1.4"
-          opacity="0.7"
-          filter={`url(#viz-glow-${id})`}
-        >
-          <animate
-            attributeName="d"
-            dur="4s"
-            repeatCount="indefinite"
-            values="M0 80 Q50 50 100 80 T200 80 T300 80 T400 80;M0 80 Q50 110 100 80 T200 80 T300 80 T400 80;M0 80 Q50 50 100 80 T200 80 T300 80 T400 80"
-          />
-        </path>
-        {[60, 140, 220, 300, 360].map((x, i) => (
-          <circle key={x} cx={x} cy="80" r="3" fill={color.stroke} opacity="0.9">
-            <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin={`${i * 0.3}s`} repeatCount="indefinite" />
-            <animate attributeName="r" values="2;4;2" dur="2s" begin={`${i * 0.3}s`} repeatCount="indefinite" />
-          </circle>
-        ))}
-      </svg>
-      <div className="absolute bottom-2 left-3 hpe-hud-label" style={{ color: color.stroke, fontSize: 9 }}>
-        Live signal - {id.toUpperCase()}
-      </div>
-    </div>
+      <img
+        src={image.src}
+        alt={image.alt}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{
+          objectPosition: image.position ?? 'center',
+          filter: 'saturate(0.92) contrast(1.08) brightness(0.82)',
+        }}
+      />
+    </figure>
   );
 }

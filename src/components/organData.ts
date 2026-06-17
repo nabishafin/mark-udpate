@@ -5,12 +5,15 @@ export type Organ = {
   y: number;
   tagline: string;
   bodySystem: string;
-  description: string;
-  hydrationImpact: string;
-  oxidativeImpact: string;
-  recovery: string;
-  microCta: string;
+  sidePanelCopy: string[];
+  supportIntro?: string;
+  supportBullets?: string[];
+  riskIntro?: string;
+  riskBullets?: string[];
+  closingCopy?: string[];
+  microCta?: string;
   metrics: { label: string; value: string; unit?: string }[];
+  image?: { src: string; alt: string; position?: string };
   color: 'blue' | 'gold' | 'green';
 };
 
@@ -22,20 +25,34 @@ export const ORGANS: Organ[] = [
     x: 50,
     y: 10,
     tagline: 'Your Brain Runs on Hydration and Energy',
-    description:
+    sidePanelCopy: [
       'The brain is nearly 75% water and uses enormous amounts of energy every second. From memory and focus to mood and recovery, healthy hydration plays a critical role in how the brain communicates and performs.',
-    hydrationImpact:
-      'Modern research explores how hydration may support mental clarity, cellular energy production, healthy circulation, waste removal during sleep, and healthy neurotransmitter function.',
-    oxidativeImpact:
-      'Healthy hydration and DDW protocols are positioned to support oxidative balance while helping reduce the cellular strain associated with dehydration.',
-    recovery:
-      'Dehydration may increase brain fog, fatigue, mental stress, reduced concentration, and cognitive strain.',
+    ],
+    supportIntro: 'Modern research explores how hydration may support:',
+    supportBullets: [
+      'Mental clarity and focus',
+      'Cellular energy production',
+      'Healthy circulation',
+      'Waste removal during sleep',
+      'Healthy neurotransmitter function',
+      'Oxidative balance',
+    ],
+    riskIntro: 'Dehydration may increase:',
+    riskBullets: ['Brain fog', 'Fatigue', 'Mental stress', 'Reduced concentration', 'Cognitive strain'],
+    closingCopy: [
+      'Mdrn-Life DDW is designed to support hydration at the cellular level while supporting mitochondrial efficiency and oxidative balance.',
+    ],
     microCta: 'Support Cognitive Performance From Within',
     metrics: [
-      { label: 'Water content', value: '75', unit: '%' },
-      { label: 'Focus support', value: 'Cellular' },
-      { label: 'DDW target', value: '5', unit: 'ppm' },
+      { label: 'Water', value: '75', unit: '%' },
+      { label: 'Focus', value: 'Support' },
+      { label: 'Balance', value: 'Oxidative' },
     ],
+    image: {
+      src: '/organ-panels/brain-neural.jpg',
+      alt: 'Neuron and mitochondria educational diagram',
+      position: 'center',
+    },
     color: 'blue',
   },
   {
@@ -45,19 +62,28 @@ export const ORGANS: Organ[] = [
     x: 50,
     y: 13,
     tagline: 'Hydration Helps Support Visual Performance',
-    description:
+    sidePanelCopy: [
       'The eyes depend on healthy hydration and circulation to function properly. Cellular stress and dehydration may contribute to fatigue and strain throughout the visual system.',
-    hydrationImpact:
-      'Healthy hydration may support eye moisture balance, nutrient delivery, circulation to delicate tissues, and visual comfort during screen exposure.',
-    oxidativeImpact:
-      'Balanced hydration may help support reduced oxidative stress in tissues that work continuously throughout the day.',
-    recovery:
-      'Visual comfort can be supported by hydrating the broader system behind vision, not only the surface of the eyes.',
+    ],
+    supportIntro: 'Healthy hydration may support:',
+    supportBullets: [
+      'Eye moisture balance',
+      'Nutrient delivery',
+      'Circulation to delicate tissues',
+      'Reduced oxidative stress',
+      'Visual comfort during screen exposure',
+    ],
     microCta: 'Hydrate the System Behind Vision',
     metrics: [
       { label: 'Moisture', value: 'Balance' },
-      { label: 'Screen comfort', value: 'Support' },
+      { label: 'Comfort', value: 'Visual' },
+      { label: 'Stress', value: 'Reduced' },
     ],
+    image: {
+      src: '/organ-panels/eyes-moisture.jpg',
+      alt: 'Eye anatomy educational diagram',
+      position: 'center',
+    },
     color: 'gold',
   },
   {
@@ -67,18 +93,22 @@ export const ORGANS: Organ[] = [
     x: 50,
     y: 17,
     tagline: 'Hydration Begins Here',
-    description:
-      'Water absorption starts immediately throughout the mouth and digestive tract. Hydration is one of the body\'s most essential biological functions, influencing nearly every system in the body.',
-    hydrationImpact:
-      'Proper hydration supports nutrient transport, saliva production, digestive preparation, cellular communication, and metabolic balance.',
-    oxidativeImpact:
-      'A consistent hydration protocol helps the body maintain the fluid environment needed for normal cellular balance.',
-    recovery:
-      'Daily hydration habits begin with intake, absorption, and the systems that move water into circulation.',
-    microCta: 'Hydration Begins Here',
+    sidePanelCopy: ['Water absorption starts immediately throughout the mouth and digestive tract.'],
+    supportIntro: 'Proper hydration supports:',
+    supportBullets: [
+      'Nutrient transport',
+      'Saliva production',
+      'Digestive preparation',
+      'Cellular communication',
+      'Metabolic balance',
+    ],
+    closingCopy: [
+      "Hydration is one of the body's most essential biological functions, influencing nearly every system in the body.",
+    ],
     metrics: [
       { label: 'Absorption', value: 'Immediate' },
-      { label: 'Cell signal', value: 'Support' },
+      { label: 'Transport', value: 'Nutrients' },
+      { label: 'Balance', value: 'Metabolic' },
     ],
     color: 'green',
   },
@@ -89,19 +119,29 @@ export const ORGANS: Organ[] = [
     x: 50.5,
     y: 28,
     tagline: 'Every Cell Depends on Circulation',
-    description:
+    sidePanelCopy: [
       'The cardiovascular system delivers oxygen, nutrients, and hydration throughout the body. Proper hydration supports healthy blood flow and helps transport metabolic waste away from cells.',
-    hydrationImpact:
-      'Healthy circulation supports oxygen transport, physical endurance, energy production, recovery after activity, and nutrient delivery.',
-    oxidativeImpact:
-      'Dehydration may place added stress on circulation and energy systems, increasing the importance of consistent cellular hydration.',
-    recovery:
-      'Hydration helps fuel the flow of life by supporting the systems that move oxygen and nutrients through the body.',
+    ],
+    supportIntro: 'Healthy circulation supports:',
+    supportBullets: [
+      'Oxygen transport',
+      'Physical endurance',
+      'Energy production',
+      'Recovery after activity',
+      'Nutrient delivery',
+    ],
+    closingCopy: ['Dehydration may place added stress on circulation and energy systems.'],
     microCta: 'Fuel the Flow of Life',
     metrics: [
-      { label: 'Circulation', value: 'O2' },
-      { label: 'Recovery', value: 'Flow' },
+      { label: 'Oxygen', value: 'Transport' },
+      { label: 'Endurance', value: 'Support' },
+      { label: 'Flow', value: 'Healthy' },
     ],
+    image: {
+      src: '/organ-panels/heart-circulation.jpg',
+      alt: 'Blood flow and cardiovascular circulation educational diagram',
+      position: 'center',
+    },
     color: 'blue',
   },
   {
@@ -111,19 +151,27 @@ export const ORGANS: Organ[] = [
     x: 52.5,
     y: 28,
     tagline: 'Energy Begins With Oxygen',
-    description:
+    sidePanelCopy: [
       'The lungs work closely with circulation and hydration systems to support oxygen delivery throughout the body.',
-    hydrationImpact:
-      'Healthy hydration may support efficient circulation, cellular oxygen transport, athletic endurance, and recovery from physical stress.',
-    oxidativeImpact:
-      'Every breath supports the mitochondria, the tiny energy factories inside your cells, where oxidative balance matters for cellular performance.',
-    recovery:
-      'Oxygen delivery, circulation, and hydration work together to support the body after stress and exertion.',
-    microCta: 'Support Oxygen Delivery From Within',
+    ],
+    supportIntro: 'Healthy hydration may support:',
+    supportBullets: [
+      'Efficient circulation',
+      'Cellular oxygen transport',
+      'Athletic endurance',
+      'Recovery from physical stress',
+    ],
+    closingCopy: ['Every breath supports the mitochondria — the tiny energy factories inside your cells.'],
     metrics: [
       { label: 'Oxygen', value: 'Delivery' },
-      { label: 'Endurance', value: 'Support' },
+      { label: 'Endurance', value: 'Athletic' },
+      { label: 'Recovery', value: 'Physical' },
     ],
+    image: {
+      src: '/organ-panels/lungs-oxygen.jpg',
+      alt: 'Oxygen delivery lung diagram',
+      position: 'center',
+    },
     color: 'blue',
   },
   {
@@ -132,20 +180,27 @@ export const ORGANS: Organ[] = [
     bodySystem: 'Hepatic / Metabolic',
     x: 48.5,
     y: 38,
-    tagline: 'The Body\'s Natural Filtration System',
-    description:
+    tagline: "The Body's Natural Filtration System",
+    sidePanelCopy: [
       'The liver helps process metabolic waste products, including ammonia created during protein metabolism.',
-    hydrationImpact:
-      'Healthy hydration supports natural detox pathways, metabolic balance, waste transport, and recovery systems.',
-    oxidativeImpact:
+    ],
+    supportIntro: 'Healthy hydration supports:',
+    supportBullets: ['Natural detox pathways', 'Metabolic balance', 'Waste transport', 'Recovery systems'],
+    closingCopy: [
       'Researchers study how dehydration and oxidative stress may place additional strain on detoxification systems.',
-    recovery:
       'Supporting hydration and mitochondrial function may help maintain healthy cellular efficiency.',
+    ],
     microCta: 'Support Natural Detoxification Pathways',
     metrics: [
       { label: 'Detox', value: 'Natural' },
       { label: 'Waste', value: 'Transport' },
+      { label: 'Balance', value: 'Metabolic' },
     ],
+    image: {
+      src: '/organ-panels/liver-detox.jpg',
+      alt: 'Liver detoxification educational diagram',
+      position: 'center',
+    },
     color: 'gold',
   },
   {
@@ -155,19 +210,31 @@ export const ORGANS: Organ[] = [
     x: 50,
     y: 45,
     tagline: 'Where Immunity and Absorption Begin',
-    description:
+    sidePanelCopy: [
       'Nearly 70% of the immune system is connected to the gut. Hydration supports digestion, nutrient absorption, and healthy gut barrier function.',
-    hydrationImpact:
-      'Healthy gut balance may support nutrient absorption, energy production, digestive comfort, immune balance, and reduced metabolic stress.',
-    oxidativeImpact:
+    ],
+    supportIntro: 'Healthy gut balance may support:',
+    supportBullets: [
+      'Nutrient absorption',
+      'Energy production',
+      'Digestive comfort',
+      'Immune balance',
+      'Reduced metabolic stress',
+    ],
+    closingCopy: [
       'Researchers also study how poor gut balance may contribute to increased ammonia production and inflammatory stress.',
-    recovery:
-      'Supporting hydration helps maintain the foundation of wellness across digestion, immunity, and energy systems.',
+    ],
     microCta: 'Support the Foundation of Wellness',
     metrics: [
-      { label: 'Immune link', value: '70', unit: '%' },
-      { label: 'Absorption', value: 'Gut' },
+      { label: 'Immune', value: '70', unit: '%' },
+      { label: 'Absorption', value: 'Nutrients' },
+      { label: 'Comfort', value: 'Digestive' },
     ],
+    image: {
+      src: '/organ-panels/gut-microbiome.jpg',
+      alt: 'Gut microbiota educational diagram',
+      position: 'center',
+    },
     color: 'green',
   },
   {
@@ -176,20 +243,22 @@ export const ORGANS: Organ[] = [
     bodySystem: 'Renal',
     x: 52,
     y: 42,
-    tagline: 'The Body\'s Fluid Balance System',
-    description:
-      'The kidneys help regulate fluid balance while filtering waste from the bloodstream.',
-    hydrationImpact:
-      'Proper hydration supports waste removal, electrolyte balance, circulation, recovery, and metabolic stability.',
-    oxidativeImpact:
-      'When hydration drops, waste products can become more concentrated inside the body.',
-    recovery:
-      'Healthy filtration and flow are central to the body\'s daily recovery and fluid balance.',
+    tagline: "The Body's Fluid Balance System",
+    sidePanelCopy: ['The kidneys help regulate fluid balance while filtering waste from the bloodstream.'],
+    supportIntro: 'Proper hydration supports:',
+    supportBullets: ['Waste removal', 'Electrolyte balance', 'Circulation', 'Recovery', 'Metabolic stability'],
+    closingCopy: ['When hydration drops, waste products can become more concentrated inside the body.'],
     microCta: 'Support Healthy Filtration and Flow',
     metrics: [
       { label: 'Fluid', value: 'Balance' },
-      { label: 'Electrolytes', value: 'Support' },
+      { label: 'Waste', value: 'Removal' },
+      { label: 'Stability', value: 'Metabolic' },
     ],
+    image: {
+      src: '/organ-panels/kidneys-filtration.jpg',
+      alt: 'Kidney hydration and filtration educational diagram',
+      position: 'center',
+    },
     color: 'blue',
   },
   {
@@ -199,19 +268,29 @@ export const ORGANS: Organ[] = [
     x: 42,
     y: 42,
     tagline: 'Performance Depends on Cellular Energy',
-    description:
+    sidePanelCopy: [
       'During intense activity, muscles generate metabolic waste and oxidative stress. Hydration supports circulation, recovery, and energy production.',
-    hydrationImpact:
-      'Athletes and active individuals often focus on recovery support, reduced fatigue, endurance, cellular hydration, and mitochondrial performance.',
-    oxidativeImpact:
-      'Healthy hydration helps the body manage physical stress more efficiently.',
-    recovery:
-      'Hydration connects circulation, energy production, and the recovery systems active after training or daily exertion.',
+    ],
+    supportIntro: 'Athletes and active individuals often focus on:',
+    supportBullets: [
+      'Recovery support',
+      'Reduced fatigue',
+      'Endurance',
+      'Cellular hydration',
+      'Mitochondrial performance',
+    ],
+    closingCopy: ['Healthy hydration helps the body manage physical stress more efficiently.'],
     microCta: 'Hydrate Recovery at the Cellular Level',
     metrics: [
-      { label: 'Recovery', value: 'Cellular' },
-      { label: 'Energy', value: 'ATP' },
+      { label: 'Recovery', value: 'Support' },
+      { label: 'Energy', value: 'Cellular' },
+      { label: 'Endurance', value: 'Focus' },
     ],
+    image: {
+      src: '/organ-panels/muscles-recovery.jpg',
+      alt: 'Muscle cell hydration educational diagram',
+      position: 'center',
+    },
     color: 'blue',
   },
   {
@@ -221,19 +300,21 @@ export const ORGANS: Organ[] = [
     x: 48.5,
     y: 72,
     tagline: 'Movement Depends on Hydration',
-    description:
-      'Joints rely on hydration for lubrication, mobility, and shock absorption.',
-    hydrationImpact:
-      'Healthy hydration may support joint comfort, flexibility, cartilage function, mobility, and recovery after movement.',
-    oxidativeImpact:
-      'Oxidative stress and aging may affect joint performance over time.',
-    recovery:
-      'Supporting mobility from within starts with the fluid balance that helps joints move comfortably.',
+    sidePanelCopy: ['Joints rely on hydration for lubrication, mobility, and shock absorption.'],
+    supportIntro: 'Healthy hydration may support:',
+    supportBullets: ['Joint comfort', 'Flexibility', 'Cartilage function', 'Mobility', 'Recovery after movement'],
+    closingCopy: ['Oxidative stress and aging may affect joint performance over time.'],
     microCta: 'Support Mobility From Within',
     metrics: [
       { label: 'Mobility', value: 'Support' },
-      { label: 'Cartilage', value: 'Hydration' },
+      { label: 'Cartilage', value: 'Function' },
+      { label: 'Comfort', value: 'Joint' },
     ],
+    image: {
+      src: '/organ-panels/joints-cartilage.jpg',
+      alt: 'Joint cartilage anatomy educational image',
+      position: 'center',
+    },
     color: 'gold',
   },
   {
@@ -243,19 +324,28 @@ export const ORGANS: Organ[] = [
     x: 62,
     y: 36,
     tagline: 'Hydration You Can See',
-    description:
+    sidePanelCopy: [
       'The skin reflects internal hydration and cellular balance. Proper hydration supports elasticity, circulation, and healthy skin appearance.',
-    hydrationImpact:
-      'Healthy hydration may help support skin moisture balance, recovery from oxidative stress, cellular renewal, and healthy aging routines.',
-    oxidativeImpact:
-      'The appearance of healthy skin often begins at the cellular level, where hydration and oxidative balance shape resilience.',
-    recovery:
-      'A daily hydration protocol supports the internal conditions behind visible radiance.',
+    ],
+    supportIntro: 'Healthy hydration may help support:',
+    supportBullets: [
+      'Skin moisture balance',
+      'Recovery from oxidative stress',
+      'Cellular renewal',
+      'Healthy aging routines',
+    ],
+    closingCopy: ['The appearance of healthy skin often begins at the cellular level.'],
     microCta: 'Radiance Starts Within',
     metrics: [
       { label: 'Moisture', value: 'Skin' },
-      { label: 'Renewal', value: 'Support' },
+      { label: 'Renewal', value: 'Cellular' },
+      { label: 'Aging', value: 'Healthy' },
     ],
+    image: {
+      src: '/organ-panels/skin-aging.jpg',
+      alt: 'Young skin and aged skin educational diagram',
+      position: 'center',
+    },
     color: 'gold',
   },
   {
@@ -265,19 +355,27 @@ export const ORGANS: Organ[] = [
     x: 48.5,
     y: 58,
     tagline: 'The Power Source of Human Performance',
-    description:
-      'Mitochondria produce ATP, the energy currency used by every cell in the body.',
-    hydrationImpact:
-      'Researchers studying DDW are exploring its potential role in supporting cellular energy production, metabolic efficiency, and mitochondrial performance.',
-    oxidativeImpact:
-      'DDW research also focuses on oxidative balance, one of the cellular conditions tied to performance and recovery systems.',
-    recovery:
-      'Every heartbeat, thought, movement, and recovery process depends on cellular energy.',
+    sidePanelCopy: ['Mitochondria produce ATP, the energy currency used by every cell in the body.'],
+    supportIntro: 'Researchers studying DDW are exploring its potential role in supporting:',
+    supportBullets: [
+      'Cellular energy production',
+      'Oxidative balance',
+      'Metabolic efficiency',
+      'Recovery systems',
+      'Mitochondrial performance',
+    ],
+    closingCopy: ['Every heartbeat, thought, movement, and recovery process depends on cellular energy.'],
     microCta: 'Support Energy at the Source',
     metrics: [
       { label: 'Energy', value: 'ATP' },
+      { label: 'Efficiency', value: 'Metabolic' },
       { label: 'DDW', value: '5', unit: 'ppm' },
     ],
+    image: {
+      src: '/organ-panels/mitochondria-atp.jpg',
+      alt: 'ATP power of the cell educational diagram',
+      position: 'center',
+    },
     color: 'green',
   },
 ];

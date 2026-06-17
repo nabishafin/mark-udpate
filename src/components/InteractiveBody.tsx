@@ -22,7 +22,7 @@ const COLOR_MAP = {
     glow: 'rgba(94,230,181,0.7)'
   }
 } as const;
-// Recalibrated for the 16:9 video frame
+// Calibrated against the rendered 16:9 anatomy video frame.
 const HOTSPOT_POSITIONS: Record<
   string,
   {
@@ -32,51 +32,51 @@ const HOTSPOT_POSITIONS: Record<
 {
   brain: {
     x: 50,
-    y: 10
+    y: 9.6
   },
   eyes: {
     x: 50,
-    y: 13
+    y: 12.6
   },
   mouth: {
     x: 50,
-    y: 17
+    y: 15.4
   },
   heart: {
-    x: 50.5,
-    y: 28
+    x: 50.2,
+    y: 27.6
   },
   lungs: {
-    x: 52.5,
-    y: 28
+    x: 48.4,
+    y: 25.4
   },
   liver: {
-    x: 48.5,
-    y: 38
+    x: 48.2,
+    y: 37.2
   },
   gut: {
     x: 50,
-    y: 45
+    y: 44.2
   },
   kidneys: {
-    x: 52,
-    y: 42
+    x: 52.5,
+    y: 40.8
   },
   joints: {
-    x: 48.5,
-    y: 72
+    x: 52.4,
+    y: 72.2
   },
   muscles: {
-    x: 42,
-    y: 42
+    x: 42.4,
+    y: 31.4
   },
   skin: {
-    x: 62,
-    y: 36
+    x: 57.8,
+    y: 34.8
   },
   mitochondria: {
-    x: 48.5,
-    y: 58
+    x: 50.4,
+    y: 57.8
   }
 };
 const BODY_VID = "/Human.webm";
@@ -217,6 +217,36 @@ export function InteractiveBody({ onSelect, active }: Props) {
                   height: isHover ? 4 : 3,
                   opacity: 0.95
                 }} />
+
+              <motion.span
+                initial={false}
+                animate={{
+                  opacity: isHover ? 1 : 0,
+                  y: isHover ? -104 : -92,
+                  scale: isHover ? 1 : 0.94
+                }}
+                transition={{ duration: 0.18 }}
+                className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-56 -translate-x-1/2 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[#06131a]/92 text-left shadow-[0_22px_70px_-28px_rgba(63,184,255,0.85)] backdrop-blur-md"
+              >
+                <span className="flex gap-3 p-2.5">
+                  <span className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+                    <img
+                      src={organ.image?.src ?? '/brand/logo.png'}
+                      alt={organ.image?.alt ?? `${organ.name} preview`}
+                      className="h-full w-full object-cover"
+                      style={{ objectPosition: organ.image?.position ?? 'center' }}
+                    />
+                  </span>
+                  <span className="min-w-0 py-1">
+                    <span className="block text-[11px] font-semibold leading-tight text-white">
+                      {organ.name}
+                    </span>
+                    <span className="mt-1.5 block text-[10px] leading-snug text-cyan-100/68">
+                      {organ.tagline}
+                    </span>
+                  </span>
+                </span>
+              </motion.span>
               
             </button>);
 

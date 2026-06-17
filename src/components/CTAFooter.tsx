@@ -1,16 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Hexagon, Instagram, Music2, Youtube } from 'lucide-react';
-import { Particles } from './Particles';
+import { ArrowRight, Instagram, Music2, Youtube } from 'lucide-react';
+
+const FINAL_CTA_TITLE = 'Explore the Human Body Like Never Before';
+const FINAL_CTA_BODY =
+  'Every system in the body depends on hydration, energy, circulation, and cellular balance. Discover how advanced hydration may support performance, recovery, and healthy aging from the inside out.';
 
 export function CTAFooter() {
   return (
-    <footer id="contact" className="relative overflow-hidden">
+    <footer className="relative overflow-hidden">
       <section className="hpe-section relative">
-        <div className="absolute inset-0 hpe-grid opacity-30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[700px] hpe-glow-cyan opacity-40" />
-        <Particles count={32} />
-
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -18,48 +17,52 @@ export function CTAFooter() {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.8 }}
           >
-            <div className="hpe-hud-label mb-5">08 - Begin</div>
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.02]">
-              <span className="hpe-text-chrome">Begin your</span>
+            <div className="hpe-hud-label mb-5">Human Body Experience</div>
+            <h2
+              aria-label={FINAL_CTA_TITLE}
+              className="text-4xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.02]"
+            >
+              <span className="hpe-text-chrome">Explore the Human Body</span>
               <br />
               <span style={{ color: '#3FB8FF', textShadow: '0 0 32px rgba(63,184,255,0.5)' }}>
-                hydration journey.
+                Like Never Before
               </span>
             </h2>
-            <p className="mt-6 text-white/65 text-lg max-w-2xl mx-auto leading-relaxed">
+            <p aria-label={FINAL_CTA_BODY} className="mt-6 text-white/65 text-lg max-w-2xl mx-auto leading-relaxed">
               Every system in the body depends on hydration, energy, circulation,
-              and cellular balance. Discover Mdrn-Life DDW in verified 5 ppm Glass
-              and PET Plastic formats.
+              and cellular balance. Discover how advanced hydration may support
+              performance, recovery, and healthy aging from the inside out.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              <a href="/science/lab-testing" className="hpe-btn-ghost rounded-xl px-6 py-3.5 text-sm font-medium tracking-wide">
+                Explore the Science
+              </a>
               <a
-                href="#products"
+                href="/products"
                 className="hpe-btn-primary rounded-xl px-6 py-3.5 text-sm font-medium tracking-wide inline-flex items-center gap-2"
               >
                 Discover Mdrn-Life DDW
                 <ArrowRight size={14} />
               </a>
-              <a href="#science/lab-testing" className="hpe-btn-ghost rounded-xl px-6 py-3.5 text-sm font-medium tracking-wide">
-                Explore the Science
+              <a href="/explore-the-body" className="hpe-btn-ghost rounded-xl px-6 py-3.5 text-sm font-medium tracking-wide">
+                Begin Your Hydration Journey
               </a>
             </div>
           </motion.div>
         </div>
       </section>
 
-      <div className="relative border-t border-white/5 py-12">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+      <section className="relative py-12">
+        <div className="max-w-7xl mx-auto px-6 grid gap-8 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <span
-                className="relative w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{
-                  background: 'linear-gradient(180deg, rgba(63,184,255,0.25), rgba(63,184,255,0.05))',
-                  border: '1px solid rgba(63,184,255,0.4)',
-                  boxShadow: '0 0 20px -4px rgba(63,184,255,0.5)',
-                }}
-              >
-                <Hexagon size={16} className="text-cyan-300" strokeWidth={1.6} />
+              <span className="relative flex h-12 items-center">
+                <span className="absolute inset-0 rounded-full bg-cyan-300/20 blur-xl" />
+                <img
+                  src="/brand/logo.png"
+                  alt="Mdrn-Life DDW"
+                  className="relative h-11 w-auto object-contain drop-shadow-[0_0_18px_rgba(63,184,255,0.32)]"
+                />
               </span>
               <div className="flex flex-col leading-none">
                 <span className="text-white font-medium tracking-tight">Mdrn-Life</span>
@@ -95,19 +98,19 @@ export function CTAFooter() {
           <FooterCol
             title="Explore"
             links={[
-              ['Interactive Body', '#body'],
-              ['DDW Science', '#science'],
-              ['Lab Testing', '#science/lab-testing'],
-              ['Systems', '#systems'],
+              ['Interactive Body', '/explore-the-body'],
+              ['DDW Science', '/science'],
+              ['Lab Testing', '/science/lab-testing'],
+              ['Healthy Aging', '/healthy-aging'],
             ]}
           />
 
           <FooterCol
             title="Shop"
             links={[
-              ['Glass Bottles', '#products'],
-              ['PET Plastic Bottles', '#products'],
-              ['5 ppm DDW', '#products'],
+              ['Glass Bottles', '/products'],
+              ['PET Plastic Bottles', '/products'],
+              ['5 ppm DDW', '/products'],
               ['Current Store', 'https://mdrnlifeddw.com/collections/mdrn-life-ddw'],
             ]}
           />
@@ -115,19 +118,17 @@ export function CTAFooter() {
           <FooterCol
             title="Company"
             links={[
-              ['Research', '#research'],
-              ['Contact', '#contact'],
-              ['Privacy', 'https://mdrnlifeddw.com/policies/privacy-policy'],
-              ['Terms', 'https://mdrnlifeddw.com/policies/terms-of-service'],
+              ['Research', '/research'],
+              ['Contact', '/contact'],
             ]}
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 mt-10 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
+        <div className="max-w-7xl mx-auto px-6 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
           <div className="font-mono">© 2026 MDRN-LIFE DDW</div>
           <div className="font-mono">5 PPM - GLASS AND PET PLASTIC</div>
         </div>
-      </div>
+      </section>
     </footer>
   );
 }

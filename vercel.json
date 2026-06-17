@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!assets/|products/|organ-panels/|favicon.svg).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

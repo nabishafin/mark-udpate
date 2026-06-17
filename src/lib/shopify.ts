@@ -4,15 +4,11 @@ export type ShopifyProductConfig = {
   productUrl: string;
   variantId?: string;
   quantity?: number;
-  subscriptionCheckoutUrl?: string;
 };
 
-export type ShopifyLinks = {
-  productUrl: string;
-  buyNowUrl: string;
-  addToCartUrl: string;
-  subscriptionCheckoutUrl: string;
-  isCheckoutReady: boolean;
+export type ShopifyCheckoutItem = {
+  variantId?: string;
+  quantity: number;
 };
 
 const DEFAULT_STORE_DOMAIN = 'mdrnlifeddw.com';
@@ -32,22 +28,19 @@ function appendTracking(url: URL, source: string) {
   return url.toString();
 }
 
-export function buildShopifyCartPermalink(variantId: string, quantity = 1, source = 'buy_button') {
-  const url = new URL(`https://${getStoreDomain()}/cart/${variantId}:${quantity}`);
+function normalizeQuantity(quantity: number) {
+  return Math.max(1, Math.floor(quantity || 1));
+}
+
+export function buildShopifyCheckoutUrl(items: ShopifyCheckoutItem[], source = 'cart_checkout') {
+  const cartLines = items
+    .filter((item) => item.variantId)
+    .map((item) => `${item.variantId}:${normalizeQuantity(item.quantity)}`);
+
+  const url = new URL(`https://${getStoreDomain()}/cart/${cartLines.join(',')}`);
   return appendTracking(url, source);
 }
 
-export function getShopifyLinks(product: ShopifyProductConfig): ShopifyLinks {
-  const quantity = product.quantity ?? 1;
-  const checkoutUrl = product.variantId
-    ? buildShopifyCartPermalink(product.variantId, quantity, 'product_cta')
-    : product.productUrl;
-
-  return {
-    productUrl: product.productUrl,
-    buyNowUrl: checkoutUrl,
-    addToCartUrl: checkoutUrl,
-    subscriptionCheckoutUrl: product.subscriptionCheckoutUrl || product.productUrl,
-    isCheckoutReady: Boolean(product.variantId),
-  };
+export function hasCheckoutVariants(items: ShopifyCheckoutItem[]) {
+  return items.length > 0 && items.every((item) => Boolean(item.variantId));
 }

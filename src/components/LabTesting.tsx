@@ -1,38 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Beaker, FileCheck2, ShieldCheck } from 'lucide-react';
-import { Particles } from './Particles';
+import { ArrowRight, Award, Beaker, ChevronDown, FileCheck2, ShieldCheck } from 'lucide-react';
+import { LAB_FAQS } from '../lib/seo';
 
 const RESULTS = [
-  { label: 'Mdrn-Life DDW', value: '5 ppm', detail: 'Batch-specific target' },
-  { label: 'Tap water baseline', value: '~150 ppm', detail: 'Typical drinking water' },
-  { label: 'Standard bottled water', value: '~145 ppm', detail: 'Common market range' },
-];
-
-const FAQS = [
-  {
-    q: 'Is deuterium depleted water the same as hydrogen water?',
-    a: 'No. Hydrogen water is regular water infused with dissolved molecular hydrogen. Deuterium-depleted water is processed to reduce the heavy hydrogen isotope concentration from typical drinking-water levels to a lower ppm target.',
-  },
-  {
-    q: 'How do I know my DDW is actually 5 ppm?',
-    a: 'Mdrn-Life DDW presents independent verification from Hydroisotop GmbH and the USGS Reston Stable Isotope Lab using isotope analysis methods including Isotope Ratio Mass Spectrometry.',
-  },
-  {
-    q: 'What labs test deuterium levels in water?',
-    a: 'Specialized stable isotope laboratories test deuterium levels. The client SEO brief names Hydroisotop GmbH in Germany and the USGS Reston Stable Isotope Lab in the United States.',
-  },
-  {
-    q: 'Where can I buy independently tested deuterium depleted water?',
-    a: 'Mdrn-Life DDW is available through the current product collection in glass bottles and PET plastic bottles, with internal links provided from this experience.',
-  },
+  { label: 'Mdrn-Life DDW', value: '5 ppm', detail: 'Batch-specific target', width: '6%' },
+  { label: 'Tap water baseline', value: '~150 ppm', detail: 'Typical drinking water', width: '96%' },
+  { label: 'Standard bottled water', value: '~145 ppm', detail: 'Common market range', width: '92%' },
+  { label: 'Competitor claims', value: 'Varies', detail: 'Often missing public batch proof', width: '58%' },
 ];
 
 const LAB_SCHEMA = [
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: FAQS.map((faq) => ({
+    mainEntity: LAB_FAQS.map((faq) => ({
       '@type': 'Question',
       name: faq.q,
       acceptedAnswer: {
@@ -44,7 +26,7 @@ const LAB_SCHEMA = [
   {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: 'Why Independent Lab Testing Makes Mdrn-Life DDW the World\'s Most Verified Deuterium-Depleted Water',
+    headline: "Why Independent Lab Testing Makes Mdrn-Life DDW the World's Most Verified Deuterium-Depleted Water",
     description:
       'Every batch of Mdrn-Life DDW is verified by Hydroisotop GmbH and USGS Reston Stable Isotope Lab using isotope testing. See the results and what they mean.',
     url: 'https://mdrnlifeddw.com/science/lab-testing',
@@ -67,6 +49,8 @@ const LAB_SCHEMA = [
 ];
 
 export function LabTesting() {
+  const [openFaq, setOpenFaq] = useState(0);
+
   return (
     <section id="science/lab-testing" className="hpe-section relative overflow-hidden">
       {LAB_SCHEMA.map((schema) => (
@@ -76,10 +60,6 @@ export function LabTesting() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
-      <div className="absolute inset-0 hpe-grid opacity-25" />
-      <div className="absolute left-1/2 top-0 h-[620px] w-[920px] -translate-x-1/2 hpe-glow-cyan opacity-25" />
-      <Particles count={18} color="rgba(94,230,181,0.36)" />
-
       <div className="relative z-10 mx-auto max-w-7xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -89,109 +69,244 @@ export function LabTesting() {
           className="max-w-4xl"
         >
           <div className="hpe-hud-label mb-3" style={{ color: '#5EE6B5' }}>
-            03 - Lab Testing
+            Lab Testing
           </div>
           <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.05]">
-            <span className="hpe-text-chrome">Why independent lab testing makes</span>
+            <span className="hpe-text-chrome">Why independent lab testing makes Mdrn-Life DDW</span>
             <br />
-            <span className="text-white/80">Mdrn-Life DDW verifiable.</span>
+            <span className="text-white/80">the world's most verified deuterium-depleted water.</span>
           </h2>
           <p className="mt-5 max-w-3xl text-white/65 text-base sm:text-lg leading-relaxed">
-            The wellness water market is crowded with unverified claims. Mdrn-Life DDW
-            turns verification into the standard: 5 ppm deuterium results, independent
-            review, and a clear explanation of what the lab data means for cellular
-            hydration and performance.
+            The lab testing page follows the client SEO outline directly: market
+            skepticism, what deuterium testing measures, the independent labs,
+            batch transparency, what the results mean, and a schema-ready FAQ.
           </p>
         </motion.div>
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="hpe-glass rounded-2xl p-6 sm:p-8">
+        <div className="mt-12 space-y-6">
+          <OutlineSection eyebrow="The Problem With Unverified Claims" title="Consumers are right to be skeptical.">
+            <p>
+              The supplement and wellness water industry is full of unverified
+              claims. Consumers and practitioners need proof before trusting a
+              product that makes scientific claims.
+            </p>
+            <p>
+              Mdrn-Life DDW chose independent verification from day one because
+              verification is a scientific obligation, not a marketing move.
+            </p>
+          </OutlineSection>
+
+          <OutlineSection eyebrow="What Deuterium Testing Actually Measures" title="Deuterium ppm, IRMS, and the 5 ppm result.">
+            <DeuteriumMeasurement />
+            <p>
+              Deuterium testing measures the ratio of hydrogen isotopes in water
+              and reports the result in parts per million. Isotope Ratio Mass
+              Spectrometry gives a clear way to verify whether a batch reaches
+              the 5 ppm target.
+            </p>
+            <p>
+              In simple terms, deuterium is heavier hydrogen. The Mdrn-Life DDW
+              science story connects that measurement to the ATP Synthase analogy:
+              lighter hydrogen movement supports the cellular energy story in a
+              way shoppers can understand without losing the science.
+            </p>
+          </OutlineSection>
+
+          <article className="hpe-glass rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3">
               <ShieldCheck className="text-emerald-300" size={22} />
-              <h3 className="text-2xl font-medium text-white">Meet the verification labs</h3>
+              <div>
+                <div className="hpe-hud-label" style={{ color: '#5EE6B5' }}>
+                  Meet the Labs
+                </div>
+                <h3 className="mt-2 text-2xl font-medium text-white">Hydroisotop GmbH and USGS Reston Stable Isotope Lab</h3>
+              </div>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <LabCard
                 icon={<Award size={18} />}
                 title="Hydroisotop GmbH"
-                body="Germany-based stable isotope specialists named by the client as an independent third-party validation source for Mdrn-Life DDW."
+                body="Hydroisotop GmbH is presented as an independent stable-isotope specialist used to verify deuterium and isotope ratios for Mdrn-Life DDW."
+                proof="Add the actual Hydroisotop batch PDF here when the client provides the file."
               />
               <LabCard
                 icon={<FileCheck2 size={18} />}
                 title="USGS Reston Stable Isotope Lab"
-                body="A United States federal stable isotope laboratory referenced in the SEO brief for independent deuterium verification."
+                body="USGS Reston Stable Isotope Lab is presented as a United States institutional lab reference for deuterium and isotope-ratio validation."
+                proof="Add the actual USGS Reston batch PDF here when the client provides the file."
               />
             </div>
-            <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.04] p-5">
-              <div className="hpe-hud-label mb-2" style={{ color: '#5EE6B5' }}>
-                Method
-              </div>
-              <p className="text-sm leading-relaxed text-white/70">
-                Deuterium concentration is evaluated with stable isotope testing,
-                including Isotope Ratio Mass Spectrometry. This measures the ratio of
-                hydrogen isotopes in water and reports the result in parts per million,
-                making the 5 ppm target easy to compare against ordinary water.
-              </p>
-            </div>
-          </div>
+          </article>
 
-          <div className="hpe-glass rounded-2xl p-6 sm:p-8">
+          <article className="hpe-glass rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3">
               <Beaker className="text-cyan-300" size={22} />
-              <h3 className="text-2xl font-medium text-white">Batch transparency</h3>
-            </div>
-            <div className="mt-6 space-y-3">
-              {RESULTS.map((row) => (
-                <div key={row.label} className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <div>
-                    <div className="text-sm font-medium text-white">{row.label}</div>
-                    <div className="mt-1 text-xs text-white/45">{row.detail}</div>
-                  </div>
-                  <div className="font-mono text-lg text-cyan-200">{row.value}</div>
+              <div>
+                <div className="hpe-hud-label" style={{ color: '#5EE6B5' }}>
+                  Batch-by-Batch Transparency
                 </div>
+                <h3 className="mt-2 text-2xl font-medium text-white">5 ppm shown against ordinary water benchmarks.</h3>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {RESULTS.map((row, index) => (
+                <motion.div
+                  key={row.label}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.45, delay: index * 0.08 }}
+                  className="rounded-xl border border-white/10 bg-white/[0.04] p-4"
+                >
+                  <div className="text-sm font-medium text-white">{row.label}</div>
+                  <div className="mt-3 font-mono text-2xl text-cyan-200">{row.value}</div>
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+                    <motion.div
+                      className={row.label === 'Mdrn-Life DDW' ? 'h-full bg-cyan-300' : 'h-full bg-amber-200/80'}
+                      initial={{ width: 0 }}
+                      whileInView={{ width: row.width }}
+                      viewport={{ once: true, margin: '-60px' }}
+                      transition={{ duration: 0.9, delay: 0.15 + index * 0.08 }}
+                    />
+                  </div>
+                  <div className="mt-2 text-xs leading-relaxed text-white/45">{row.detail}</div>
+                </motion.div>
               ))}
             </div>
-            <p className="mt-5 text-sm leading-relaxed text-white/65">
-              This content gives search engines and buyers the same answer: Mdrn-Life DDW
-              is positioned as the independently verified 5 ppm option among deuterium
-              depleted water brands.
+          </article>
+
+          <OutlineSection eyebrow="What This Means for You" title="Verification connected to energy, recovery, and cellular performance.">
+            <p>
+              The test results support the broader science story without replacing
+              it with unsupported promises. The verified 5 ppm positioning connects
+              back to energy, recovery, cellular hydration, and performance in a
+              compliance-friendly way.
             </p>
-          </div>
-        </div>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a href="/benefits" className="hpe-btn-ghost rounded-xl px-5 py-3 text-sm font-medium tracking-wide">
+                Explore benefits
+              </a>
+              <a href="/products" className="hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
+                See the full lab report - then try it risk-free for 30 days
+                <ArrowRight size={14} />
+              </a>
+            </div>
+          </OutlineSection>
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-4">
-          {FAQS.map((faq) => (
-            <article key={faq.q} className="hpe-glass rounded-2xl p-5">
-              <h3 className="text-base font-medium leading-snug text-white">{faq.q}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/60">{faq.a}</p>
-            </article>
-          ))}
-        </div>
-
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <a href="#products" className="hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide">
-            Try it risk-free for 30 days
-          </a>
-          <a href="#science" className="hpe-btn-ghost rounded-xl px-5 py-3 text-sm font-medium tracking-wide">
-            Explore the science
-          </a>
+          <article className="hpe-glass rounded-2xl p-6 sm:p-8">
+            <div className="hpe-hud-label mb-3" style={{ color: '#5EE6B5' }}>
+              FAQ Block
+            </div>
+            <h3 className="text-2xl font-medium text-white">Schema-ready answers for long-tail DDW searches.</h3>
+            <div className="mt-6 space-y-3">
+              {LAB_FAQS.map((faq, index) => (
+                <motion.article
+                  key={faq.q}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.45, delay: index * 0.04 }}
+                  className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.035]"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
+                    className="flex w-full items-center justify-between gap-4 p-5 text-left"
+                    aria-expanded={openFaq === index}
+                  >
+                    <span className="text-base font-medium leading-snug text-white">{faq.q}</span>
+                    <motion.span animate={{ rotate: openFaq === index ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                      <ChevronDown size={18} className="text-cyan-200" />
+                    </motion.span>
+                  </button>
+                  <motion.div
+                    initial={false}
+                    animate={{ height: openFaq === index ? 'auto' : 0, opacity: openFaq === index ? 1 : 0 }}
+                    transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-5 pb-5 text-sm leading-relaxed text-white/60">{faq.a}</p>
+                  </motion.div>
+                </motion.article>
+              ))}
+            </div>
+          </article>
         </div>
       </div>
     </section>
   );
 }
 
-function LabCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+function DeuteriumMeasurement() {
+  return (
+    <div className="mb-6 grid gap-3 sm:grid-cols-3">
+      {[
+        ['Sample', 'Water batch'],
+        ['Measure', 'Hydrogen isotope ratio'],
+        ['Verify', '5 ppm result'],
+      ].map(([label, value], index) => (
+        <motion.div
+          key={label}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.45, delay: index * 0.08 }}
+          className="rounded-xl border border-cyan-300/15 bg-cyan-300/[0.045] p-4"
+        >
+          <div className="hpe-hud-label" style={{ color: '#5EE6B5', fontSize: 9 }}>
+            {label}
+          </div>
+          <div className="mt-2 text-sm font-medium text-white">{value}</div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function OutlineSection({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <article className="hpe-glass rounded-2xl p-6 sm:p-8">
+      <div className="hpe-hud-label mb-3" style={{ color: '#5EE6B5' }}>
+        {eyebrow}
+      </div>
+      <h3 className="text-2xl font-medium text-white">{title}</h3>
+      <div className="mt-4 space-y-4 text-sm leading-relaxed text-white/65">{children}</div>
+    </article>
+  );
+}
+
+function LabCard({
+  icon,
+  title,
+  body,
+  proof,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+  proof: string;
+}) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.04] p-5">
       <div className="mb-3 flex items-center gap-2 text-cyan-200">
         {icon}
         <div className="hpe-hud-label" style={{ color: '#5EE6B5' }}>
-          Independent
+          Independent Verification
         </div>
       </div>
-      <h3 className="text-lg font-medium text-white">{title}</h3>
+      <h4 className="text-lg font-medium text-white">{title}</h4>
       <p className="mt-2 text-sm leading-relaxed text-white/60">{body}</p>
+      <div className="mt-4 rounded-lg border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-xs leading-relaxed text-cyan-100/75">
+        {proof}
+      </div>
     </div>
   );
 }

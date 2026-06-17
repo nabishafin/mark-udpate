@@ -51,9 +51,6 @@ const FEATURED = [
 export function OrganShowcase({ onSelectOrgan }: Props) {
   return (
     <section id="systems" className="hpe-section relative overflow-hidden">
-      <div className="absolute inset-0 hpe-grid opacity-30" />
-      <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[900px] h-[500px] hpe-glow-cyan opacity-25" />
-
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -62,14 +59,13 @@ export function OrganShowcase({ onSelectOrgan }: Props) {
           transition={{ duration: 0.7 }}
           className="max-w-3xl"
         >
-          <div className="hpe-hud-label mb-3">06 - Systems</div>
           <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.05]">
             <span className="text-white/80">Every system,</span>{' '}
             <span className="hpe-text-chrome">mapped to hydration.</span>
           </h2>
           <p className="mt-5 text-white/60 text-base sm:text-lg leading-relaxed">
-            Click any system below to inspect the client-provided side-panel copy,
-            hydration support message, and conversion CTA.
+            Click any system below to inspect the hydration support message,
+            educational body content, and available conversion CTA.
           </p>
         </motion.div>
 
