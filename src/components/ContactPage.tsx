@@ -1,6 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Send } from 'lucide-react';
+import { Mail, MapPin, Phone, Send } from 'lucide-react';
+
+const CONTACT_DETAILS = [
+  {
+    icon: Phone,
+    title: 'Phone',
+    value: '(888) 391-8023',
+    href: 'tel:+18883918023',
+  },
+  {
+    icon: Mail,
+    title: 'Email',
+    value: 'Support@orisefinance.com',
+    href: 'mailto:Support@orisefinance.com',
+  },
+  {
+    icon: MapPin,
+    title: 'Address',
+    value: '1436 E Atlantic Blvd Unit C, Pompano Beach, FL 33060',
+    href: 'https://www.google.com/maps/search/?api=1&query=1436%20E%20Atlantic%20Blvd%20Unit%20C%2C%20Pompano%20Beach%2C%20FL%2033060',
+  },
+];
 
 export function ContactPage() {
   return (
@@ -37,19 +58,30 @@ export function ContactPage() {
               Send the Mdrn-Life team a message.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/62">
-              Use the form for product questions, lab-report requests, wholesale
-              inquiries, subscription support, or practitioner conversations.
+              Use the form for product questions, wholesale inquiries,
+              subscription support, or practitioner conversations.
             </p>
             <div className="mt-8 grid gap-3">
-              {[
-                ['Product questions', 'Glass, PET, 5 ppm DDW, usage, and product details.'],
-                ['Lab report requests', 'Hydroisotop GmbH, USGS Reston, and verification questions.'],
-                ['Partnerships', 'Wholesale, practitioner, and performance-focused inquiries.'],
-              ].map(([title, body]) => (
-                <div key={title} className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <h2 className="text-sm font-medium text-white">{title}</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-white/50">{body}</p>
-                </div>
+              {CONTACT_DETAILS.map(({ icon: Icon, title, value, href }) => (
+                <a
+                  key={title}
+                  href={href}
+                  target={title === 'Address' ? '_blank' : undefined}
+                  rel={title === 'Address' ? 'noreferrer' : undefined}
+                  className="group rounded-xl border border-white/10 bg-white/[0.04] p-4 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.055]"
+                >
+                  <div className="flex gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.07] text-cyan-200 transition group-hover:text-white">
+                      <Icon size={17} />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-medium text-white">{title}</span>
+                      <span className="mt-1.5 block text-sm leading-relaxed text-white/58 transition group-hover:text-white/78">
+                        {value}
+                      </span>
+                    </span>
+                  </div>
+                </a>
               ))}
             </div>
           </motion.div>

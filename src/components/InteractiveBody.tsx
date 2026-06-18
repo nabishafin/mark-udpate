@@ -226,18 +226,18 @@ export function InteractiveBody({ onSelect, active }: Props) {
                   scale: isHover ? 1 : 0.94
                 }}
                 transition={{ duration: 0.18 }}
-                className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-56 -translate-x-1/2 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[#06131a]/92 text-left shadow-[0_22px_70px_-28px_rgba(63,184,255,0.85)] backdrop-blur-md"
+                className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-72 -translate-x-1/2 overflow-hidden rounded-2xl border border-cyan-200/25 bg-white/[0.055] text-left shadow-[0_22px_70px_-28px_rgba(63,184,255,0.85)] backdrop-blur-md"
               >
-                <span className="flex gap-3 p-2.5">
-                  <span className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+                <span className="block p-2.5">
+                  <span className="block aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
                     <img
                       src={organ.image?.src ?? '/brand/logo.png'}
                       alt={organ.image?.alt ?? `${organ.name} preview`}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                       style={{ objectPosition: organ.image?.position ?? 'center' }}
                     />
                   </span>
-                  <span className="min-w-0 py-1">
+                  <span className="mt-2 block min-w-0 px-1 pb-1">
                     <span className="block text-[11px] font-semibold leading-tight text-white">
                       {organ.name}
                     </span>

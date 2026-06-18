@@ -230,6 +230,12 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   assert.doesNotMatch(footer, /VITE_CONTACT_FORM_ENDPOINT/);
   assert.match(contact, /Contact Mdrn-Life DDW/);
   assert.match(contact, /Questions about 5 ppm DDW, lab reports, wholesale, subscriptions,\s+or practitioner support/);
+  assert.match(contact, /\(888\) 391-8023/);
+  assert.match(contact, /Support@orisefinance\.com/);
+  assert.match(contact, /1436 E Atlantic Blvd Unit C, Pompano Beach, FL 33060/);
+  assert.doesNotMatch(contact, /Lab report requests/);
+  assert.doesNotMatch(contact, /Hydroisotop GmbH, USGS Reston, and verification questions/);
+  assert.doesNotMatch(footer, /Current Store/);
   assert.match(contact, /<motion\.form[\s\S]*name="name"[\s\S]*name="email"[\s\S]*name="message"/);
   assert.match(contact, /VITE_CONTACT_FORM_ENDPOINT/);
   assert.match(app, /case '\/contact':\s*return <ContactPage \/>/);
@@ -480,7 +486,8 @@ test('side panel content matches the client PDF copy and keeps internal labels o
   assert.doesNotMatch(panel, /<a[\s\S]*\{organ\.tagline\}[\s\S]*<\/a>/);
   assert.match(panel, /organ\.microCta &&/);
   assert.match(panel, /organ\.image &&/);
-  assert.doesNotMatch(mouthBlock, /microCta|image:/);
+  assert.doesNotMatch(mouthBlock, /microCta/);
+  assert.match(mouthBlock, /mouth-throat-cellular-absorption\.png/);
   assert.doesNotMatch(lungsBlock, /microCta/);
 });
 
@@ -489,26 +496,27 @@ test('side panel uses real client-PDF organ images instead of abstract generated
   const panel = file('src/components/OrganPanel.tsx');
 
   for (const image of [
-    '/organ-panels/brain-neural.jpg',
-    '/organ-panels/eyes-moisture.jpg',
-    '/organ-panels/heart-circulation.jpg',
-    '/organ-panels/lungs-oxygen.jpg',
-    '/organ-panels/liver-detox.jpg',
-    '/organ-panels/gut-microbiome.jpg',
-    '/organ-panels/kidneys-filtration.jpg',
-    '/organ-panels/muscles-recovery.jpg',
-    '/organ-panels/joints-cartilage.jpg',
-    '/organ-panels/skin-aging.jpg',
-    '/organ-panels/mitochondria-atp.jpg',
+    '/organ-panels/brain-nervous-system.png',
+    '/organ-panels/eyes-visual-system.png',
+    '/organ-panels/mouth-throat-cellular-absorption.png',
+    '/organ-panels/heart-circulation.png',
+    '/organ-panels/lungs-oxygen-delivery.png',
+    '/organ-panels/liver-detox-support.png',
+    '/organ-panels/gut-microbiome.png',
+    '/organ-panels/kidneys-filtration.png',
+    '/organ-panels/muscles-recovery.png',
+    '/organ-panels/joints-cartilage.png',
+    '/organ-panels/skin-healthy-aging.png',
+    '/organ-panels/mitochondria-cellular-energy.png',
   ]) {
     assert.match(organData, new RegExp(`src:\\s*'${image.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
   }
 
-  assert.doesNotMatch(organData, /mouth-absorption\.jpg/);
+  assert.doesNotMatch(organData, /mouth-absorption\.jpg|brain-neural\.jpg|eyes-moisture\.jpg|mitochondria-atp\.jpg/);
   assert.doesNotMatch(organData, /Support Oxygen Delivery From Within/);
   assert.match(panel, /OrganImage/);
   assert.match(panel, /<img/);
-  assert.match(panel, /object-cover/);
+  assert.match(panel, /object-contain/);
   assert.doesNotMatch(panel, /VisualGlyph/);
   assert.doesNotMatch(panel, /viewBox="0 0 420 220"/);
   assert.doesNotMatch(panel, /Live signal/i);

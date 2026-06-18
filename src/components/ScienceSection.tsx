@@ -208,7 +208,7 @@ function ScienceSimulation() {
             {stages.map((stage, index) => (
               <motion.div
                 key={stage.title}
-                className="absolute w-24 rounded-xl border border-white/10 bg-[#06131a]/80 p-2 text-center backdrop-blur"
+                className="absolute w-24 rounded-xl border border-white/10 bg-white/[0.055] p-2 text-center backdrop-blur"
                 style={{
                   left: `${10 + index * 34}%`,
                   top: index === 1 ? '4%' : '74%',

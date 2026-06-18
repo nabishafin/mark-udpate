@@ -198,11 +198,11 @@ function OrganImage({
   image: NonNullable<Organ['image']>;
 }) {
   return (
-    <figure className="mt-6 relative h-48 rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+    <figure className="mt-6 relative aspect-[16/9] w-full rounded-2xl bg-white/[0.04] border border-white/10 overflow-hidden">
       <div
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
-          background: `linear-gradient(180deg, rgba(3,5,8,0.05), rgba(3,5,8,0.28)), radial-gradient(circle at 50% 40%, transparent 35%, ${color.soft} 100%)`,
+          background: `radial-gradient(circle at 50% 40%, transparent 58%, ${color.soft} 100%)`,
           boxShadow: `inset 0 0 0 1px ${color.soft}`,
         }}
       />
@@ -211,10 +211,10 @@ function OrganImage({
         alt={image.alt}
         loading="lazy"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
         style={{
           objectPosition: image.position ?? 'center',
-          filter: 'saturate(0.92) contrast(1.08) brightness(0.82)',
+          filter: 'saturate(1.02) contrast(1.03)',
         }}
       />
     </figure>

@@ -36,7 +36,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           </h1>
 
           <p className="mt-3 text-white/65 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-            Explore how advanced Deuterium Depleted Water Hydration supports the brain, joints, gut,
+            Explore how advanced deuterium-depleted hydration supports the brain, joints, gut,
             energy production, recovery, and healthy aging.
           </p>
         </div>

@@ -81,8 +81,8 @@ export function HealthyAging() {
               Premium DDW for longevity-focused living.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
-              Healthy aging is presented as a daily system: labels, quality,
-              cleaner ingredients, and a routine that compounds over time.
+              Healthy aging is a daily system: labels, quality, cleaner
+              ingredients, and a routine that compounds over time.
             </p>
             <a href="/products" className="mt-8 hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
               Shop Mdrn-Life DDW
@@ -131,8 +131,8 @@ export function HealthyAging() {
                 Small decisions, long-term intent.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/56">
-                The supplied healthy-aging copy is now staged as a lifestyle
-                sequence: choices, intention, 5 PPM hydration, and routine.
+                Long-term wellness is shaped through daily choices, intentional
+                standards, 5 PPM hydration, and routines that keep repeating.
               </p>
             </div>
             <div className="relative space-y-4">
@@ -188,7 +188,7 @@ function LongevityStoryStep({
       transition={{ duration: 0.45, delay: index * 0.08 }}
       className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] p-5 sm:ml-12"
     >
-      <span className="absolute -left-[3.15rem] top-5 hidden h-10 w-10 items-center justify-center rounded-full border border-amber-200/30 bg-[#100d00] font-mono text-xs text-amber-100 sm:flex">
+      <span className="absolute -left-[3.15rem] top-5 hidden h-10 w-10 items-center justify-center rounded-full border border-amber-200/30 bg-amber-200/[0.08] font-mono text-xs text-amber-100 backdrop-blur sm:flex">
         {index + 1}
       </span>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_20%,rgba(229,194,90,0.10),transparent_34%)]" />

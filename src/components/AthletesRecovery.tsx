@@ -93,8 +93,8 @@ export function AthletesRecovery() {
               Advanced hydration for performance-focused living.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
-              The page now translates the client copy into a training-to-recovery
-              flow so athletes understand where DDW belongs in the routine.
+              Hydration belongs inside the performance routine: before training,
+              during demanding days, and through the recovery window.
             </p>
             <a href="/products" className="mt-8 hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
               Shop Performance Hydration
@@ -141,9 +141,8 @@ export function AthletesRecovery() {
                 Training, recovery, routine, standard.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/56">
-                The supplied page copy is preserved as a guided performance
-                system, so users can follow why hydration matters before,
-                during, and after training.
+                Performance is built through repeated signals: training load,
+                energy demand, recovery windows, and the standard you refuse to lower.
               </p>
             </div>
             <div className="relative space-y-4">
@@ -197,7 +196,7 @@ function StorySimulationStep({
       transition={{ duration: 0.45, delay: index * 0.08 }}
       className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] p-5 sm:ml-12"
     >
-      <span className="absolute -left-[3.15rem] top-5 hidden h-10 w-10 items-center justify-center rounded-full border border-cyan-300/30 bg-[#07121a] font-mono text-xs text-cyan-100 sm:flex">
+      <span className="absolute -left-[3.15rem] top-5 hidden h-10 w-10 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-300/[0.08] font-mono text-xs text-cyan-100 backdrop-blur sm:flex">
         {index + 1}
       </span>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_20%,rgba(63,184,255,0.10),transparent_34%)]" />
@@ -330,7 +329,7 @@ function TrainingSimulation() {
             </div>
           </div>
 
-          <div className="relative min-h-[310px] overflow-hidden rounded-2xl border border-white/10 bg-[#061018]/70 p-5">
+          <div className="relative min-h-[310px] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] p-5">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(63,184,255,0.17),transparent_42%)]" />
 
             <div className="relative z-10 flex h-full flex-col justify-between">

@@ -111,7 +111,6 @@ export function CTAFooter() {
               ['Glass Bottles', '/products'],
               ['PET Plastic Bottles', '/products'],
               ['5 ppm DDW', '/products'],
-              ['Current Store', 'https://mdrnlifeddw.com/collections/mdrn-life-ddw'],
             ]}
           />
 
