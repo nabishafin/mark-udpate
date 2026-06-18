@@ -197,7 +197,6 @@ export function LabTesting() {
             <div className="hpe-hud-label mb-3" style={{ color: '#5EE6B5' }}>
               FAQ Block
             </div>
-            <h3 className="text-2xl font-medium text-white">Schema-ready answers for long-tail DDW searches.</h3>
             <div className="mt-6 space-y-3">
               {LAB_FAQS.map((faq, index) => (
                 <motion.article
