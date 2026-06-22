@@ -13,6 +13,12 @@ import { CTAFooter } from './components/CTAFooter';
 import { ContactPage } from './components/ContactPage';
 import { OrganPanel } from './components/OrganPanel';
 import { SeoHead } from './components/SeoHead';
+import { BlogPage } from './components/BlogPage';
+import { BlogArticlePage } from './components/BlogArticlePage';
+import { PolicyPage } from './components/PolicyPage';
+import { FounderPage } from './components/FounderPage';
+import { LearnPage } from './components/LearnPage';
+import { FloatingShopCTA } from './components/FloatingShopCTA';
 import { Organ } from './components/organData';
 
 function normalizePath(pathname: string) {
@@ -86,6 +92,7 @@ export function App() {
         onClose={() => setActiveOrgan(null)}
         onNavigate={handleSelectOrgan}
       />
+      <FloatingShopCTA pathname={pathname} />
     </div>
   );
 }
@@ -94,8 +101,6 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
   switch (pathname) {
     case '/':
       return <HomePage onSelectOrgan={onSelectOrgan} activeId={activeId} />;
-    case '/explore-the-body':
-      return <ExploreBodyPage onSelectOrgan={onSelectOrgan} activeId={activeId} />;
     case '/science':
       return <ScienceSection />;
     case '/science/lab-testing':
@@ -114,9 +119,29 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       return <CartPage />;
     case '/research':
       return <Research />;
+    case '/blogs':
+    case '/blogs/news':
+      return <BlogPage />;
     case '/contact':
       return <ContactPage />;
+    case '/learn':
+      return <LearnPage />;
     default:
+      if (pathname.startsWith('/blogs/news/') && pathname.length > '/blogs/news/'.length) {
+        return <BlogArticlePage handle={pathname.slice('/blogs/news/'.length)} />;
+      }
+      if (pathname.startsWith('/policies/')) {
+        return <PolicyPage slug={pathname.replace('/policies/', '')} />;
+      }
+      if (pathname === '/pages/refund') {
+        return <PolicyPage slug="refund-information" />;
+      }
+      if (pathname === '/founder') {
+        return <FounderPage />;
+      }
+      if (pathname.startsWith('/learn/') && pathname.length > '/learn/'.length) {
+        return <LearnPage slug={pathname.slice('/learn/'.length)} />;
+      }
       return <HomePage onSelectOrgan={onSelectOrgan} activeId={activeId} />;
   }
 }
@@ -133,14 +158,3 @@ function HomePage({
   );
 }
 
-function ExploreBodyPage({
-  onSelectOrgan,
-  activeId,
-}: {
-  onSelectOrgan: (organ: Organ) => void;
-  activeId: string | null;
-}) {
-  return (
-    <Hero onSelectOrgan={onSelectOrgan} activeId={activeId} />
-  );
-}

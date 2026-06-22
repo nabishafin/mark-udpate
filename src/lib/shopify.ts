@@ -9,6 +9,8 @@ export type ShopifyProductConfig = {
 export type ShopifyCheckoutItem = {
   variantId?: string;
   quantity: number;
+  sellingPlanId?: string;
+  purchaseOption?: 'subscription' | 'one-time';
 };
 
 const DEFAULT_STORE_DOMAIN = 'mdrnlifeddw.com';
@@ -38,9 +40,16 @@ export function buildShopifyCheckoutUrl(items: ShopifyCheckoutItem[], source = '
     .map((item) => `${item.variantId}:${normalizeQuantity(item.quantity)}`);
 
   const url = new URL(`https://${getStoreDomain()}/cart/${cartLines.join(',')}`);
+  const sellingPlans = [...new Set(items.map((item) => item.sellingPlanId).filter(Boolean))];
+  if (sellingPlans.length === 1 && items.every((item) => item.sellingPlanId === sellingPlans[0])) {
+    url.searchParams.set('selling_plan', sellingPlans[0] as string);
+  }
   return appendTracking(url, source);
 }
 
 export function hasCheckoutVariants(items: ShopifyCheckoutItem[]) {
-  return items.length > 0 && items.every((item) => Boolean(item.variantId));
+  if (!items.length || !items.every((item) => Boolean(item.variantId))) return false;
+  if (items.some((item) => item.purchaseOption === 'subscription' && !item.sellingPlanId)) return false;
+  const plans = [...new Set(items.map((item) => item.sellingPlanId || 'one-time'))];
+  return plans.length === 1;
 }

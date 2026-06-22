@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Atom, Cpu, FlaskConical, Gauge, Waves } from 'lucide-react';
+import { ArrowRight, Atom, Cpu, FlaskConical, Gauge, Package, ShieldCheck, Waves } from 'lucide-react';
 
 const PILLARS = [
   {
@@ -53,6 +53,8 @@ export function ScienceSection() {
           <ScienceSimulation />
         </motion.div>
 
+        <DDWJourney />
+
         <div className="mt-12 grid gap-4 sm:grid-cols-3">
           <ScienceStat label="Ordinary water range" value="145-155 ppm" />
           <ScienceStat label="Mdrn-Life DDW" value="5 ppm" />
@@ -102,6 +104,80 @@ export function ScienceSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function DDWJourney() {
+  const steps = [
+    {
+      icon: Waves,
+      label: 'Natural Water',
+      value: '145–155 ppm',
+      body: 'Deuterium occurs naturally in drinking water at this baseline concentration.',
+      color: 'text-amber-200',
+    },
+    {
+      icon: FlaskConical,
+      label: 'Depletion Process',
+      value: 'Fractional distillation',
+      body: 'A selective process progressively reduces deuterium content to target levels.',
+      color: 'text-cyan-200',
+    },
+    {
+      icon: Cpu,
+      label: '5 ppm Production',
+      value: 'Target reached',
+      body: 'Water is produced to a verified 5 ppm deuterium concentration.',
+      color: 'text-green-200',
+    },
+    {
+      icon: ShieldCheck,
+      label: 'IRMS Verification',
+      value: 'Independent labs',
+      body: 'Isotope Ratio Mass Spectrometry confirms every batch from two independent labs.',
+      color: 'text-emerald-200',
+    },
+    {
+      icon: Package,
+      label: 'Final Bottling',
+      value: 'Glass & PET',
+      body: 'Verified DDW bottled in premium glass and BPA-free PET plastic in the US.',
+      color: 'text-cyan-200',
+    },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.7, delay: 0.1 }}
+      className="mt-12"
+    >
+      <div className="hpe-hud-label mb-4">DDW Production Journey</div>
+      <div className="grid gap-3 sm:grid-cols-5">
+        {steps.map((step, index) => (
+          <motion.div
+            key={step.label}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.5, delay: index * 0.08 }}
+            className="relative rounded-2xl border border-white/10 bg-white/[0.035] p-4"
+          >
+            {index < steps.length - 1 && (
+              <span className="absolute -right-1.5 top-1/2 hidden -translate-y-1/2 text-white/20 sm:block text-xs">›</span>
+            )}
+            <div className="mb-3 flex items-center gap-2">
+              <step.icon size={14} className={step.color} />
+              <div className="hpe-hud-label" style={{ fontSize: 8 }}>{step.label}</div>
+            </div>
+            <div className="font-mono text-sm text-white leading-tight">{step.value}</div>
+            <p className="mt-2 text-xs leading-relaxed text-white/48">{step.body}</p>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
   );
 }
 

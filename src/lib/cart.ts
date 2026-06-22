@@ -3,6 +3,8 @@ import { Product, getProduct } from './products';
 export type CartItem = {
   productId: Product['id'];
   quantity: number;
+  purchaseOption: 'subscription' | 'one-time';
+  sellingPlanId?: string;
 };
 
 export type HydratedCartItem = CartItem & {
@@ -38,6 +40,8 @@ export function getCartItems(): CartItem[] {
       .map((item) => ({
         productId: item.productId,
         quantity: normalizeQuantity(Number(item.quantity)),
+        purchaseOption: item.purchaseOption === 'subscription' ? 'subscription' as const : 'one-time' as const,
+        sellingPlanId: typeof item.sellingPlanId === 'string' ? item.sellingPlanId : undefined,
       }))
       .filter((item) => getProduct(item.productId));
   } catch {
@@ -53,6 +57,8 @@ export function saveCartItems(items: CartItem[]) {
     .map((item) => ({
       productId: item.productId,
       quantity: normalizeQuantity(item.quantity),
+      purchaseOption: item.purchaseOption,
+      sellingPlanId: item.sellingPlanId,
     }));
 
   localStorage.setItem(CART_KEY, JSON.stringify(normalized));
@@ -64,12 +70,22 @@ export function hydrateCartItems(items = getCartItems()): HydratedCartItem[] {
     const product = getProduct(item.productId);
     if (!product) return [];
     const quantity = normalizeQuantity(item.quantity);
+
+    let priceCents = product.priceCents;
+    if (item.purchaseOption === 'subscription') {
+      const plan = product.subscription.plans.find((p) => p.sellingPlanId === item.sellingPlanId)
+        ?? product.subscription.plans[0];
+      priceCents = plan ? plan.priceCents : product.subscription.priceCents;
+    }
+
     return [
       {
         productId: item.productId,
         quantity,
+        purchaseOption: item.purchaseOption,
+        sellingPlanId: item.sellingPlanId,
         product,
-        lineTotalCents: product.priceCents * quantity,
+        lineTotalCents: priceCents * quantity,
       },
     ];
   });
@@ -83,17 +99,24 @@ export function getCartSubtotalCents(items = getCartItems()) {
   return hydrateCartItems(items).reduce((total, item) => total + item.lineTotalCents, 0);
 }
 
-export function addCartItem(productId: Product['id'], quantity = 1) {
+export function addCartItem(
+  productId: Product['id'],
+  quantity = 1,
+  purchaseOption: CartItem['purchaseOption'] = 'one-time',
+  sellingPlanId?: string,
+) {
   const current = getCartItems();
   const existing = current.find((item) => item.productId === productId);
 
   if (existing) {
     existing.quantity = normalizeQuantity(existing.quantity + quantity);
+    existing.purchaseOption = purchaseOption;
+    existing.sellingPlanId = sellingPlanId;
     saveCartItems(current);
     return;
   }
 
-  saveCartItems([...current, { productId, quantity: normalizeQuantity(quantity) }]);
+  saveCartItems([...current, { productId, quantity: normalizeQuantity(quantity), purchaseOption, sellingPlanId }]);
 }
 
 export function updateCartItemQuantity(productId: Product['id'], quantity: number) {

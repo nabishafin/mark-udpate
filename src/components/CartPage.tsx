@@ -32,6 +32,8 @@ export function CartPage() {
     hydratedItems.map((item) => ({
       variantId: item.product.variantId,
       quantity: item.quantity,
+      sellingPlanId: item.purchaseOption === 'subscription' ? item.sellingPlanId : undefined,
+      purchaseOption: item.purchaseOption,
     })),
   );
 
@@ -52,6 +54,8 @@ export function CartPage() {
       hydratedItems.map((item) => ({
         variantId: item.product.variantId,
         quantity: item.quantity,
+        sellingPlanId: item.purchaseOption === 'subscription' ? item.sellingPlanId : undefined,
+        purchaseOption: item.purchaseOption,
       })),
     );
 
@@ -156,8 +160,20 @@ export function CartPage() {
                         {item.product.badge}
                       </div>
                       <h2 className="mt-2 text-lg font-medium text-white">{item.product.name}</h2>
-                      <p className="mt-2 font-mono text-sm text-white/68">{item.product.price}</p>
+                      <p className="mt-2 font-mono text-sm text-white/68">
+                        {item.purchaseOption === 'subscription'
+                          ? (item.product.subscription.plans.find((p) => p.sellingPlanId === item.sellingPlanId) ?? item.product.subscription.plans[0])?.price ?? item.product.subscription.price
+                          : item.product.price}
+                      </p>
                       <p className="mt-3 text-sm text-white/55">{item.product.optionLabel}</p>
+                      <div className="mt-3 inline-flex rounded-full border border-cyan-200/20 bg-cyan-200/[0.06] px-3 py-1 text-[11px] text-cyan-100/80">
+                        {item.purchaseOption === 'subscription'
+                          ? (() => {
+                              const plan = item.product.subscription.plans.find((p) => p.sellingPlanId === item.sellingPlanId) ?? item.product.subscription.plans[0];
+                              return plan ? `${plan.frequency} · ${plan.useCase}` : item.product.subscription.frequency;
+                            })()
+                          : 'One-time purchase'}
+                      </div>
                       <div className="mt-4 flex items-center gap-2 text-xs text-cyan-100/70">
                         <ShieldCheck size={13} />
                         <span>Shopify checkout ready</span>
@@ -229,6 +245,11 @@ export function CartPage() {
                 Taxes, discounts, shipping, payment, and customer information are
                 calculated securely in Shopify.
               </p>
+              {!canCheckout && hydratedItems.length > 0 && (
+                <p className="mt-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-xs leading-relaxed text-amber-100/75">
+                  Complete one purchase plan at a time until the Shopify Storefront cart API is connected.
+                </p>
+              )}
               <button
                 type="button"
                 onClick={handleCheckout}

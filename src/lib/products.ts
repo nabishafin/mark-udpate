@@ -1,5 +1,15 @@
 import { ShopifyProductConfig } from './shopify';
 
+export type SubscriptionPlan = {
+  id: string;
+  frequency: string;
+  useCase: string;
+  discount: string;
+  price: string;
+  priceCents: number;
+  sellingPlanId?: string;
+};
+
 export type Product = ShopifyProductConfig & {
   id: 'glass' | 'pet';
   badge: string;
@@ -19,6 +29,15 @@ export type Product = ShopifyProductConfig & {
     v: string;
   }[];
   accent: 'blue' | 'gold';
+  subscription: {
+    label: string;
+    frequency: string;
+    discount: string;
+    price: string;
+    priceCents: number;
+    sellingPlanId?: string;
+    plans: SubscriptionPlan[];
+  };
 };
 
 export const PRODUCTS: Product[] = [
@@ -39,6 +58,43 @@ export const PRODUCTS: Product[] = [
     },
     productUrl: 'https://mdrnlifeddw.com/products/mdrn-life-ddw',
     variantId: import.meta.env.VITE_SHOPIFY_GLASS_VARIANT_ID || '41077216739362',
+    subscription: {
+      label: 'Subscribe & save',
+      frequency: 'Monthly',
+      discount: 'Save 10%',
+      price: '$150.21',
+      priceCents: 15021,
+      sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID,
+      plans: [
+        {
+          id: 'glass-standard',
+          frequency: 'Monthly',
+          useCase: 'Standard daily hydration habit',
+          discount: 'Save 10%',
+          price: '$150.21',
+          priceCents: 15021,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID,
+        },
+        {
+          id: 'glass-intensive',
+          frequency: 'Monthly',
+          useCase: 'High-dilution, clinical or intensive use',
+          discount: 'Save 10%',
+          price: '$150.21',
+          priceCents: 15021,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID_2,
+        },
+        {
+          id: 'glass-travel',
+          frequency: 'As needed',
+          useCase: 'Travel, occasional or maintenance use',
+          discount: 'Save 10%',
+          price: '$150.21',
+          priceCents: 15021,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID_3,
+        },
+      ],
+    },
     spec: [
       { k: 'Deuterium', v: '5 ppm' },
       { k: 'Packaging', v: 'Glass' },
@@ -63,6 +119,43 @@ export const PRODUCTS: Product[] = [
     },
     productUrl: 'https://mdrnlifeddw.com/products/mdrn-life-ddw-pet-plastic?variant=41122368749602',
     variantId: import.meta.env.VITE_SHOPIFY_PET_VARIANT_ID || '41122368749602',
+    subscription: {
+      label: 'Subscribe & save',
+      frequency: 'Monthly',
+      discount: 'Save 10%',
+      price: '$137.48',
+      priceCents: 13748,
+      sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID,
+      plans: [
+        {
+          id: 'pet-standard',
+          frequency: 'Monthly',
+          useCase: 'Standard daily hydration habit',
+          discount: 'Save 10%',
+          price: '$137.48',
+          priceCents: 13748,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID,
+        },
+        {
+          id: 'pet-intensive',
+          frequency: 'Monthly',
+          useCase: 'High-dilution, clinical or intensive use',
+          discount: 'Save 10%',
+          price: '$137.48',
+          priceCents: 13748,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID_2,
+        },
+        {
+          id: 'pet-travel',
+          frequency: 'As needed',
+          useCase: 'Travel, occasional or maintenance use',
+          discount: 'Save 10%',
+          price: '$137.48',
+          priceCents: 13748,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID_3,
+        },
+      ],
+    },
     spec: [
       { k: 'Deuterium', v: '5 ppm' },
       { k: 'Packaging', v: 'PET Plastic' },

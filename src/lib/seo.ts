@@ -222,6 +222,31 @@ export const SEO_CONFIGS = {
     twitterDescription: 'Send product, lab-report, wholesale, subscription, or practitioner questions to Mdrn-Life DDW.',
     image: socialImage,
   },
+  blog: {
+    title: 'DDW Journal | Mdrn-Life DDW',
+    description: 'Read evidence-aware guides on deuterium depletion, mitochondrial energy, recovery, metabolism, and longevity-focused hydration.',
+    canonical: `${siteUrl}/blogs/news`,
+    keywords: 'deuterium depleted water blog, DDW research, mitochondrial hydration, healthy aging hydration',
+    ogTitle: 'The DDW Journal | Mdrn-Life DDW',
+    ogDescription: 'Guides on deuterium depletion, mitochondrial energy, recovery, metabolism, and longevity-focused hydration.',
+    ogUrl: `${siteUrl}/blogs/news`,
+    ogType: 'website',
+    twitterTitle: 'The DDW Journal | Mdrn-Life DDW',
+    twitterDescription: 'Evidence-aware guides for cellular hydration and longevity-focused living.',
+    image: `${siteUrl}/blog/immune-support.webp`,
+  },
+  policy: {
+    title: 'Policies & Information | Mdrn-Life DDW',
+    description: 'Review Mdrn-Life DDW terms, shipping, refunds, privacy, and subscription information.',
+    canonical: `${siteUrl}/policies/terms-of-service`,
+    ogTitle: 'Policies & Information | Mdrn-Life DDW',
+    ogDescription: 'Terms, shipping, refunds, privacy, and subscription information for Mdrn-Life DDW customers.',
+    ogUrl: `${siteUrl}/policies/terms-of-service`,
+    ogType: 'website',
+    twitterTitle: 'Policies & Information | Mdrn-Life DDW',
+    twitterDescription: 'Customer terms, shipping, refunds, privacy, and subscription information.',
+    image: socialImage,
+  },
 } satisfies Record<string, SeoConfig>;
 
 export function resolveSeo(pathname: string, hash: string): SeoConfig {
@@ -234,5 +259,10 @@ export function resolveSeo(pathname: string, hash: string): SeoConfig {
   if (pathname === '/explore-the-body') return SEO_CONFIGS.body;
   if (pathname === '/research') return SEO_CONFIGS.research;
   if (pathname === '/contact') return SEO_CONFIGS.contact;
+  if (pathname === '/blogs' || pathname === '/blogs/news') return SEO_CONFIGS.blog;
+  if (pathname.startsWith('/policies/') || pathname === '/pages/refund') {
+    const url = `${siteUrl}${pathname}`;
+    return { ...SEO_CONFIGS.policy, canonical: url, ogUrl: url };
+  }
   return SEO_CONFIGS.home;
 }

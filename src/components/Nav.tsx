@@ -3,13 +3,12 @@ import { motion } from 'framer-motion';
 
 const LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Explore the Body', href: '/explore-the-body' },
   { label: 'The Science', href: '/science' },
   { label: 'Benefits', href: '/benefits' },
   { label: 'Athletes & Recovery', href: '/athletes-recovery' },
   { label: 'Healthy Aging', href: '/healthy-aging' },
-  { label: 'Shop', href: '/products' },
   { label: 'Research', href: '/research' },
+  { label: 'Blog', href: '/blogs/news' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -83,7 +82,7 @@ export function Nav({ pathname }: Props) {
             href="/products"
             className="hpe-btn-primary rounded-xl px-4 py-2 text-xs sm:text-sm font-medium tracking-wide shrink-0"
           >
-            Shop DDW -&gt;
+            Shop
           </a>
         </div>
       </motion.nav>

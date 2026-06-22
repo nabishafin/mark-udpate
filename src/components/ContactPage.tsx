@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Phone, Send } from 'lucide-react';
+import { Beaker, Briefcase, Mail, MapPin, Phone, Send, ShieldCheck, Users } from 'lucide-react';
 
 const CONTACT_DETAILS = [
   {
@@ -146,6 +146,52 @@ export function ContactPage() {
           </button>
         </motion.form>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.14 }}
+          className="mt-10"
+        >
+          <div className="hpe-hud-label mb-4">Inquiry Types</div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: Briefcase,
+                title: 'Wholesale',
+                body: 'Bulk orders and wholesale pricing for retailers, distributors, and commercial buyers.',
+              },
+              {
+                icon: ShieldCheck,
+                title: 'Practitioner Program',
+                body: 'DDW for clinical, therapeutic, or practitioner-recommended protocols.',
+              },
+              {
+                icon: Users,
+                title: 'Retail Partnerships',
+                body: 'Stocking Mdrn-Life DDW in your store, dispensary, or online marketplace.',
+              },
+              {
+                icon: Beaker,
+                title: 'Testing & Verification',
+                body: 'Questions about our IRMS testing process, batch documentation, or lab reports.',
+              },
+            ].map(({ icon: Icon, title, body }) => (
+              <div
+                key={title}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+              >
+                <div className="mb-3 flex items-center gap-2.5">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-300/20 bg-cyan-300/[0.07] text-cyan-200">
+                    <Icon size={15} />
+                  </span>
+                  <span className="text-sm font-medium text-white">{title}</span>
+                </div>
+                <p className="text-xs leading-relaxed text-white/52">{body}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

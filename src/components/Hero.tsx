@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { ShieldCheck, Sparkles } from 'lucide-react';
 import { InteractiveBody } from './InteractiveBody';
 import { Organ } from './organData';
 
@@ -68,6 +68,26 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           >
             <SpecBlock label="FORMATS" value="2" unit="bottle types" />
             <SpecBlock label="ORIGIN" value="US" unit="made" />
+          </div>
+        </div>
+
+        <div className="absolute bottom-5 inset-x-0 z-10 hidden sm:flex justify-center px-6 pointer-events-none">
+          <div className="hpe-glass rounded-full px-5 py-2.5 flex items-center gap-3 sm:gap-5 pointer-events-auto">
+            {[
+              'Independently Tested',
+              'IRMS Verified',
+              'Produced to 5 PPM',
+              'Florida Manufactured',
+              'Glass & PET',
+            ].map((item, i) => (
+              <React.Fragment key={item}>
+                {i > 0 && <span className="text-white/18 font-mono text-xs">·</span>}
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck size={10} className="text-cyan-400/70 shrink-0" />
+                  <span className="hpe-hud-label" style={{ fontSize: 9 }}>{item}</span>
+                </span>
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </div>

@@ -90,7 +90,6 @@ test('site is routed as a multipage experience instead of one long homepage', ()
 
   assert.match(app, /switch \(pathname\)/);
   const appRoutes = [
-    '/explore-the-body',
     '/science',
     '/science/lab-testing',
     '/benefits',
@@ -210,19 +209,17 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
 
   for (const label of [
     'Home',
-    'Explore the Body',
     'The Science',
     'Benefits',
     'Athletes & Recovery',
     'Healthy Aging',
-    'Shop',
     'Research',
     'Contact',
   ]) {
     assert.match(nav, new RegExp(`label:\\s*'${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
   }
 
-  assert.match(nav, /href:\s*'\/products'/);
+  assert.match(nav, /href="\/products"/);
   assert.match(nav, /src="\/brand\/logo\.png"/);
   assert.match(nav, /href:\s*'\/contact'/);
   assert.doesNotMatch(footer, /<footer id="contact"/);
@@ -531,7 +528,6 @@ test('final website CTA matches the client PDF objective', () => {
   assert.match(footer, /Discover how advanced hydration may support performance, recovery, and healthy aging from the inside out\./);
   assert.match(footer, /Explore the Science/);
   assert.match(footer, /Discover Mdrn-Life DDW/);
-  assert.match(footer, /Begin Your Hydration Journey/);
   assert.doesNotMatch(footer, /Send Message/);
 });
 
@@ -571,4 +567,62 @@ test('page sections do not use independent glow or particle background layers', 
   assert.doesNotMatch(blendedSectionComponents, /hpe-glow-(cyan|gold)/);
   assert.doesNotMatch(blendedSectionComponents, /<Particles\b/);
   assert.doesNotMatch(blendedSectionComponents, /<section className="hpe-glass/);
+});
+
+test('blog archive is routed, theme-native, and ready for Shopify Storefront articles', () => {
+  const app = file('src/App.tsx');
+  const nav = file('src/components/Nav.tsx');
+  const footer = file('src/components/CTAFooter.tsx');
+  const blog = file('src/components/BlogPage.tsx');
+  const blogData = file('src/lib/blog.ts');
+
+  assert.match(app, /case '\/blogs\/news':\s*return <BlogPage \/>/);
+  assert.match(nav, /label:\s*'Blog',\s*href:\s*'\/blogs\/news'/);
+  assert.match(footer, /\['Blog', '\/blogs\/news'\]/);
+  assert.match(blog, /Cellular hydration/);
+  assert.match(blog, /getBlogArticles/);
+  assert.match(blogData, /VITE_SHOPIFY_STOREFRONT_API_URL/);
+  assert.match(blogData, /X-Shopify-Storefront-Access-Token/);
+  assert.match(blogData, /blog\(handle: "news"\)/);
+});
+
+test('footer policy routes render the copied Shopify policy content', () => {
+  const app = file('src/App.tsx');
+  const footer = file('src/components/CTAFooter.tsx');
+  const policyPage = file('src/components/PolicyPage.tsx');
+  const policies = file('src/data/policies.json');
+
+  for (const path of [
+    '/policies/terms-of-service',
+    '/policies/shipping-policy',
+    '/policies/refund-policy',
+    '/policies/privacy-policy',
+    '/pages/refund',
+    '/policies/subscription-policy',
+  ]) {
+    assert.match(footer, new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.match(app, /pathname\.startsWith\('\/policies\/'\)/);
+  assert.match(policyPage, /dangerouslySetInnerHTML/);
+  assert.match(policies, /SECTION 1 - ONLINE STORE TERMS/);
+  assert.match(policies, /Domestic Shipping Rates and Estimates/);
+  assert.match(policies, /Cancellation Policy/);
+});
+
+test('shop defaults to subscription while preserving one-time purchase checkout', () => {
+  const productsPage = file('src/components/Products.tsx');
+  const products = file('src/lib/products.ts');
+  const cart = file('src/lib/cart.ts');
+  const cartPage = file('src/components/CartPage.tsx');
+  const shopify = file('src/lib/shopify.ts');
+
+  assert.match(productsPage, /useState<'subscription' \| 'one-time'>\('subscription'\)/);
+  assert.match(productsPage, /Subscribe & Add to Cart/);
+  assert.match(productsPage, /One-time purchase/);
+  assert.match(products, /VITE_SHOPIFY_GLASS_SELLING_PLAN_ID/);
+  assert.match(products, /VITE_SHOPIFY_PET_SELLING_PLAN_ID/);
+  assert.match(cart, /purchaseOption: 'subscription' \| 'one-time'/);
+  assert.match(cartPage, /item\.sellingPlanId/);
+  assert.match(shopify, /selling_plan/);
+  assert.match(shopify, /item\.purchaseOption === 'subscription' && !item\.sellingPlanId/);
 });

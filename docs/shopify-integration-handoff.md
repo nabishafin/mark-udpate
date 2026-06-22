@@ -225,6 +225,19 @@ Provide:
 
 Do not enable subscription UI on the frontend until selling plan IDs and checkout compatibility are confirmed.
 
+## Current blog and subscription environment variables
+
+The frontend now includes the subscription selector and Shopify-backed blog adapter. Add these values when Shopify access is provided:
+
+```env
+VITE_SHOPIFY_STOREFRONT_API_URL=https://mdrnlifeddw.com/api/<storefront-api-version>/graphql.json
+VITE_SHOPIFY_STOREFRONT_TOKEN=<public-storefront-access-token>
+VITE_SHOPIFY_GLASS_SELLING_PLAN_ID=<glass-selling-plan-id>
+VITE_SHOPIFY_PET_SELLING_PLAN_ID=<pet-selling-plan-id>
+```
+
+Without the Storefront settings, `/blogs/news` uses the captured article fallback. Without a product's selling-plan ID, the subscription selection remains visible and can be added to the local cart, but checkout is blocked with an explanatory message so the order cannot silently become a one-time purchase.
+
 ## Security Rules
 
 - Never expose Admin API access tokens in Vite environment variables.

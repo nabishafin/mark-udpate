@@ -5,11 +5,15 @@ type CommerceEventName =
   | 'subscription_started_intent';
 
 type CommercePayload = {
-  productId: string;
-  productName: string;
+  productId?: string;
+  productName?: string;
   value?: string;
   variantId?: string;
   checkoutReady?: boolean;
+  purchaseOption?: string;
+  sellingPlanId?: string;
+  items?: string;
+  cartQuantity?: number;
 };
 
 declare global {

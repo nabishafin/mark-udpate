@@ -293,3 +293,24 @@ body {
 /* Hide horizontal scrollbar on testimonials marquee */
 .hpe-no-scrollbar::-webkit-scrollbar { display: none; }
 .hpe-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Long-form policy content copied from the Shopify storefront. */
+.hpe-policy-content { color: rgba(231,236,243,0.68); line-height: 1.8; }
+.hpe-policy-content > :first-child { margin-top: 0; }
+.hpe-policy-content h1,
+.hpe-policy-content h2,
+.hpe-policy-content h3,
+.hpe-policy-content strong { color: #fff; }
+.hpe-policy-content h2,
+.hpe-policy-content h3 { margin-top: 2.25rem; margin-bottom: 0.75rem; font-size: 1.25rem; line-height: 1.35; }
+.hpe-policy-content p { margin: 0.85rem 0; }
+.hpe-policy-content ul,
+.hpe-policy-content ol { margin: 1rem 0; padding-left: 1.4rem; }
+.hpe-policy-content ul { list-style: disc; }
+.hpe-policy-content ol { list-style: decimal; }
+.hpe-policy-content li { margin: 0.45rem 0; }
+.hpe-policy-content a { color: #8bd7ff; text-decoration: underline; text-decoration-color: rgba(63,184,255,0.35); text-underline-offset: 3px; }
+.hpe-policy-content table { display: block; width: 100%; margin: 1.5rem 0; overflow-x: auto; border-collapse: collapse; }
+.hpe-policy-content td,
+.hpe-policy-content th { min-width: 9rem; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.11); text-align: left; }
+.hpe-policy-content img { max-width: 100%; height: auto; margin: 1.5rem 0; border-radius: 1rem; }

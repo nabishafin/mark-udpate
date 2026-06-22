@@ -44,16 +44,13 @@ export function CTAFooter() {
                 Discover Mdrn-Life DDW
                 <ArrowRight size={14} />
               </a>
-              <a href="/explore-the-body" className="hpe-btn-ghost rounded-xl px-6 py-3.5 text-sm font-medium tracking-wide">
-                Begin Your Hydration Journey
-              </a>
             </div>
           </motion.div>
         </div>
       </section>
 
       <section className="relative py-12">
-        <div className="max-w-7xl mx-auto px-6 grid gap-8 md:grid-cols-4">
+        <div className="max-w-7xl mx-auto px-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
               <span className="relative flex h-12 items-center">
@@ -98,10 +95,11 @@ export function CTAFooter() {
           <FooterCol
             title="Explore"
             links={[
-              ['Interactive Body', '/explore-the-body'],
               ['DDW Science', '/science'],
               ['Lab Testing', '/science/lab-testing'],
               ['Healthy Aging', '/healthy-aging'],
+              ['Benefits', '/benefits'],
+              ['Learn', '/learn'],
             ]}
           />
 
@@ -117,8 +115,22 @@ export function CTAFooter() {
           <FooterCol
             title="Company"
             links={[
+              ['Our Story', '/founder'],
               ['Research', '/research'],
+              ['Blog', '/blogs/news'],
               ['Contact', '/contact'],
+            ]}
+          />
+
+          <FooterCol
+            title="Policies"
+            links={[
+              ['Terms of Service', '/policies/terms-of-service'],
+              ['Shipping Policy', '/policies/shipping-policy'],
+              ['Refund Policy', '/policies/refund-policy'],
+              ['Privacy Policy', '/policies/privacy-policy'],
+              ['Refund Information', '/pages/refund'],
+              ['Subscription Policy', '/policies/subscription-policy'],
             ]}
           />
         </div>
