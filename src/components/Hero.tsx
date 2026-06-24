@@ -46,7 +46,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
 
           <div
             className={`relative w-full max-w-none flex-1 flex items-center justify-center transition-all duration-700 ease-in-out ${
-              activeId ? '-translate-x-[34vw] sm:-translate-x-[24vw] lg:-translate-x-[15vw] scale-100' : 'translate-x-0 scale-100 sm:scale-110 lg:scale-125'
+              activeId ? '-translate-x-[28vw] scale-110 sm:-translate-x-[24vw] sm:scale-105 lg:-translate-x-[15vw] lg:scale-100' : 'translate-x-0 scale-110 sm:scale-110 lg:scale-125'
             }`}
             id="body"
             style={{ minHeight: '58vh' }}

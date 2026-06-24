@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 
 const LINKS = [
   { label: 'Home', href: '/' },
@@ -18,6 +19,7 @@ type Props = {
 
 export function Nav({ pathname }: Props) {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -25,19 +27,42 @@ export function Nav({ pathname }: Props) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileOpen]);
+
   return (
-    <div className="fixed top-4 inset-x-0 z-30 flex justify-center px-4 pointer-events-none">
+    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
       <motion.nav
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-        className="w-auto max-w-full pointer-events-auto"
+        className="relative w-full max-w-[min(100%,870px)] pointer-events-auto lg:w-auto"
       >
         <div
-          className={`hpe-glass rounded-2xl pl-3 pr-2 sm:pl-4 py-2.5 flex items-center gap-4 sm:gap-6 transition-all duration-300 ${
+          className={`hpe-glass rounded-2xl px-2.5 py-2.5 flex items-center justify-between gap-3 transition-all duration-300 sm:gap-6 lg:pl-3 lg:pr-2 ${
             scrolled ? 'shadow-[0_8px_40px_-12px_rgba(63,184,255,0.35)]' : ''
           }`}
         >
+          <button
+            type="button"
+            aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((open) => !open)}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/80 transition hover:bg-white/[0.08] hover:text-white lg:hidden"
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+
           <a href="/" className="flex items-center gap-2.5 group shrink-0">
             <span className="relative flex h-11 items-center">
               <span className="absolute inset-0 rounded-full bg-cyan-300/20 blur-xl transition group-hover:bg-cyan-300/30" />
@@ -79,6 +104,36 @@ export function Nav({ pathname }: Props) {
             Shop
           </a>
         </div>
+
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+              className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-2xl border border-white/10 bg-[#071017]/95 shadow-2xl backdrop-blur-2xl lg:hidden"
+            >
+              <div className="grid gap-1 p-2">
+                {LINKS.map((l) => {
+                  const active = pathname === l.href || (l.href !== '/' && pathname.startsWith(`${l.href}/`));
+                  return (
+                    <a
+                      key={l.href}
+                      href={l.href}
+                      aria-current={active ? 'page' : undefined}
+                      className={`rounded-xl px-4 py-3 text-sm transition ${
+                        active ? 'bg-cyan-300/[0.12] text-white' : 'text-white/72 hover:bg-white/[0.06] hover:text-white'
+                      }`}
+                    >
+                      {l.label}
+                    </a>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
     </div>
   );

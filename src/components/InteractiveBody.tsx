@@ -193,16 +193,16 @@ export function InteractiveBody({ onSelect, active }: Props) {
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
-                width: 36,
-                height: 36
+                width: 44,
+                height: 44
               }}>
               
               <span className="absolute inset-0 rounded-full" />
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300"
                 style={{
-                  width: isHover ? 28 : 22,
-                  height: isHover ? 28 : 22,
+                  width: isHover ? 34 : 28,
+                  height: isHover ? 34 : 28,
                   borderColor: color.stroke,
                   opacity: isHover ? 0.85 : 0.45
                 }} />
@@ -210,8 +210,8 @@ export function InteractiveBody({ onSelect, active }: Props) {
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full hpe-ripple"
                 style={{
-                  width: 22,
-                  height: 22,
+                  width: 28,
+                  height: 28,
                   border: `1.5px solid ${color.stroke}`,
                   animationDelay: `${ORGANS.indexOf(organ) * 0.25 % 2.4}s`
                 }} />

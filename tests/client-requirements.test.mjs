@@ -205,17 +205,19 @@ test('interactive body side panel includes the client-provided systems and micro
   }
 });
 
-test('mobile body interaction uses a side drawer instead of full-screen overlay', () => {
+test('mobile body interaction uses a split view instead of blocking the hotspots', () => {
   const hero = file('src/components/Hero.tsx');
   const body = file('src/components/InteractiveBody.tsx');
   const panel = file('src/components/OrganPanel.tsx');
 
-  assert.match(hero, /activeId \? '-translate-x-\[34vw\] sm:-translate-x-\[24vw\] lg:-translate-x-\[15vw\] scale-100'/);
+  assert.match(hero, /activeId \? '-translate-x-\[28vw\] scale-110 sm:-translate-x-\[24vw\] sm:scale-105 lg:-translate-x-\[15vw\] lg:scale-100'/);
   assert.match(body, /hpe-body-stage/);
+  assert.match(body, /width:\s*44,\s*height:\s*44/);
   assert.match(body, /\{organ\.name\}/);
   assert.match(body, /aria-label=\{`Inspect \$\{organ\.name\}`\}/);
-  assert.match(file('src/index.css'), /\.hpe-body-stage\s*\{\s*flex:\s*0 0 auto;\s*width:\s*clamp\(680px,\s*352vw,\s*760px\);\s*\}/);
-  assert.match(panel, /right-3 bottom-3 w-\[78vw\] max-w-\[330px\]/);
+  assert.match(file('src/index.css'), /\.hpe-body-stage\s*\{\s*flex:\s*0 0 auto;\s*width:\s*clamp\(760px,\s*230vw,\s*860px\);\s*\}/);
+  assert.match(panel, /right-2 top-24[\s\S]*w-\[43vw\]/);
+  assert.match(panel, /sm:right-3 sm:w-\[78vw\] sm:max-w-\[380px\]/);
   assert.doesNotMatch(panel, /w-\[calc\(100%-2rem\)\]/);
 });
 
@@ -224,6 +226,10 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   const footer = file('src/components/CTAFooter.tsx');
   const contact = file('src/components/ContactPage.tsx');
   const app = file('src/App.tsx');
+
+  assert.match(nav, /aria-label=\{mobileOpen \? 'Close navigation menu' : 'Open navigation menu'\}/);
+  assert.match(nav, /lg:hidden/);
+  assert.match(nav, /setMobileOpen/);
 
   for (const label of [
     'Home',

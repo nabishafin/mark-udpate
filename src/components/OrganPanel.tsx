@@ -61,7 +61,7 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
           role="dialog"
           aria-modal="false"
           aria-labelledby="organ-title"
-          className="fixed top-24 right-3 bottom-3 w-[78vw] max-w-[330px] lg:right-8 lg:bottom-8 z-40 sm:max-w-[380px] lg:w-[440px] lg:max-w-none xl:w-[500px] hpe-glass-strong overflow-y-auto border border-white/10 rounded-2xl shadow-2xl"
+          className="fixed bottom-3 right-2 top-24 z-40 w-[43vw] overflow-y-auto rounded-xl border border-white/10 hpe-glass-strong shadow-2xl sm:right-3 sm:w-[78vw] sm:max-w-[380px] sm:rounded-2xl lg:right-8 lg:bottom-8 lg:w-[440px] lg:max-w-none xl:w-[500px]"
           initial={{ x: '120%', opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '120%', opacity: 0 }}
@@ -70,16 +70,16 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
         >
           <Particles count={15} color={color.stroke} />
 
-          <div className="relative z-10 p-6 sm:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
+          <div className="relative z-10 p-3 sm:p-8">
+            <div className="mb-4 flex items-center justify-between gap-2 sm:mb-6">
+              <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
                 <IconButton label="Previous system" onClick={goPrev}>
                   <ChevronLeft size={16} />
                 </IconButton>
                 <IconButton label="Next system" onClick={goNext}>
                   <ChevronRight size={16} />
                 </IconButton>
-                <span className="ml-2 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                <span className="ml-1 hidden font-mono text-[10px] uppercase tracking-widest text-white/40 min-[430px]:inline sm:ml-2 sm:inline">
                   {String(index + 1).padStart(2, '0')} / {String(ORGANS.length).padStart(2, '0')}
                 </span>
               </div>
@@ -88,19 +88,19 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
               </IconButton>
             </div>
 
-            <div className="mb-6">
-              <h2 id="organ-title" className="text-3xl sm:text-4xl font-medium text-white leading-tight tracking-tight">
+            <div className="mb-4 sm:mb-6">
+              <h2 id="organ-title" className="text-base font-medium leading-tight tracking-tight text-white min-[430px]:text-lg sm:text-4xl">
                 {organ.name}
               </h2>
-              <p className="mt-2 text-white/60 text-sm">{organ.tagline}</p>
+              <p className="mt-1.5 text-[11px] leading-snug text-white/60 sm:mt-2 sm:text-sm">{organ.tagline}</p>
             </div>
 
             {organ.image && <OrganImage color={color} image={organ.image} />}
 
-            <div className="mt-8 space-y-5">
+            <div className="mt-5 space-y-4 sm:mt-8 sm:space-y-5">
               <div className="space-y-3">
                 {organ.sidePanelCopy.map((paragraph) => (
-                  <p key={paragraph} className="text-white/75 text-sm leading-relaxed">
+                  <p key={paragraph} className="text-[11px] leading-relaxed text-white/75 sm:text-sm">
                     {paragraph}
                   </p>
                 ))}
@@ -126,11 +126,11 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
             </div>
 
             {organ.microCta && (
-              <div className="mt-8">
+              <div className="mt-5 sm:mt-8">
                 <a
                   href="/products"
                   onClick={onClose}
-                  className="w-full hpe-btn-primary rounded-xl px-5 py-3.5 text-sm font-medium tracking-wide flex items-center justify-center shadow-lg"
+                  className="flex w-full items-center justify-center rounded-xl px-3 py-3 text-center text-[11px] font-medium tracking-wide shadow-lg hpe-btn-primary sm:px-5 sm:py-3.5 sm:text-sm"
                 >
                   {organ.microCta} →
                 </a>
@@ -148,7 +148,7 @@ function IconButton({ label, onClick, children }: { label: string; onClick: () =
     <button
       onClick={onClick}
       aria-label={label}
-      className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white sm:h-9 sm:w-9"
     >
       {children}
     </button>
@@ -172,7 +172,7 @@ function PanelBlock({
           {title}
         </div>
       </div>
-      <div className="space-y-3">{children}</div>
+      <div className="space-y-2 sm:space-y-3">{children}</div>
     </div>
   );
 }
@@ -181,8 +181,8 @@ function BulletList({ items, color }: { items: string[]; color: string }) {
   return (
     <ul className="space-y-2">
       {items.map((item) => (
-        <li key={item} className="flex gap-2 text-white/75 text-sm leading-relaxed">
-          <span className="mt-2 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+        <li key={item} className="flex gap-2 text-[11px] leading-relaxed text-white/75 sm:text-sm">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full sm:mt-2" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
           <span>{item}</span>
         </li>
       ))}
@@ -198,7 +198,7 @@ function OrganImage({
   image: NonNullable<Organ['image']>;
 }) {
   return (
-    <figure className="mt-6 relative aspect-[16/9] w-full rounded-2xl bg-white/[0.04] border border-white/10 overflow-hidden">
+    <figure className="relative mt-4 aspect-[4/3] w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] sm:mt-6 sm:aspect-[16/9] sm:rounded-2xl">
       <div
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
