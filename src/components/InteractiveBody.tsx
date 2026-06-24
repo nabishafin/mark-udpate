@@ -32,15 +32,15 @@ const HOTSPOT_POSITIONS: Record<
 {
   brain: {
     x: 50,
-    y: 8.7
+    y: 8.4
   },
   eyes: {
-    x: 46.1,
-    y: 14
+    x: 48,
+    y: 13.1
   },
   mouth: {
-    x: 53.7,
-    y: 17.9
+    x: 52.1,
+    y: 16.6
   },
   heart: {
     x: 50.2,

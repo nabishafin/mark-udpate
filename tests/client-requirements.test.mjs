@@ -68,6 +68,16 @@ test('app exposes the lab testing credibility page content from the client SEO b
   }
   assert.match(lab, /ATP Synthase/);
   assert.match(lab, /competitor claims/i);
+  assert.match(lab, /LAB_REPORTS/);
+  assert.match(lab, /hydroisotop-batch\.pdf/);
+  assert.match(lab, /usgs-reston-batch\.pdf/);
+  assert.match(lab, /View batch PDF/);
+  assert.match(lab, /<LabReportPanel/);
+  assert.match(lab, /<iframe/);
+  assert.doesNotMatch(lab, /Add the actual Hydroisotop batch PDF here when the client provides the file/);
+  assert.doesNotMatch(lab, /Add the actual USGS Reston batch PDF here when the client provides the file/);
+  assert.ok(statSync(join(rootPath, 'public/lab-reports/hydroisotop-batch.pdf')).size > 0);
+  assert.ok(statSync(join(rootPath, 'public/lab-reports/usgs-reston-batch.pdf')).size > 0);
   assert.match(lab, /ChevronDown/);
   assert.match(lab, /aria-expanded=\{openFaq === index\}/);
   assert.match(lab, /DeuteriumMeasurement/);
@@ -160,9 +170,9 @@ test('interactive body hotspots are calibrated to visible anatomy regions', () =
   const body = file('src/components/InteractiveBody.tsx');
 
   for (const snippet of [
-    /brain:\s*\{\s*x:\s*50,\s*y:\s*8\.7/,
-    /eyes:\s*\{\s*x:\s*46\.1,\s*y:\s*14/,
-    /mouth:\s*\{\s*x:\s*53\.7,\s*y:\s*17\.9/,
+    /brain:\s*\{\s*x:\s*50,\s*y:\s*8\.4/,
+    /eyes:\s*\{\s*x:\s*48,\s*y:\s*13\.1/,
+    /mouth:\s*\{\s*x:\s*52\.1,\s*y:\s*16\.6/,
     /lungs:\s*\{\s*x:\s*48\.4,\s*y:\s*25\.4/,
     /muscles:\s*\{\s*x:\s*42\.4,\s*y:\s*31\.4/,
     /skin:\s*\{\s*x:\s*57\.8,\s*y:\s*34\.8/,
