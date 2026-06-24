@@ -1,12 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import policyData from '../data/policies.json';
 
 type PolicyRecord = {
   slug: string;
   title: string;
-  sourceUrl: string;
   html: string;
 };
 
@@ -33,10 +32,6 @@ export function PolicyPage({ slug }: { slug: string }) {
           className="hpe-glass hpe-policy-content mt-10 rounded-3xl p-6 sm:p-10 lg:p-14"
           dangerouslySetInnerHTML={{ __html: policy.html }}
         />
-
-        <a href={policy.sourceUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 text-xs text-white/42 transition hover:text-white/70">
-          View source policy <ExternalLink size={13} />
-        </a>
       </div>
     </section>
   );
