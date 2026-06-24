@@ -125,7 +125,8 @@ test('hero presents the body experience without the removed lower CTA buttons', 
   assert.match(hero, /Every Cell Needs Energy\./);
   assert.match(hero, /Every System Needs/);
   assert.match(hero, /Hydration\./);
-  assert.match(hero, /Explore how advanced deuterium-depleted hydration supports the brain, joints, gut/);
+  assert.match(hero, /Explore how advanced Deuterium Depleted Water Hydration supports the brain, joints, gut/);
+  assert.doesNotMatch(hero, /Mdrn-Life DDW - 5 ppm/);
   assert.doesNotMatch(hero, /href="\/explore-the-body"[^>]*>\s*Explore the Body/i);
   assert.doesNotMatch(hero, /Discover DDW Science/);
   assert.doesNotMatch(hero, /Start Your Hydration Journey/);
@@ -159,7 +160,9 @@ test('interactive body hotspots are calibrated to visible anatomy regions', () =
   const body = file('src/components/InteractiveBody.tsx');
 
   for (const snippet of [
-    /brain:\s*\{\s*x:\s*50,\s*y:\s*9\.6/,
+    /brain:\s*\{\s*x:\s*50,\s*y:\s*8\.7/,
+    /eyes:\s*\{\s*x:\s*46\.1,\s*y:\s*14/,
+    /mouth:\s*\{\s*x:\s*53\.7,\s*y:\s*17\.9/,
     /lungs:\s*\{\s*x:\s*48\.4,\s*y:\s*25\.4/,
     /muscles:\s*\{\s*x:\s*42\.4,\s*y:\s*31\.4/,
     /skin:\s*\{\s*x:\s*57\.8,\s*y:\s*34\.8/,
@@ -167,6 +170,11 @@ test('interactive body hotspots are calibrated to visible anatomy regions', () =
   ]) {
     assert.match(body, snippet);
   }
+
+  assert.match(body, /const PREVIEW_SIDE/);
+  assert.match(body, /right:\s*'calc\(100% \+ 10px\)'/);
+  assert.match(body, /left:\s*'calc\(100% \+ 10px\)'/);
+  assert.match(body, /w-40[\s\S]*sm:w-44/);
 });
 
 test('interactive body side panel includes the client-provided systems and micro CTAs', () => {
@@ -513,7 +521,7 @@ test('side panel uses real client-PDF organ images instead of abstract generated
   assert.doesNotMatch(organData, /Support Oxygen Delivery From Within/);
   assert.match(panel, /OrganImage/);
   assert.match(panel, /<img/);
-  assert.match(panel, /object-contain/);
+  assert.match(panel, /object-cover/);
   assert.doesNotMatch(panel, /VisualGlyph/);
   assert.doesNotMatch(panel, /viewBox="0 0 420 220"/);
   assert.doesNotMatch(panel, /Live signal/i);

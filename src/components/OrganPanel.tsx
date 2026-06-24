@@ -211,7 +211,7 @@ function OrganImage({
         alt={image.alt}
         loading="lazy"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-contain"
+        className="absolute inset-0 h-full w-full object-cover"
         style={{
           objectPosition: image.position ?? 'center',
           filter: 'saturate(1.02) contrast(1.03)',

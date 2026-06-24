@@ -47,12 +47,6 @@ export function Nav({ pathname }: Props) {
                 className="relative h-10 w-auto object-contain drop-shadow-[0_0_18px_rgba(63,184,255,0.38)]"
               />
             </span>
-            <div className="hidden sm:flex flex-col leading-none">
-              <span className="text-white font-medium tracking-tight text-sm">Mdrn-Life</span>
-              <span className="hpe-hud-label text-[8px]" style={{ fontSize: 8 }}>
-                5 PPM DDW
-              </span>
-            </div>
           </a>
 
           <div className="hidden lg:flex items-center gap-1 max-w-[min(66vw,780px)] overflow-x-auto hpe-no-scrollbar">

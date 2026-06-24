@@ -32,15 +32,15 @@ const HOTSPOT_POSITIONS: Record<
 {
   brain: {
     x: 50,
-    y: 9.6
+    y: 8.7
   },
   eyes: {
-    x: 50,
-    y: 12.6
+    x: 46.1,
+    y: 14
   },
   mouth: {
-    x: 50,
-    y: 15.4
+    x: 53.7,
+    y: 17.9
   },
   heart: {
     x: 50.2,
@@ -78,6 +78,20 @@ const HOTSPOT_POSITIONS: Record<
     x: 50.4,
     y: 57.8
   }
+};
+const PREVIEW_SIDE: Record<string, 'left' | 'right'> = {
+  brain: 'right',
+  eyes: 'left',
+  mouth: 'right',
+  heart: 'right',
+  lungs: 'left',
+  liver: 'left',
+  gut: 'right',
+  kidneys: 'right',
+  joints: 'right',
+  muscles: 'left',
+  skin: 'right',
+  mitochondria: 'right'
 };
 const BODY_VID = "/Human.webm";
 
@@ -164,6 +178,7 @@ export function InteractiveBody({ onSelect, active }: Props) {
           const color = COLOR_MAP[organ.color];
           const isActive = active === organ.id;
           const isHover = hovered === organ.id || isActive;
+          const previewSide = PREVIEW_SIDE[organ.id] ?? (pos.x < 50 ? 'left' : 'right');
           return (
             <button
               key={organ.id}
@@ -178,16 +193,16 @@ export function InteractiveBody({ onSelect, active }: Props) {
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
-                width: 44,
-                height: 44
+                width: 36,
+                height: 36
               }}>
               
               <span className="absolute inset-0 rounded-full" />
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300"
                 style={{
-                  width: isHover ? 32 : 24,
-                  height: isHover ? 32 : 24,
+                  width: isHover ? 28 : 22,
+                  height: isHover ? 28 : 22,
                   borderColor: color.stroke,
                   opacity: isHover ? 0.85 : 0.45
                 }} />
@@ -195,8 +210,8 @@ export function InteractiveBody({ onSelect, active }: Props) {
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full hpe-ripple"
                 style={{
-                  width: 24,
-                  height: 24,
+                  width: 22,
+                  height: 22,
                   border: `1.5px solid ${color.stroke}`,
                   animationDelay: `${ORGANS.indexOf(organ) * 0.25 % 2.4}s`
                 }} />
@@ -204,8 +219,8 @@ export function InteractiveBody({ onSelect, active }: Props) {
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300"
                 style={{
-                  width: isHover ? 12 : 8,
-                  height: isHover ? 12 : 8,
+                  width: isHover ? 11 : 8,
+                  height: isHover ? 11 : 8,
                   background: color.fill,
                   boxShadow: `0 0 ${isHover ? 18 : 10}px ${color.glow}`
                 }} />
@@ -222,26 +237,31 @@ export function InteractiveBody({ onSelect, active }: Props) {
                 initial={false}
                 animate={{
                   opacity: isHover ? 1 : 0,
-                  y: isHover ? -104 : -92,
+                  x: isHover ? 0 : previewSide === 'left' ? 8 : -8,
+                  y: '-50%',
                   scale: isHover ? 1 : 0.94
                 }}
                 transition={{ duration: 0.18 }}
-                className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-72 -translate-x-1/2 overflow-hidden rounded-2xl border border-cyan-200/25 bg-white/[0.055] text-left shadow-[0_22px_70px_-28px_rgba(63,184,255,0.85)] backdrop-blur-md"
+                className="pointer-events-none absolute top-1/2 z-20 w-40 overflow-hidden rounded-xl border border-cyan-200/25 bg-white/[0.06] text-left shadow-[0_18px_46px_-26px_rgba(63,184,255,0.85)] backdrop-blur-md sm:w-44"
+                style={{
+                  ...(previewSide === 'left' ? { right: 'calc(100% + 10px)' } : { left: 'calc(100% + 10px)' }),
+                  transformOrigin: previewSide === 'left' ? 'right center' : 'left center'
+                }}
               >
-                <span className="block p-2.5">
-                  <span className="block aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+                <span className="block p-1.5">
+                  <span className="block aspect-[16/9] w-full overflow-hidden rounded-lg border border-white/10 bg-white/[0.04]">
                     <img
                       src={organ.image?.src ?? '/brand/logo.png'}
                       alt={organ.image?.alt ?? `${organ.name} preview`}
-                      className="h-full w-full object-contain"
+                      className="h-full w-full object-cover"
                       style={{ objectPosition: organ.image?.position ?? 'center' }}
                     />
                   </span>
-                  <span className="mt-2 block min-w-0 px-1 pb-1">
-                    <span className="block text-[11px] font-semibold leading-tight text-white">
+                  <span className="mt-1 block min-w-0 px-0.5 pb-0.5">
+                    <span className="block text-[10px] font-semibold leading-tight text-white sm:text-[11px]">
                       {organ.name}
                     </span>
-                    <span className="mt-1.5 block text-[10px] leading-snug text-cyan-100/68">
+                    <span className="mt-1 block text-[9px] leading-snug text-cyan-100/68 sm:text-[10px]">
                       {organ.tagline}
                     </span>
                   </span>

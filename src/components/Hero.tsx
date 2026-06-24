@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Sparkles } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { InteractiveBody } from './InteractiveBody';
 import { Organ } from './organData';
 
@@ -19,13 +19,6 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
             activeId ? 'opacity-0 h-0 overflow-hidden scale-95' : 'opacity-100 h-auto scale-100 mb-12'
           }`}
         >
-          <div className="inline-flex items-center gap-2 hpe-glass rounded-full px-3 py-1.5 mb-4">
-            <Sparkles size={12} className="text-cyan-300" />
-            <span className="hpe-hud-label" style={{ fontSize: 10 }}>
-              Mdrn-Life DDW - 5 ppm
-            </span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.05]">
             <span className="hpe-text-chrome">Every Cell Needs Energy.</span>
             <br />
@@ -36,7 +29,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           </h1>
 
           <p className="mt-3 text-white/65 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-            Explore how advanced deuterium-depleted hydration supports the brain, joints, gut,
+            Explore how advanced Deuterium Depleted Water Hydration supports the brain, joints, gut,
             energy production, recovery, and healthy aging.
           </p>
         </div>
