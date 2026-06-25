@@ -170,9 +170,9 @@ test('interactive body hotspots are calibrated to visible anatomy regions', () =
   const body = file('src/components/InteractiveBody.tsx');
 
   for (const snippet of [
-    /brain:\s*\{\s*x:\s*50,\s*y:\s*8\.4/,
-    /eyes:\s*\{\s*x:\s*48,\s*y:\s*13\.1/,
-    /mouth:\s*\{\s*x:\s*52\.1,\s*y:\s*16\.6/,
+    /brain:\s*\{\s*x:\s*50,\s*y:\s*6\.5/,
+    /eyes:\s*\{\s*x:\s*49\.15,\s*y:\s*10\.6/,
+    /mouth:\s*\{\s*x:\s*50\.2,\s*y:\s*13\.5/,
     /lungs:\s*\{\s*x:\s*48\.4,\s*y:\s*25\.4/,
     /muscles:\s*\{\s*x:\s*42\.4,\s*y:\s*31\.4/,
     /skin:\s*\{\s*x:\s*57\.8,\s*y:\s*34\.8/,
