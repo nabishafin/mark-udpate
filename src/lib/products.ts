@@ -1,5 +1,9 @@
 import { ShopifyProductConfig } from './shopify';
 
+const SELLING_PLAN_STANDARD = '27086716962';
+const SELLING_PLAN_INTENSIVE = '27086749730';
+const SELLING_PLAN_TRAVEL = '27086782498';
+
 export type SubscriptionPlan = {
   id: string;
   frequency: string;
@@ -60,38 +64,38 @@ export const PRODUCTS: Product[] = [
     variantId: import.meta.env.VITE_SHOPIFY_GLASS_VARIANT_ID || '41077216739362',
     subscription: {
       label: 'Subscribe & save',
-      frequency: 'Monthly',
+      frequency: 'Every 1 month',
       discount: 'Save 10%',
       price: '$150.21',
       priceCents: 15021,
-      sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID,
+      sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID || SELLING_PLAN_STANDARD,
       plans: [
         {
           id: 'glass-standard',
-          frequency: 'Monthly',
+          frequency: 'Every 1 month',
           useCase: 'Standard daily hydration habit',
           discount: 'Save 10%',
           price: '$150.21',
           priceCents: 15021,
-          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID || SELLING_PLAN_STANDARD,
         },
         {
           id: 'glass-intensive',
-          frequency: 'Monthly',
+          frequency: 'Every 3 weeks',
           useCase: 'High-dilution, clinical or intensive use',
           discount: 'Save 10%',
           price: '$150.21',
           priceCents: 15021,
-          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID_2,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID_2 || SELLING_PLAN_INTENSIVE,
         },
         {
           id: 'glass-travel',
-          frequency: 'As needed',
+          frequency: 'Every 6 weeks',
           useCase: 'Travel, occasional or maintenance use',
-          discount: 'Save 10%',
-          price: '$150.21',
-          priceCents: 15021,
-          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID_3,
+          discount: 'Save 8%',
+          price: '$153.55',
+          priceCents: 15355,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_GLASS_SELLING_PLAN_ID_3 || SELLING_PLAN_TRAVEL,
         },
       ],
     },
@@ -121,38 +125,38 @@ export const PRODUCTS: Product[] = [
     variantId: import.meta.env.VITE_SHOPIFY_PET_VARIANT_ID || '41122368749602',
     subscription: {
       label: 'Subscribe & save',
-      frequency: 'Monthly',
+      frequency: 'Every 1 month',
       discount: 'Save 10%',
       price: '$137.48',
       priceCents: 13748,
-      sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID,
+      sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID || SELLING_PLAN_STANDARD,
       plans: [
         {
           id: 'pet-standard',
-          frequency: 'Monthly',
+          frequency: 'Every 1 month',
           useCase: 'Standard daily hydration habit',
           discount: 'Save 10%',
           price: '$137.48',
           priceCents: 13748,
-          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID || SELLING_PLAN_STANDARD,
         },
         {
           id: 'pet-intensive',
-          frequency: 'Monthly',
+          frequency: 'Every 3 weeks',
           useCase: 'High-dilution, clinical or intensive use',
           discount: 'Save 10%',
           price: '$137.48',
           priceCents: 13748,
-          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID_2,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID_2 || SELLING_PLAN_INTENSIVE,
         },
         {
           id: 'pet-travel',
-          frequency: 'As needed',
+          frequency: 'Every 6 weeks',
           useCase: 'Travel, occasional or maintenance use',
-          discount: 'Save 10%',
-          price: '$137.48',
-          priceCents: 13748,
-          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID_3,
+          discount: 'Save 8%',
+          price: '$140.53',
+          priceCents: 14053,
+          sellingPlanId: import.meta.env.VITE_SHOPIFY_PET_SELLING_PLAN_ID_3 || SELLING_PLAN_TRAVEL,
         },
       ],
     },
