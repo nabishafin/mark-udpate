@@ -126,6 +126,10 @@ test('site is routed as a multipage experience instead of one long homepage', ()
   assert.match(app, /<main>\s*\{page\}\s*<CTAFooter \/>\s*<\/main>/);
   assert.doesNotMatch(app, /pathname !== '\/contact'/);
   assert.doesNotMatch(app, /<main>\s*<Hero[\s\S]*<ScienceSection \/>[\s\S]*<LabTesting \/>[\s\S]*<Benefits \/>/);
+  assert.match(file('src/index.tsx'), /redirectShopifyCheckoutPath/);
+  assert.match(file('src/index.tsx'), /cart\\\/c/);
+  assert.match(vercel, /"source":\s*"\/cart\/c\/:path\*"/);
+  assert.match(vercel, /orise-6796\.myshopify\.com\/cart\/c\/:path\*/);
   assert.match(vercel, /"source":\s*"\/\(\.\*\)"/);
   assert.match(vercel, /"destination":\s*"\/index\.html"/);
 });

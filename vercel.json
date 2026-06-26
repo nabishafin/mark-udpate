@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/cart/c/:path*",
+      "destination": "https://orise-6796.myshopify.com/cart/c/:path*",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
