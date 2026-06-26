@@ -126,6 +126,7 @@ test('site is routed as a multipage experience instead of one long homepage', ()
   assert.match(app, /<main>\s*\{page\}\s*<CTAFooter \/>\s*<\/main>/);
   assert.doesNotMatch(app, /pathname !== '\/contact'/);
   assert.doesNotMatch(app, /<main>\s*<Hero[\s\S]*<ScienceSection \/>[\s\S]*<LabTesting \/>[\s\S]*<Benefits \/>/);
+  assert.match(vercel, /"source":\s*"\/\(\.\*\)"/);
   assert.match(vercel, /"destination":\s*"\/index\.html"/);
 });
 
