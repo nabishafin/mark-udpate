@@ -14,7 +14,8 @@ export type ShopifyCheckoutItem = {
 };
 
 const DEFAULT_STORE_DOMAIN = 'mdrnlifeddw.com';
-const BUY_BUTTON_CHANNEL = 'channel=buy_button';
+const DEFAULT_STOREFRONT_API_URL = 'https://orise-6796.myshopify.com/api/2026-04/graphql.json';
+const DEFAULT_STOREFRONT_TOKEN = 'ea7c67f92e797d20ab1abd406684703f';
 const PRODUCT_VARIANT_GID_PREFIX = 'gid://shopify/ProductVariant/';
 const SELLING_PLAN_GID_PREFIX = 'gid://shopify/SellingPlan/';
 
@@ -24,8 +25,6 @@ function getStoreDomain() {
 }
 
 function appendTracking(url: URL, source: string) {
-  const [, channelValue] = BUY_BUTTON_CHANNEL.split('=');
-  url.searchParams.set('channel', channelValue);
   url.searchParams.set('utm_source', 'mdrn_life_external_site');
   url.searchParams.set('utm_medium', source);
   url.searchParams.set('utm_campaign', 'ddw_product_checkout');
@@ -37,11 +36,11 @@ function normalizeQuantity(quantity: number) {
 }
 
 function getStorefrontApiUrl() {
-  return import.meta.env.VITE_SHOPIFY_STOREFRONT_API_URL;
+  return import.meta.env.VITE_SHOPIFY_STOREFRONT_API_URL || DEFAULT_STOREFRONT_API_URL;
 }
 
 function getStorefrontToken() {
-  return import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN;
+  return import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || DEFAULT_STOREFRONT_TOKEN;
 }
 
 function toProductVariantGid(variantId: string) {

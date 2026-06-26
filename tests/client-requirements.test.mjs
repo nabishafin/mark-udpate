@@ -388,7 +388,8 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.match(shopify, /VITE_SHOPIFY_STORE_DOMAIN/);
   assert.match(shopify, /buildShopifyCheckoutUrl/);
   assert.match(shopify, /cartLines\.join\(','\)/);
-  assert.match(shopify, /channel=buy_button/);
+  assert.doesNotMatch(shopify, /channel=buy_button/);
+  assert.match(shopify, /cartCreate/);
 
   for (const phrase of ['Meta Pixel', 'Google Analytics 4', 'TikTok Pixel', 'Klaviyo']) {
     assert.match(tracking, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
