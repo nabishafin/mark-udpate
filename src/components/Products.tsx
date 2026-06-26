@@ -175,8 +175,7 @@ function ProductCard({
           alt={product.image.alt}
           loading="lazy"
           decoding="async"
-          className="aspect-[16/11] w-full object-cover"
-          style={{ objectPosition: 'center 48%' }}
+          className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050608]/55 via-transparent to-transparent" />
       </div>
