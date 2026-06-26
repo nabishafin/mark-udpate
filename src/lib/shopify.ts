@@ -43,6 +43,33 @@ function getStorefrontToken() {
   return import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || DEFAULT_STOREFRONT_TOKEN;
 }
 
+export async function shopifyStorefrontFetch<T = any>(body: object, signal?: AbortSignal): Promise<T> {
+  const endpoint = getStorefrontApiUrl();
+  const token = getStorefrontToken();
+  if (!endpoint || !token) {
+    throw new Error('Storefront API is not configured.');
+  }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': token,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) throw new Error(`Shopify request failed: ${response.status}`);
+
+  const payload = await response.json();
+  if (payload?.errors?.length) {
+    throw new Error(payload.errors.map((error: { message?: string }) => error.message).filter(Boolean).join(' ') || 'Shopify request failed.');
+  }
+
+  return payload as T;
+}
+
 function toProductVariantGid(variantId: string) {
   return variantId.startsWith('gid://') ? variantId : `${PRODUCT_VARIANT_GID_PREFIX}${variantId}`;
 }
@@ -69,12 +96,6 @@ export function canUseStorefrontCart() {
 }
 
 export async function createShopifyCartCheckoutUrl(items: ShopifyCheckoutItem[]) {
-  const endpoint = getStorefrontApiUrl();
-  const token = getStorefrontToken();
-  if (!endpoint || !token) {
-    throw new Error('Storefront API is not configured.');
-  }
-
   const lines = items
     .filter((item) => item.variantId)
     .map((item) => ({
@@ -87,14 +108,8 @@ export async function createShopifyCartCheckoutUrl(items: ShopifyCheckoutItem[])
 
   if (!lines.length) throw new Error('Cart has no checkout-ready items.');
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': token,
-    },
-    body: JSON.stringify({
-      query: `mutation CartCreate($input: CartInput!) {
+  const payload = await shopifyStorefrontFetch({
+    query: `mutation CartCreate($input: CartInput!) {
         cartCreate(input: $input) {
           cart {
             checkoutUrl
@@ -105,13 +120,8 @@ export async function createShopifyCartCheckoutUrl(items: ShopifyCheckoutItem[])
           }
         }
       }`,
-      variables: { input: { lines } },
-    }),
+    variables: { input: { lines } },
   });
-
-  if (!response.ok) throw new Error(`Shopify cart request failed: ${response.status}`);
-
-  const payload = await response.json();
   const errors = payload?.errors || payload?.data?.cartCreate?.userErrors || [];
   if (errors.length) {
     throw new Error(errors.map((error: { message?: string }) => error.message).filter(Boolean).join(' ') || 'Shopify cart could not be created.');

@@ -5,7 +5,7 @@ import { BlogArticle, FALLBACK_ARTICLES, getBlogArticles } from '../lib/blog';
 
 export function BlogPage() {
   const [articles, setArticles] = useState<BlogArticle[]>(FALLBACK_ARTICLES);
-  const [loading, setLoading] = useState(Boolean(import.meta.env.VITE_SHOPIFY_STOREFRONT_API_URL));
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();

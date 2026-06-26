@@ -66,8 +66,12 @@ export function saveCartItems(items: CartItem[]) {
 }
 
 export function hydrateCartItems(items = getCartItems()): HydratedCartItem[] {
+  return hydrateCartItemsWithProducts(items);
+}
+
+export function hydrateCartItemsWithProducts(items = getCartItems(), products?: Product[]): HydratedCartItem[] {
   return items.flatMap((item) => {
-    const product = getProduct(item.productId);
+    const product = products?.find((candidate) => candidate.id === item.productId) || getProduct(item.productId);
     if (!product) return [];
     const quantity = normalizeQuantity(item.quantity);
 

@@ -2,14 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Check, Droplets, FlaskConical, Loader2, Package, Plus, ShieldCheck, ShoppingCart, Sparkles, Star, Timer, Zap } from 'lucide-react';
 import { addCartItem, getCartCount, onCartChange } from '../lib/cart';
-import { PRODUCTS, Product } from '../lib/products';
+import { PRODUCTS, Product, getLiveProducts } from '../lib/products';
 import { trackCommerceEvent } from '../lib/tracking';
 
 export function Products() {
   const [cartCount, setCartCount] = useState(() => getCartCount());
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
 
   useEffect(() => {
-    PRODUCTS.forEach((product) => {
+    const controller = new AbortController();
+    getLiveProducts(controller.signal)
+      .then(setProducts)
+      .catch(() => setProducts(PRODUCTS));
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    products.forEach((product) => {
       trackCommerceEvent('product_viewed', {
         productId: product.id,
         productName: product.name,
@@ -20,7 +30,7 @@ export function Products() {
     });
 
     return onCartChange(() => setCartCount(getCartCount()));
-  }, []);
+  }, [products]);
 
   return (
     <section id="products" className="hpe-section relative overflow-hidden">
@@ -66,7 +76,7 @@ export function Products() {
         </motion.div>
 
         <div className="mt-14 grid gap-5 md:grid-cols-2">
-          {PRODUCTS.map((product, i) => (
+          {products.map((product, i) => (
             <ProductCard
               key={product.id}
               product={product}

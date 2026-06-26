@@ -9,7 +9,7 @@ export function BlogArticlePage({ handle }: Props) {
   const [article, setArticle] = useState<BlogArticle | null>(() =>
     FALLBACK_ARTICLES.find((a) => a.handle === handle) || null,
   );
-  const [loading, setLoading] = useState(Boolean(import.meta.env.VITE_SHOPIFY_STOREFRONT_API_URL));
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();

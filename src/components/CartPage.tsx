@@ -5,13 +5,12 @@ import {
   clearCart,
   formatMoney,
   getCartItems,
-  getCartSubtotalCents,
-  hydrateCartItems,
+  hydrateCartItemsWithProducts,
   onCartChange,
   removeCartItem,
   updateCartItemQuantity,
 } from '../lib/cart';
-import { Product } from '../lib/products';
+import { PRODUCTS, Product, getLiveProducts } from '../lib/products';
 import {
   buildShopifyCheckoutUrl,
   canUseStorefrontCart,
@@ -30,11 +29,20 @@ export function CartPage() {
   const [cartItems, setCartItems] = useState(() => getCartItems());
   const [checkoutError, setCheckoutError] = useState('');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
 
   useEffect(() => onCartChange(() => setCartItems(getCartItems())), []);
 
-  const hydratedItems = useMemo(() => hydrateCartItems(cartItems), [cartItems]);
-  const subtotalCents = useMemo(() => getCartSubtotalCents(cartItems), [cartItems]);
+  useEffect(() => {
+    const controller = new AbortController();
+    getLiveProducts(controller.signal)
+      .then(setProducts)
+      .catch(() => setProducts(PRODUCTS));
+    return () => controller.abort();
+  }, []);
+
+  const hydratedItems = useMemo(() => hydrateCartItemsWithProducts(cartItems, products), [cartItems, products]);
+  const subtotalCents = useMemo(() => hydratedItems.reduce((total, item) => total + item.lineTotalCents, 0), [hydratedItems]);
   const canCheckout = hasCheckoutVariants(
     hydratedItems.map((item) => ({
       variantId: item.product.variantId,

@@ -1,3 +1,5 @@
+import { shopifyStorefrontFetch } from './shopify';
+
 export type BlogArticle = {
   id: string;
   title: string;
@@ -128,25 +130,6 @@ type ShopifyArticleNode = {
   author?: { name: string };
 };
 
-async function shopifyFetch(body: object, signal?: AbortSignal) {
-  const endpoint = import.meta.env.VITE_SHOPIFY_STOREFRONT_API_URL;
-  const token = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN;
-  if (!endpoint || !token) return null;
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    signal,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': token,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) throw new Error(`Shopify request failed: ${response.status}`);
-  return response.json();
-}
-
 function mapNode(article: ShopifyArticleNode): BlogArticle {
   return {
     id: article.id,
@@ -165,7 +148,7 @@ function mapNode(article: ShopifyArticleNode): BlogArticle {
 }
 
 export async function getBlogArticles(signal?: AbortSignal): Promise<BlogArticle[]> {
-  const payload = await shopifyFetch({
+  const payload = await shopifyStorefrontFetch({
     query: `query BlogArticles($first: Int!) {
       blog(handle: "news") {
         articles(first: $first, sortKey: PUBLISHED_AT, reverse: true) {
@@ -174,7 +157,7 @@ export async function getBlogArticles(signal?: AbortSignal): Promise<BlogArticle
       }
     }`,
     variables: { first: 24 },
-  }, signal);
+  }, signal).catch(() => null);
 
   if (!payload) return FALLBACK_ARTICLES;
   const nodes: ShopifyArticleNode[] = payload?.data?.blog?.articles?.nodes || [];
@@ -185,7 +168,7 @@ export async function getBlogArticles(signal?: AbortSignal): Promise<BlogArticle
 export async function getBlogArticle(handle: string, signal?: AbortSignal): Promise<BlogArticle | null> {
   const fallback = FALLBACK_ARTICLES.find((a) => a.handle === handle) || null;
 
-  const payload = await shopifyFetch({
+  const payload = await shopifyStorefrontFetch({
     query: `query BlogArticle($handle: String!) {
       blog(handle: "news") {
         articleByHandle(handle: $handle) {

@@ -607,8 +607,8 @@ test('blog archive is routed, theme-native, and ready for Shopify Storefront art
   assert.match(footer, /\['Blog', '\/blogs\/news'\]/);
   assert.match(blog, /Cellular hydration/);
   assert.match(blog, /getBlogArticles/);
-  assert.match(blogData, /VITE_SHOPIFY_STOREFRONT_API_URL/);
-  assert.match(blogData, /X-Shopify-Storefront-Access-Token/);
+  assert.match(blogData, /shopifyStorefrontFetch/);
+  assert.match(file('src/lib/shopify.ts'), /X-Shopify-Storefront-Access-Token/);
   assert.match(blogData, /blog\(handle: "news"\)/);
 });
 

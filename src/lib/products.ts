@@ -1,4 +1,4 @@
-import { ShopifyProductConfig } from './shopify';
+import { ShopifyProductConfig, shopifyStorefrontFetch } from './shopify';
 
 const SELLING_PLAN_STANDARD = '27086716962';
 const SELLING_PLAN_INTENSIVE = '27086749730';
@@ -171,4 +171,90 @@ export const PRODUCTS: Product[] = [
 
 export function getProduct(productId: Product['id']) {
   return PRODUCTS.find((product) => product.id === productId);
+}
+
+type ShopifyProductNode = {
+  title?: string;
+  onlineStoreUrl?: string;
+  featuredImage?: { url: string; altText?: string };
+  variants?: {
+    nodes?: {
+      id: string;
+      title?: string;
+      image?: { url: string; altText?: string };
+      price?: { amount: string; currencyCode: string };
+    }[];
+  };
+};
+
+type ShopifyProductsPayload = {
+  data?: {
+    glass?: ShopifyProductNode | null;
+    pet?: ShopifyProductNode | null;
+  };
+};
+
+function gidToNumericId(value?: string) {
+  return value?.match(/\/(\d+)$/)?.[1] || value;
+}
+
+function formatShopifyPrice(price?: { amount: string; currencyCode: string }) {
+  if (!price?.amount) return null;
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: price.currencyCode || 'USD',
+  }).format(Number(price.amount));
+}
+
+function mergeShopifyProduct(product: Product, shopifyProduct?: ShopifyProductNode | null): Product {
+  if (!shopifyProduct) return product;
+
+  const variants = shopifyProduct.variants?.nodes || [];
+  const variant = variants.find((node) => gidToNumericId(node.id) === product.variantId) || variants[0];
+  const image = variant?.image || shopifyProduct.featuredImage;
+  const imageAlt = image?.altText && !/6\s*pack/i.test(image.altText) ? image.altText : product.image.alt;
+  const price = formatShopifyPrice(variant?.price);
+  const priceCents = variant?.price?.amount ? Math.round(Number(variant.price.amount) * 100) : product.priceCents;
+
+  return {
+    ...product,
+    name: shopifyProduct.title || product.name,
+    productUrl: shopifyProduct.onlineStoreUrl || product.productUrl,
+    variantId: gidToNumericId(variant?.id) || product.variantId,
+    price: price || product.price,
+    priceCents,
+    image: {
+      src: image?.url || product.image.src,
+      alt: imageAlt,
+    },
+  };
+}
+
+export async function getLiveProducts(signal?: AbortSignal): Promise<Product[]> {
+  const payload = await shopifyStorefrontFetch<ShopifyProductsPayload>({
+    query: `query ProductCards {
+      glass: product(handle: "mdrn-life-ddw") {
+        ...ProductCardFields
+      }
+      pet: product(handle: "mdrn-life-ddw-pet-plastic") {
+        ...ProductCardFields
+      }
+    }
+
+    fragment ProductCardFields on Product {
+      title
+      onlineStoreUrl
+      featuredImage { url altText }
+      variants(first: 20) {
+        nodes {
+          id
+          title
+          image { url altText }
+          price { amount currencyCode }
+        }
+      }
+    }`,
+  }, signal);
+
+  return PRODUCTS.map((product) => mergeShopifyProduct(product, payload.data?.[product.id]));
 }
