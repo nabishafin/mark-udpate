@@ -14,6 +14,7 @@ export type ShopifyCheckoutItem = {
 };
 
 const DEFAULT_STORE_DOMAIN = 'mdrnlifeddw.com';
+const DEFAULT_CHECKOUT_DOMAIN = 'orise-6796.myshopify.com';
 const DEFAULT_STOREFRONT_API_URL = 'https://orise-6796.myshopify.com/api/2026-04/graphql.json';
 const DEFAULT_STOREFRONT_TOKEN = 'ea7c67f92e797d20ab1abd406684703f';
 const PRODUCT_VARIANT_GID_PREFIX = 'gid://shopify/ProductVariant/';
@@ -24,11 +25,22 @@ function getStoreDomain() {
   return domain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
 }
 
+function getCheckoutDomain() {
+  const domain = import.meta.env.VITE_SHOPIFY_CHECKOUT_DOMAIN || DEFAULT_CHECKOUT_DOMAIN;
+  return domain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+}
+
 function appendTracking(url: URL, source: string) {
   url.searchParams.set('utm_source', 'mdrn_life_external_site');
   url.searchParams.set('utm_medium', source);
   url.searchParams.set('utm_campaign', 'ddw_product_checkout');
   return url.toString();
+}
+
+function forceShopifyCheckoutDomain(value: string, source = 'storefront_cart_checkout') {
+  const url = new URL(value);
+  url.hostname = getCheckoutDomain();
+  return appendTracking(url, source);
 }
 
 function normalizeQuantity(quantity: number) {
@@ -83,7 +95,7 @@ export function buildShopifyCheckoutUrl(items: ShopifyCheckoutItem[], source = '
     .filter((item) => item.variantId)
     .map((item) => `${item.variantId}:${normalizeQuantity(item.quantity)}`);
 
-  const url = new URL(`https://${getStoreDomain()}/cart/${cartLines.join(',')}`);
+  const url = new URL(`https://${getCheckoutDomain()}/cart/${cartLines.join(',')}`);
   const sellingPlans = [...new Set(items.map((item) => item.sellingPlanId).filter(Boolean))];
   if (sellingPlans.length === 1 && items.every((item) => item.sellingPlanId === sellingPlans[0])) {
     url.searchParams.set('selling_plan', sellingPlans[0] as string);
@@ -130,7 +142,7 @@ export async function createShopifyCartCheckoutUrl(items: ShopifyCheckoutItem[])
   const checkoutUrl = payload?.data?.cartCreate?.cart?.checkoutUrl;
   if (!checkoutUrl) throw new Error('Shopify did not return a checkout URL.');
 
-  return checkoutUrl as string;
+  return forceShopifyCheckoutDomain(checkoutUrl as string);
 }
 
 export function hasCheckoutVariants(items: ShopifyCheckoutItem[]) {

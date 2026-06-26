@@ -387,6 +387,9 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.doesNotMatch(products, /getShopifyLinks/);
 
   assert.match(shopify, /VITE_SHOPIFY_STORE_DOMAIN/);
+  assert.match(shopify, /VITE_SHOPIFY_CHECKOUT_DOMAIN/);
+  assert.match(shopify, /orise-6796\.myshopify\.com/);
+  assert.match(shopify, /forceShopifyCheckoutDomain/);
   assert.match(shopify, /buildShopifyCheckoutUrl/);
   assert.match(shopify, /cartLines\.join\(','\)/);
   assert.doesNotMatch(shopify, /channel=buy_button/);
