@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
+import { clearCustomerSession, getStoredCustomerSession, onCustomerSessionChange } from '../lib/customer';
 
 const LINKS = [
   { label: 'Home', href: '/' },
@@ -20,6 +21,7 @@ type Props = {
 export function Nav({ pathname }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(() => Boolean(getStoredCustomerSession()));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -30,6 +32,8 @@ export function Nav({ pathname }: Props) {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  useEffect(() => onCustomerSessionChange(() => setLoggedIn(Boolean(getStoredCustomerSession()))), []);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -46,7 +50,7 @@ export function Nav({ pathname }: Props) {
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-        className="relative w-full max-w-[min(100%,870px)] pointer-events-auto lg:w-auto"
+        className="relative w-full max-w-[min(100%,1080px)] pointer-events-auto lg:w-auto"
       >
         <div
           className={`hpe-glass rounded-2xl px-2.5 py-2.5 flex items-center justify-between gap-3 transition-all duration-300 sm:gap-6 lg:pl-3 lg:pr-2 ${
@@ -74,7 +78,7 @@ export function Nav({ pathname }: Props) {
             </span>
           </a>
 
-          <div className="hidden lg:flex items-center gap-1 max-w-[min(66vw,780px)] overflow-x-auto hpe-no-scrollbar">
+          <div className="hidden lg:flex items-center gap-1 max-w-[min(58vw,690px)] overflow-x-auto hpe-no-scrollbar">
             {LINKS.map((l) => {
               const active = pathname === l.href || (l.href !== '/' && pathname.startsWith(`${l.href}/`));
               return (
@@ -103,6 +107,28 @@ export function Nav({ pathname }: Props) {
           >
             Shop
           </a>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            {loggedIn ? (
+              <>
+                <a href="/account" className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-white/75 transition hover:border-cyan-300/30 hover:text-white">
+                  Account
+                </a>
+                <button
+                  type="button"
+                  aria-label="Logout"
+                  onClick={() => clearCustomerSession()}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/60 transition hover:border-cyan-300/30 hover:text-white"
+                >
+                  <LogOut size={14} />
+                </button>
+              </>
+            ) : (
+              <a href="/login" className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-white/75 transition hover:border-cyan-300/30 hover:text-white">
+                Login
+              </a>
+            )}
+          </div>
         </div>
 
         <AnimatePresence>
@@ -130,6 +156,22 @@ export function Nav({ pathname }: Props) {
                     </a>
                   );
                 })}
+                <div className="mt-1 grid grid-cols-2 gap-2 border-t border-white/10 pt-2">
+                  {loggedIn ? (
+                    <>
+                      <a href="/account" className="rounded-xl bg-cyan-300/[0.10] px-4 py-3 text-sm text-cyan-100">
+                        Account
+                      </a>
+                      <button type="button" onClick={() => clearCustomerSession()} className="rounded-xl bg-white/[0.05] px-4 py-3 text-left text-sm text-white/72">
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <a href="/login" className="rounded-xl bg-white/[0.05] px-4 py-3 text-sm text-white/72">
+                      Login
+                    </a>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}

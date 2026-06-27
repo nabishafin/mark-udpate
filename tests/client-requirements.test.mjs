@@ -225,7 +225,7 @@ test('mobile body interaction uses a split view instead of blocking the hotspots
 
   assert.match(hero, /activeId \? '-translate-x-\[28vw\] scale-110 sm:-translate-x-\[24vw\] sm:scale-105 lg:-translate-x-\[15vw\] lg:scale-100'/);
   assert.match(body, /hpe-body-stage/);
-  assert.match(body, /width:\s*44,\s*height:\s*44/);
+  assert.match(body, /width:\s*22,\s*height:\s*22/);
   assert.match(body, /\{organ\.name\}/);
   assert.match(body, /aria-label=\{`Inspect \$\{organ\.name\}`\}/);
   assert.match(file('src/index.css'), /\.hpe-body-stage\s*\{\s*flex:\s*0 0 auto;\s*width:\s*clamp\(760px,\s*230vw,\s*860px\);\s*\}/);

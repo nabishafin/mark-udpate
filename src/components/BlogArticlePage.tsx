@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Loader2 } from 'lucide-react';
-import { BlogArticle, FALLBACK_ARTICLES, getBlogArticle } from '../lib/blog';
+import { ArrowLeft, ArrowUpRight, BookOpen, Loader2 } from 'lucide-react';
+import { BlogArticle, FALLBACK_ARTICLES, getBlogArticle, getRecommendedBlogArticles } from '../lib/blog';
 
 type Props = { handle: string };
 
 export function BlogArticlePage({ handle }: Props) {
   const [article, setArticle] = useState<BlogArticle | null>(() =>
     FALLBACK_ARTICLES.find((a) => a.handle === handle) || null,
+  );
+  const [recommended, setRecommended] = useState<BlogArticle[]>(() =>
+    FALLBACK_ARTICLES.filter((a) => a.handle !== handle).slice(0, 3),
   );
   const [loading, setLoading] = useState(true);
 
@@ -17,6 +20,14 @@ export function BlogArticlePage({ handle }: Props) {
       .then((a) => { if (a) setArticle(a); })
       .catch(() => undefined)
       .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [handle]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getRecommendedBlogArticles(handle, controller.signal)
+      .then(setRecommended)
+      .catch(() => setRecommended(FALLBACK_ARTICLES.filter((a) => a.handle !== handle).slice(0, 3)));
     return () => controller.abort();
   }, [handle]);
 
@@ -123,6 +134,39 @@ export function BlogArticlePage({ handle }: Props) {
             <ArrowLeft size={14} /> Back to the Journal
           </a>
         </motion.div>
+
+        {recommended.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.42 }}
+            className="mt-14"
+          >
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <div>
+                <div className="hpe-hud-label">Recommended</div>
+                <h2 className="mt-2 text-2xl font-medium text-white">More from the Shopify journal</h2>
+              </div>
+              <a href="/blogs/news" className="hidden items-center gap-2 text-sm text-cyan-200/75 transition hover:text-cyan-100 sm:inline-flex">
+                View all <ArrowUpRight size={14} />
+              </a>
+            </div>
+            <div className="grid gap-5 md:grid-cols-3">
+              {recommended.map((item) => (
+                <a key={item.id} href={`/blogs/news/${item.handle}`} className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] transition hover:border-cyan-300/30 hover:bg-cyan-300/[0.045]">
+                  <div className="aspect-[16/10] overflow-hidden bg-white/[0.03]">
+                    <img src={item.image.src} alt={item.image.alt} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]" />
+                  </div>
+                  <div className="p-5">
+                    <time className="font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-200/55" dateTime={item.publishedAt}>{formatDate(item.publishedAt)}</time>
+                    <h3 className="mt-3 line-clamp-2 text-base font-medium leading-snug text-white">{item.title}</h3>
+                    <span className="mt-5 inline-flex items-center gap-2 text-sm text-cyan-100">Read article <ArrowUpRight size={13} /></span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </motion.section>
+        )}
       </div>
     </article>
   );

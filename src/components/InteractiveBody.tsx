@@ -97,6 +97,7 @@ const BODY_VID = "/Human.webm";
 
 export function InteractiveBody({ onSelect, active }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const hotspotIndex = (id: string) => ORGANS.findIndex((organ) => organ.id === id);
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {/* HOLOGRAPHIC BODY VIDEO + HOTSPOTS */}
@@ -193,16 +194,17 @@ export function InteractiveBody({ onSelect, active }: Props) {
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
-                width: 44,
-                height: 44
+                width: 22,
+                height: 22,
+                touchAction: 'manipulation'
               }}>
               
               <span className="absolute inset-0 rounded-full" />
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300"
                 style={{
-                  width: isHover ? 34 : 28,
-                  height: isHover ? 34 : 28,
+                  width: isHover ? 18 : 14,
+                  height: isHover ? 18 : 14,
                   borderColor: color.stroke,
                   opacity: isHover ? 0.85 : 0.45
                 }} />
@@ -210,26 +212,26 @@ export function InteractiveBody({ onSelect, active }: Props) {
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full hpe-ripple"
                 style={{
-                  width: 28,
-                  height: 28,
+                  width: 11,
+                  height: 11,
                   border: `1.5px solid ${color.stroke}`,
-                  animationDelay: `${ORGANS.indexOf(organ) * 0.25 % 2.4}s`
+                  animationDelay: `${hotspotIndex(organ.id) * 0.25 % 2.4}s`
                 }} />
               
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300"
                 style={{
-                  width: isHover ? 11 : 8,
-                  height: isHover ? 11 : 8,
+                  width: isHover ? 7 : 5,
+                  height: isHover ? 7 : 5,
                   background: color.fill,
-                  boxShadow: `0 0 ${isHover ? 18 : 10}px ${color.glow}`
+                  boxShadow: `0 0 ${isHover ? 12 : 7}px ${color.glow}`
                 }} />
               
               <span
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
                 style={{
-                  width: isHover ? 4 : 3,
-                  height: isHover ? 4 : 3,
+                  width: isHover ? 2.5 : 1.8,
+                  height: isHover ? 2.5 : 1.8,
                   opacity: 0.95
                 }} />
 

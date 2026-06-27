@@ -194,7 +194,7 @@ export function CheckoutPage() {
   }
 
   return (
-    <section className="relative min-h-screen overflow-hidden pb-24 pt-20">
+    <section className="relative min-h-screen overflow-hidden pb-24 pt-32 sm:pt-36">
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
 
         {/* Header */}

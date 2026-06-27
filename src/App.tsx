@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
 import { ScienceSection } from './components/ScienceSection';
@@ -20,6 +20,7 @@ import { FounderPage } from './components/FounderPage';
 import { LearnPage } from './components/LearnPage';
 import { FloatingShopCTA } from './components/FloatingShopCTA';
 import { CheckoutPage } from './components/CheckoutPage';
+import { AccountPage } from './components/AccountPage';
 import { Organ } from './components/organData';
 
 function normalizePath(pathname: string) {
@@ -120,6 +121,14 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       return <CartPage />;
     case '/checkout':
       return <CheckoutPage />;
+    case '/login':
+      return <AccountPage mode="login" />;
+    case '/register':
+      return <AccountPage mode="register" />;
+    case '/forgot-password':
+      return <AccountPage mode="recover" />;
+    case '/account':
+      return <AccountPage mode="account" />;
     case '/research':
       return <Research />;
     case '/blogs':

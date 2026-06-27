@@ -182,3 +182,16 @@ export async function getBlogArticle(handle: string, signal?: AbortSignal): Prom
   const node: ShopifyArticleNode | null = payload?.data?.blog?.articleByHandle || null;
   return node ? mapNode(node) : fallback;
 }
+
+export async function getRecommendedBlogArticles(handle: string, signal?: AbortSignal): Promise<BlogArticle[]> {
+  const articles = await getBlogArticles(signal);
+  const pool = articles.filter((article) => article.handle !== handle);
+  const seed = [...handle].reduce((total, char) => total + char.charCodeAt(0), 0);
+  return [...pool]
+    .sort((a, b) => scoreArticle(a.handle, seed) - scoreArticle(b.handle, seed))
+    .slice(0, 3);
+}
+
+function scoreArticle(handle: string, seed: number) {
+  return [...handle].reduce((total, char, index) => total + char.charCodeAt(0) * (index + seed + 1), 0) % 997;
+}
