@@ -11,6 +11,7 @@ const SHOPIFY_CHECKOUT_PATHS = [
   /^\/checkout\//,
   /^\/wallets\/checkouts\//,
   /^\/orders\//,
+  /^\/\d+\/orders\//,
 ];
 
 function redirectShopifyCheckoutPath() {

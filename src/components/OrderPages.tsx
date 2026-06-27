@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ExternalLink, ListOrdered, PackageCheck, ReceiptText, Truck } from 'lucide-react';
 import {
+  CustomerSession,
   ShopifyCustomerOrder,
   ShopifyMailingAddress,
   ShopifyMoney,
@@ -9,26 +10,34 @@ import {
   getCustomerOrder,
   getCustomerOrders,
   getStoredCustomerSession,
+  onCustomerSessionChange,
 } from '../lib/customer';
+import { forceShopifyCheckoutDomain } from '../lib/shopify';
 
 type OrdersPageProps = {
   orderId?: string;
 };
 
 export function OrdersPage({ orderId }: OrdersPageProps) {
+  const [session, setSession] = useState<CustomerSession | null>(() => getStoredCustomerSession());
   const [orders, setOrders] = useState<ShopifyCustomerOrder[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<ShopifyCustomerOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const session = getStoredCustomerSession();
   const decodedOrderId = orderId ? decodeURIComponent(orderId) : '';
+  const accessToken = session?.accessToken ?? '';
+  const customerName = getCustomerDisplayName(session?.customer);
+
+  useEffect(() => onCustomerSessionChange(() => setSession(getStoredCustomerSession())), []);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError('');
+    setSelectedOrder(null);
+    setOrders([]);
 
-    if (!session) {
+    if (!accessToken) {
       setLoading(false);
       return () => {
         active = false;
@@ -36,10 +45,10 @@ export function OrdersPage({ orderId }: OrdersPageProps) {
     }
 
     const request = decodedOrderId
-      ? getCustomerOrder(session.accessToken, decodedOrderId).then((order) => {
+      ? getCustomerOrder(accessToken, decodedOrderId).then((order) => {
           if (active) setSelectedOrder(order);
         })
-      : getCustomerOrders(session.accessToken).then((nextOrders) => {
+      : getCustomerOrders(accessToken).then((nextOrders) => {
           if (active) setOrders(nextOrders);
         });
 
@@ -54,7 +63,7 @@ export function OrdersPage({ orderId }: OrdersPageProps) {
     return () => {
       active = false;
     };
-  }, [decodedOrderId, session]);
+  }, [accessToken, decodedOrderId]);
 
   if (!session) {
     return (
@@ -79,7 +88,7 @@ export function OrdersPage({ orderId }: OrdersPageProps) {
         loading={loading}
         error={error}
         order={selectedOrder}
-        customerName={getCustomerDisplayName(session.customer)}
+        customerName={customerName}
       />
     );
   }
@@ -148,6 +157,7 @@ function OrderStatusView({
 
   const fulfillments = order.successfulFulfillments ?? [];
   const lineItems = order.lineItems?.nodes ?? [];
+  const shopifyStatusUrl = getShopifyStatusUrl(order.statusUrl);
 
   return (
     <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
@@ -229,7 +239,7 @@ function OrderStatusView({
                           {fulfillment.trackingInfo.map((tracking) => (
                             <a
                               key={`${tracking.number}-${tracking.url}`}
-                              href={tracking.url || order.statusUrl}
+                              href={getShopifyStatusUrl(tracking.url || order.statusUrl)}
                               target="_blank"
                               rel="noreferrer"
                               className="flex items-center justify-between gap-3 rounded-lg border border-cyan-300/15 bg-cyan-300/[0.05] px-3 py-2 text-sm text-cyan-100"
@@ -250,8 +260,8 @@ function OrderStatusView({
                   No successful fulfillment or tracking number has been added in Shopify yet.
                 </p>
               )}
-              {order.statusUrl && (
-                <a href={order.statusUrl} target="_blank" rel="noreferrer" className="hpe-btn-primary mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+              {shopifyStatusUrl && (
+                <a href={shopifyStatusUrl} target="_blank" rel="noreferrer" className="hpe-btn-primary mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
                   Open Shopify status <ExternalLink size={14} />
                 </a>
               )}
@@ -416,4 +426,14 @@ function formatDate(value?: string | null) {
 
 function formatStatus(value: string) {
   return value.replace(/_/g, ' ').toLowerCase();
+}
+
+function getShopifyStatusUrl(value?: string | null) {
+  if (!value) return undefined;
+
+  try {
+    return forceShopifyCheckoutDomain(value, 'order_status');
+  } catch {
+    return value;
+  }
 }

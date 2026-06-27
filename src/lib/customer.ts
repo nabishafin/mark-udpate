@@ -142,7 +142,21 @@ const CUSTOMER_FIELDS = `
   }
 `;
 
-const ORDER_FIELDS = `
+const ORDER_SUMMARY_FIELDS = `
+  id
+  name
+  orderNumber
+  processedAt
+  financialStatus
+  fulfillmentStatus
+  canceledAt
+  cancelReason
+  statusUrl
+  currentTotalPrice { amount currencyCode }
+  totalPrice { amount currencyCode }
+`;
+
+const ORDER_DETAIL_FIELDS = `
   id
   name
   orderNumber
@@ -326,7 +340,7 @@ export async function getCustomerOrders(accessToken: string, first = 50): Promis
       customer(customerAccessToken: $customerAccessToken) {
         orders(first: $first, sortKey: PROCESSED_AT, reverse: true) {
           nodes {
-            ${ORDER_FIELDS}
+            ${ORDER_SUMMARY_FIELDS}
           }
         }
       }
@@ -339,7 +353,21 @@ export async function getCustomerOrders(accessToken: string, first = 50): Promis
 
 export async function getCustomerOrder(accessToken: string, orderId: string): Promise<ShopifyCustomerOrder | null> {
   const orders = await getCustomerOrders(accessToken, 50);
-  return orders.find((order) => order.id === orderId) ?? null;
+  const orderBelongsToCustomer = orders.some((order) => order.id === orderId);
+  if (!orderBelongsToCustomer) return null;
+
+  const payload = await shopifyStorefrontFetch({
+    query: `query OrderDetail($id: ID!) {
+      node(id: $id) {
+        ... on Order {
+          ${ORDER_DETAIL_FIELDS}
+        }
+      }
+    }`,
+    variables: { id: orderId },
+  });
+
+  return payload?.data?.node ?? orders.find((order) => order.id === orderId) ?? null;
 }
 
 export async function updateCustomerProfile(accessToken: string, input: CustomerProfileInput, expiresAt: string): Promise<CustomerSession> {
@@ -398,6 +426,28 @@ export async function updateCustomerPassword(accessToken: string, password: stri
   const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer };
   saveCustomerSession(session);
   return session;
+}
+
+export async function resetCustomerPasswordByUrl(resetUrl: string, password: string): Promise<void> {
+  const payload = await shopifyStorefrontFetch({
+    query: `mutation CustomerResetByUrl($resetUrl: URL!, $password: String!) {
+      customerResetByUrl(resetUrl: $resetUrl, password: $password) {
+        customer { id email }
+        customerAccessToken { accessToken expiresAt }
+        customerUserErrors { field message code }
+      }
+    }`,
+    variables: {
+      resetUrl,
+      password,
+    },
+  });
+
+  const errors = payload?.data?.customerResetByUrl?.customerUserErrors ?? [];
+  if (errors.length) throw new Error(getCustomerErrors(errors));
+
+  const customer = payload?.data?.customerResetByUrl?.customer;
+  if (!customer) throw new Error('Shopify could not reset the password with this reset link.');
 }
 
 export async function recoverCustomerPassword(email: string): Promise<void> {

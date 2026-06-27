@@ -1,13 +1,22 @@
 RewriteEngine On
 
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
 # Shopify Storefront checkout URLs may use the primary domain. On Hostinger,
 # those paths must go back to Shopify before the React app fallback runs.
+RewriteRule ^account/reset/(.*)$ /index.html [L,QSA]
 RewriteRule ^cart/c/(.*)$ https://orise-6796.myshopify.com/cart/c/$1 [R=302,L,QSA]
 RewriteRule ^cart/([0-9].*)$ https://orise-6796.myshopify.com/cart/$1 [R=302,L,QSA]
 RewriteRule ^checkouts/(.*)$ https://orise-6796.myshopify.com/checkouts/$1 [R=302,L,QSA]
 RewriteRule ^checkout/(.*)$ https://orise-6796.myshopify.com/checkout/$1 [R=302,L,QSA]
 RewriteRule ^wallets/checkouts/(.*)$ https://orise-6796.myshopify.com/wallets/checkouts/$1 [R=302,L,QSA]
 RewriteRule ^orders/(.*)$ https://orise-6796.myshopify.com/orders/$1 [R=302,L,QSA]
+RewriteRule ^([0-9]+)/orders/(.*)$ https://orise-6796.myshopify.com/$1/orders/$2 [R=302,L,QSA]
 
 # React/Vite single-page app fallback.
 RewriteCond %{REQUEST_FILENAME} !-f

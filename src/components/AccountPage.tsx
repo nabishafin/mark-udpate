@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, KeyRound, ListOrdered, Lock, LogOut, Mail, MessageCircle, ShieldCheck, UserPlus } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, KeyRound, ListOrdered, Lock, LogOut, Mail, MessageCircle, ShieldCheck, UserPlus } from 'lucide-react';
 import {
   CustomerSession,
   ShopifyCustomerOrder,
@@ -10,15 +10,17 @@ import {
   getCustomerOrders,
   getStoredCustomerSession,
   loginCustomer,
+  onCustomerSessionChange,
   recoverCustomerPassword,
   registerCustomer,
+  resetCustomerPasswordByUrl,
   saveCustomerSession,
   updateCustomerPassword,
   updateCustomerProfile,
 } from '../lib/customer';
 import { SUPPORT_EMAIL, submitContactMessage } from '../lib/contact';
 
-type AuthMode = 'login' | 'register' | 'recover' | 'account';
+type AuthMode = 'login' | 'register' | 'recover' | 'reset' | 'account';
 
 type Props = {
   mode: AuthMode;
@@ -29,17 +31,32 @@ export function AccountPage({ mode }: Props) {
   const isAccount = mode === 'account';
 
   useEffect(() => {
-    const active = getStoredCustomerSession();
-    setSession(active);
-    if (!active || active.customer) return;
+    let mounted = true;
 
-    getCustomer(active.accessToken)
-      .then((customer) => {
-        const updated = { ...active, customer };
-        saveCustomerSession(updated);
-        setSession(updated);
-      })
-      .catch(() => undefined);
+    const syncSession = () => {
+      const active = getStoredCustomerSession();
+      if (!mounted) return;
+      setSession(active);
+      if (!active || active.customer) return;
+
+      getCustomer(active.accessToken)
+        .then((customer) => {
+          const current = getStoredCustomerSession();
+          if (!mounted || !current || current.accessToken !== active.accessToken) return;
+          const updated = { ...current, customer };
+          saveCustomerSession(updated);
+          setSession(updated);
+        })
+        .catch(() => undefined);
+    };
+
+    syncSession();
+    const unsubscribe = onCustomerSessionChange(syncSession);
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
   }, [mode]);
 
   if (isAccount && session) {
@@ -85,7 +102,13 @@ export function AccountPage({ mode }: Props) {
           transition={{ duration: 0.65, delay: 0.06 }}
           className="hpe-glass rounded-2xl p-5 sm:p-7"
         >
-          {mode === 'register' ? <RegisterForm onSession={setSession} /> : mode === 'recover' ? <RecoverForm /> : <LoginForm onSession={setSession} />}
+          {mode === 'register'
+            ? <RegisterForm onSession={setSession} />
+            : mode === 'recover'
+              ? <RecoverForm />
+              : mode === 'reset'
+                ? <ResetPasswordForm />
+                : <LoginForm onSession={setSession} />}
         </motion.div>
       </div>
     </section>
@@ -120,7 +143,7 @@ function LoginForm({ onSession }: { onSession: (session: CustomerSession) => voi
     <form onSubmit={submit} className="grid gap-4">
       <FormHeader icon={Lock} title="Login" body="Access your Shopify customer account." />
       <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
-      <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" required />
+      <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" required revealable />
       <Feedback error={error} status={status} />
       <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
         {submitting ? 'Signing in...' : 'Login with Shopify'} <ArrowRight size={14} />
@@ -172,7 +195,7 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
       </div>
       <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
       <TextField label="Phone" type="tel" value={phone} onChange={setPhone} autoComplete="tel" />
-      <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} />
+      <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
       <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-white/58">
         <input
           type="checkbox"
@@ -198,15 +221,26 @@ function RecoverForm() {
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return undefined;
+    const timer = window.setInterval(() => {
+      setCooldown((current) => Math.max(0, current - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [cooldown]);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (cooldown > 0) return;
     setSubmitting(true);
     setError('');
     setStatus('');
     try {
       await recoverCustomerPassword(email);
-      setStatus('If that email belongs to a Shopify customer account, Shopify will send password reset instructions.');
+      setCooldown(50);
+      setStatus('If that email belongs to a Shopify customer account, Shopify will send a password reset link.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start password recovery.');
     } finally {
@@ -219,11 +253,135 @@ function RecoverForm() {
       <FormHeader icon={Mail} title="Forgot password" body="Send a Shopify password reset email." />
       <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
       <Feedback error={error} status={status} />
-      <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-        {submitting ? 'Sending...' : 'Send reset email'} <ArrowRight size={14} />
+      <button type="submit" disabled={submitting || cooldown > 0} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+        {submitting ? 'Sending...' : cooldown > 0 ? `Send again in ${cooldown}s` : 'Send reset email'} <ArrowRight size={14} />
       </button>
-      <a href="/login" className="text-sm text-cyan-200/75 hover:text-cyan-100">Back to login</a>
+      <div className="flex flex-wrap gap-3 text-sm text-white/55">
+        <a href="/login" className="text-cyan-200/75 hover:text-cyan-100">Back to login</a>
+        <a href="/reset-password" className="text-cyan-200/75 hover:text-cyan-100">I have a reset link</a>
+      </div>
     </form>
+  );
+}
+
+function ResetPasswordForm() {
+  const resetUrlFromEmail = /\/account\/reset\//.test(window.location.pathname);
+  const [resetUrl, setResetUrl] = useState(() => {
+    const currentUrl = window.location.href;
+    return resetUrlFromEmail ? currentUrl : '';
+  });
+  const [email, setEmail] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resending, setResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState('');
+  const [resendError, setResendError] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!resetUrlFromEmail) return;
+    window.history.replaceState({}, '', '/reset-password');
+  }, [resetUrlFromEmail]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return undefined;
+    const timer = window.setInterval(() => {
+      setResendCooldown((current) => Math.max(0, current - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [resendCooldown]);
+
+  const resend = async (event: FormEvent) => {
+    event.preventDefault();
+    if (resendCooldown > 0) return;
+    setResending(true);
+    setResendStatus('');
+    setResendError('');
+
+    try {
+      await recoverCustomerPassword(email);
+      setResendCooldown(50);
+      setResendStatus('If that email belongs to a Shopify customer account, Shopify will send a new reset link.');
+    } catch (err) {
+      setResendError(err instanceof Error ? err.message : 'Could not send a new Shopify reset link.');
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('');
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await resetCustomerPasswordByUrl(resetUrl, password);
+      setResetUrl('');
+      setPassword('');
+      setConfirmPassword('');
+      setStatus('Password changed successfully. You can now login with your email and new password.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not reset password with this Shopify reset link.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="grid gap-4">
+      <FormHeader icon={KeyRound} title="Reset password" body="Use the Shopify reset link from your email." />
+      <form onSubmit={submit} className="grid gap-4">
+        {!resetUrlFromEmail && (
+          <label className="grid gap-2 text-sm text-white/70">
+            Shopify reset link
+            <textarea
+              required
+              value={resetUrl}
+              onChange={(event) => setResetUrl(event.target.value)}
+              rows={3}
+              className="resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/60"
+              placeholder="Paste the full Shopify password reset link from your email."
+            />
+          </label>
+        )}
+        {resetUrlFromEmail && (
+          <div className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] p-3 text-sm leading-relaxed text-cyan-100">
+            Shopify reset link received. The reset token was removed from the address bar for security.
+          </div>
+        )}
+        <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
+        <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
+        <Feedback error={error} status={status} />
+        {status ? (
+          <a href="/login" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+            Go to login <ArrowRight size={14} />
+          </a>
+        ) : (
+          <button type="submit" disabled={submitting || !resetUrl} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+            {submitting ? 'Saving...' : 'Set new password'} <ArrowRight size={14} />
+          </button>
+        )}
+      </form>
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <p className="text-sm font-medium text-white">Need a new Shopify reset link?</p>
+        <form onSubmit={resend} className="mt-3 grid gap-3">
+          <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
+          <button type="submit" disabled={resending || resendCooldown > 0} className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+            {resending ? 'Sending...' : resendCooldown > 0 ? `Send again in ${resendCooldown}s` : 'Send new reset link'} <ArrowRight size={14} />
+          </button>
+        </form>
+        <Feedback error={resendError} status={resendStatus} />
+      </div>
+    </div>
   );
 }
 
@@ -487,8 +645,8 @@ function PasswordForm({ session, onSessionChange }: { session: CustomerSession; 
   return (
     <form onSubmit={submit} className="hpe-glass grid gap-4 rounded-2xl p-6 sm:p-8">
       <FormHeader icon={KeyRound} title="Change password" body="Update your Shopify customer password." />
-      <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} />
-      <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} />
+      <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
+      <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
       <Feedback error={error} status={status} />
       <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
         {submitting ? 'Changing...' : 'Change password'} <ArrowRight size={14} />
@@ -528,6 +686,7 @@ function TextField({
   required,
   autoComplete,
   minLength,
+  revealable,
 }: {
   label: string;
   type?: string;
@@ -536,19 +695,35 @@ function TextField({
   required?: boolean;
   autoComplete?: string;
   minLength?: number;
+  revealable?: boolean;
 }) {
+  const [visible, setVisible] = useState(false);
+  const inputType = revealable && type === 'password' && visible ? 'text' : type;
+
   return (
     <label className="grid gap-2 text-sm text-white/70">
       {label}
-      <input
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        minLength={minLength}
-        autoComplete={autoComplete}
-        className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/60"
-      />
+      <span className="relative">
+        <input
+          type={inputType}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          required={required}
+          minLength={minLength}
+          autoComplete={autoComplete}
+          className={`w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/60 ${revealable ? 'pr-12' : ''}`}
+        />
+        {revealable && type === 'password' && (
+          <button
+            type="button"
+            aria-label={visible ? 'Hide password' : 'Show password'}
+            onClick={() => setVisible((current) => !current)}
+            className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-white/45 transition hover:bg-white/[0.06] hover:text-white"
+          >
+            {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        )}
+      </span>
     </label>
   );
 }

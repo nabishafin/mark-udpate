@@ -1,5 +1,32 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/account/reset/:path*",
+      "destination": "/index.html"
+    },
     {
       "source": "/checkouts/:path*",
       "destination": "https://orise-6796.myshopify.com/checkouts/:path*"
@@ -7,6 +34,14 @@
     {
       "source": "/cart/c/:path*",
       "destination": "https://orise-6796.myshopify.com/cart/c/:path*"
+    },
+    {
+      "source": "/:shopId(\\d+)/orders/:path*",
+      "destination": "https://orise-6796.myshopify.com/:shopId/orders/:path*"
+    },
+    {
+      "source": "/orders/:path*",
+      "destination": "https://orise-6796.myshopify.com/orders/:path*"
     },
     {
       "source": "/a/checkout",
