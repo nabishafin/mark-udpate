@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Eye, EyeOff, KeyRound, ListOrdered, Lock, LogOut, Mail, MessageCircle, ShieldCheck, UserPlus } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, KeyRound, ListOrdered, Lock, LogOut, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 import {
   CustomerSession,
   ShopifyCustomerOrder,
@@ -18,7 +18,6 @@ import {
   updateCustomerPassword,
   updateCustomerProfile,
 } from '../lib/customer';
-import { SUPPORT_EMAIL, submitContactMessage } from '../lib/contact';
 
 type AuthMode = 'login' | 'register' | 'recover' | 'reset' | 'account';
 
@@ -396,12 +395,8 @@ function CustomerDashboard({
 }) {
   const customer = session.customer;
   const displayName = getCustomerDisplayName(customer);
-  const messageSubject = `Support request from ${displayName}`;
   const [orders, setOrders] = useState<ShopifyCustomerOrder[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
-  const [messageStatus, setMessageStatus] = useState('');
-  const [messageError, setMessageError] = useState('');
-  const [messageSubmitting, setMessageSubmitting] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -420,23 +415,6 @@ function CustomerDashboard({
       active = false;
     };
   }, [session.accessToken]);
-
-  const submitMessage = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setMessageSubmitting(true);
-    setMessageStatus('');
-    setMessageError('');
-
-    try {
-      const result = await submitContactMessage(new FormData(event.currentTarget));
-      setMessageStatus(result.mode === 'email' ? 'Opening your email app with the support message ready.' : 'Message sent to store support.');
-      if (result.mode === 'endpoint') event.currentTarget.reset();
-    } catch (err) {
-      setMessageError(err instanceof Error ? err.message : 'Message could not be sent. Please email support directly.');
-    } finally {
-      setMessageSubmitting(false);
-    }
-  };
 
   return (
     <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
@@ -506,45 +484,6 @@ function CustomerDashboard({
         <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.06 }} className="space-y-6">
           <ProfileForm session={session} onSessionChange={onSessionChange} />
           <PasswordForm session={session} onSessionChange={onSessionChange} />
-
-          <div className="hpe-glass rounded-2xl p-6 sm:p-8">
-          <div className="flex items-center gap-3">
-            <MessageCircle className="text-cyan-300" size={18} />
-            <div className="hpe-hud-label">Message Shopify Admin</div>
-          </div>
-          <h2 className="mt-4 text-2xl font-medium text-white">Talk with the store team.</h2>
-          <p className="mt-3 text-sm leading-relaxed text-white/55">
-            This sends your logged-in customer details with the message so the store admin
-            can match the request to the Shopify customer record.
-          </p>
-
-          <form onSubmit={submitMessage} className="mt-6 grid gap-4">
-            <input type="hidden" name="customer_id" value={customer?.id ?? ''} />
-            <input type="hidden" name="email" value={customer?.email ?? ''} />
-            <input type="hidden" name="subject" value={messageSubject} />
-            <label className="grid gap-2 text-sm text-white/70">
-              Message
-              <textarea
-                required
-                name="message"
-                rows={6}
-                className="resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/60"
-                placeholder="Tell the Shopify admin what you need help with."
-              />
-            </label>
-            <button type="submit" disabled={messageSubmitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-              {messageSubmitting ? 'Sending...' : 'Message admin'} <MessageCircle size={14} />
-            </button>
-            {(messageStatus || messageError) && (
-              <div className={`rounded-xl border p-3 text-sm ${messageError ? 'border-red-300/20 bg-red-300/[0.06] text-red-100' : 'border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-100'}`}>
-                {messageError || messageStatus}
-              </div>
-            )}
-            <a href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(messageSubject)}`} className="text-sm text-cyan-200/75 hover:text-cyan-100">
-              Or open email directly
-            </a>
-          </form>
-          </div>
         </motion.div>
       </div>
     </section>

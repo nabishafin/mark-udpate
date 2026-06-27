@@ -24,7 +24,7 @@ export function FloatingShopCTA({ pathname }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.96 }}
           transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-          className="fixed bottom-6 right-6 z-40 pointer-events-auto"
+          className="fixed bottom-6 left-6 z-40 pointer-events-auto"
         >
           <a
             href="/products"

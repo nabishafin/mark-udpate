@@ -19,6 +19,8 @@ import { PolicyPage } from './components/PolicyPage';
 import { FounderPage } from './components/FounderPage';
 import { LearnPage } from './components/LearnPage';
 import { FloatingShopCTA } from './components/FloatingShopCTA';
+import { ShopifyInbox } from './components/ShopifyInbox';
+import { EmailPopup } from './components/EmailPopup';
 import { CheckoutPage } from './components/CheckoutPage';
 import { AccountPage } from './components/AccountPage';
 import { OrdersPage } from './components/OrderPages';
@@ -96,6 +98,8 @@ export function App() {
         onNavigate={handleSelectOrgan}
       />
       <FloatingShopCTA pathname={pathname} />
+      <ShopifyInbox />
+      <EmailPopup />
     </div>
   );
 }
