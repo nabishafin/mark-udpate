@@ -145,15 +145,11 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       if (pathname.startsWith('/learn/') && pathname.length > '/learn/'.length) {
         return <LearnPage slug={pathname.slice('/learn/'.length)} />;
       }
-      if (
-        pathname.startsWith('/checkouts/') ||
-        pathname.startsWith('/cart/c/') ||
-        pathname === '/a/checkout' ||
-        pathname.startsWith('/a/checkout/')
-      ) {
-        window.location.replace(`https://orise-6796.myshopify.com${window.location.pathname}${window.location.search}${window.location.hash}`);
-        return null;
-      }
+      // NOTE: Shopify checkout paths (/checkouts/, /cart/c/, /a/checkout) are handled
+      // by the nginx reverse-proxy (see docs/nginx-shopify-checkout-proxy.conf), so the
+      // SPA never renders for them in production. No client-side redirect here — a
+      // window.location redirect to the myshopify domain causes an infinite refresh
+      // loop (Shopify bounces back to the canonical domain -> SPA -> redirect -> ...).
       return <HomePage onSelectOrgan={onSelectOrgan} activeId={activeId} />;
   }
 }
