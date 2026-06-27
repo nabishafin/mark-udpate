@@ -1,12 +1,17 @@
 {
-  "redirects": [
+  "rewrites": [
+    {
+      "source": "/checkouts/:path*",
+      "destination": "https://orise-6796.myshopify.com/checkouts/:path*"
+    },
     {
       "source": "/cart/c/:path*",
-      "destination": "https://orise-6796.myshopify.com/cart/c/:path*",
-      "permanent": false
-    }
-  ],
-  "rewrites": [
+      "destination": "https://orise-6796.myshopify.com/cart/c/:path*"
+    },
+    {
+      "source": "/a/checkout",
+      "destination": "https://orise-6796.myshopify.com/a/checkout"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

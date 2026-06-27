@@ -19,6 +19,7 @@ import { PolicyPage } from './components/PolicyPage';
 import { FounderPage } from './components/FounderPage';
 import { LearnPage } from './components/LearnPage';
 import { FloatingShopCTA } from './components/FloatingShopCTA';
+import { CheckoutPage } from './components/CheckoutPage';
 import { Organ } from './components/organData';
 
 function normalizePath(pathname: string) {
@@ -117,6 +118,8 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
     case '/cart':
     case '/products/cart':
       return <CartPage />;
+    case '/checkout':
+      return <CheckoutPage />;
     case '/research':
       return <Research />;
     case '/blogs':
@@ -141,6 +144,15 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       }
       if (pathname.startsWith('/learn/') && pathname.length > '/learn/'.length) {
         return <LearnPage slug={pathname.slice('/learn/'.length)} />;
+      }
+      if (
+        pathname.startsWith('/checkouts/') ||
+        pathname.startsWith('/cart/c/') ||
+        pathname === '/a/checkout' ||
+        pathname.startsWith('/a/checkout/')
+      ) {
+        window.location.replace(`https://orise-6796.myshopify.com${window.location.pathname}${window.location.search}${window.location.hash}`);
+        return null;
       }
       return <HomePage onSelectOrgan={onSelectOrgan} activeId={activeId} />;
   }

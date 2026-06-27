@@ -11,12 +11,7 @@ import {
   updateCartItemQuantity,
 } from '../lib/cart';
 import { PRODUCTS, Product, getLiveProducts } from '../lib/products';
-import {
-  buildShopifyCheckoutUrl,
-  canUseStorefrontCart,
-  createShopifyCartCheckoutUrl,
-  hasCheckoutVariants,
-} from '../lib/shopify';
+import { hasCheckoutVariants } from '../lib/shopify';
 import { trackCommerceEvent } from '../lib/tracking';
 
 const CHECKOUT_STEPS = [
@@ -27,8 +22,6 @@ const CHECKOUT_STEPS = [
 
 export function CartPage() {
   const [cartItems, setCartItems] = useState(() => getCartItems());
-  const [checkoutError, setCheckoutError] = useState('');
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
 
   useEffect(() => onCartChange(() => setCartItems(getCartItems())), []);
@@ -64,33 +57,14 @@ export function CartPage() {
     syncCart();
   };
 
-  const checkoutItems = hydratedItems.map((item) => ({
-    variantId: item.product.variantId,
-    quantity: item.quantity,
-    sellingPlanId: item.purchaseOption === 'subscription' ? item.sellingPlanId : undefined,
-    purchaseOption: item.purchaseOption,
-  }));
-
-  const handleCheckout = async () => {
-    setCheckoutError('');
-    setCheckoutLoading(true);
-
+  const handleCheckout = () => {
     trackCommerceEvent('started_checkout', {
       value: formatMoney(subtotalCents),
       items: hydratedItems.map((item) => item.product.name).join(', '),
       cartQuantity: hydratedItems.reduce((total, item) => total + item.quantity, 0),
     });
-
-    try {
-      const checkoutUrl = canUseStorefrontCart()
-        ? await createShopifyCartCheckoutUrl(checkoutItems)
-        : buildShopifyCheckoutUrl(checkoutItems);
-
-      window.location.href = checkoutUrl;
-    } catch (error) {
-      setCheckoutLoading(false);
-      setCheckoutError(error instanceof Error ? error.message : 'Shopify checkout could not be started.');
-    }
+    window.history.pushState({}, '', '/checkout');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   return (
@@ -275,18 +249,13 @@ export function CartPage() {
                   Complete one purchase plan at a time until the Shopify Storefront cart API is connected.
                 </p>
               )}
-              {checkoutError && (
-                <p className="mt-4 rounded-xl border border-red-300/20 bg-red-300/[0.06] p-3 text-xs leading-relaxed text-red-100/80">
-                  {checkoutError}
-                </p>
-              )}
               <button
                 type="button"
                 onClick={handleCheckout}
-                disabled={!canCheckout || checkoutLoading}
+                disabled={!canCheckout}
                 className="hpe-btn-primary mt-6 w-full rounded-xl px-5 py-4 text-sm font-medium tracking-wide disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {checkoutLoading ? 'Opening Shopify checkout...' : 'Check out'}
+                Check out
               </button>
               <a href="/products" className="mt-3 inline-flex w-full justify-center px-5 py-3 text-sm text-white/62 underline underline-offset-4 transition hover:text-white">
                 Continue shopping
