@@ -11,7 +11,7 @@ import {
   selectCartDeliveryOption,
   updateCartBuyerIdentity,
 } from '../lib/checkout';
-import { forceShopifyCheckoutDomain } from '../lib/shopify';
+import { buildShopifyCheckoutUrl, forceShopifyCheckoutDomain } from '../lib/shopify';
 
 type Step = 'information' | 'shipping' | 'review';
 
@@ -95,6 +95,13 @@ export function CheckoutPage() {
   );
 
   const selectedOption = allDeliveryOptions.find((o) => o.handle === selectedHandle) ?? null;
+  const checkoutItems = hydratedItems.map((item) => ({
+    variantId: item.product.variantId,
+    quantity: item.quantity,
+    sellingPlanId: item.purchaseOption === 'subscription' ? item.sellingPlanId : undefined,
+    purchaseOption: item.purchaseOption,
+  }));
+  const canPay = checkoutItems.length > 0 && checkoutItems.every((item) => Boolean(item.variantId));
 
   const totalFromShopify = shopifyCart?.cost?.totalAmount;
   const totalDisplay = totalFromShopify
@@ -158,15 +165,16 @@ export function CheckoutPage() {
   };
 
   const handlePayment = () => {
-    if (!shopifyCart?.checkoutUrl) return;
+    if (!canPay) return;
     // Hand off to Shopify's hosted checkout on the myshopify domain
     // (e.g. https://orise-6796.myshopify.com/cart/c/TOKEN?key=...). This is the
     // standard, always-works payment page — no domain proxy required.
     let target: string;
     try {
-      target = forceShopifyCheckoutDomain(shopifyCart.checkoutUrl);
+      target = buildShopifyCheckoutUrl(checkoutItems, 'local_checkout_payment');
     } catch {
-      target = shopifyCart.checkoutUrl;
+      if (!shopifyCart?.checkoutUrl) return;
+      target = forceShopifyCheckoutDomain(shopifyCart.checkoutUrl);
     }
     window.location.href = target;
   };
@@ -435,7 +443,7 @@ export function CheckoutPage() {
                       <button
                         type="button"
                         onClick={handlePayment}
-                        disabled={!shopifyCart?.checkoutUrl}
+                        disabled={!canPay}
                         className="hpe-btn-primary flex flex-1 items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold tracking-wide disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Lock size={13} />

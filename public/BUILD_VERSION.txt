@@ -1,0 +1,6 @@
+checkout-continuation-fix-hostinger-2026-06-27
+
+This build contains:
+- Shopify checkout continuation redirect guard in the frontend bundle.
+- Hostinger .htaccess rules for /cart/c/*, /cart/[variant]:[qty], /checkouts/*, /checkout/*, /wallets/checkouts/*, and /orders/*.
+- Shopify checkout domain: orise-6796.myshopify.com.

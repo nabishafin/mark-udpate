@@ -128,6 +128,14 @@ test('site is routed as a multipage experience instead of one long homepage', ()
   assert.doesNotMatch(app, /<main>\s*<Hero[\s\S]*<ScienceSection \/>[\s\S]*<LabTesting \/>[\s\S]*<Benefits \/>/);
   assert.match(file('src/index.tsx'), /redirectShopifyCheckoutPath/);
   assert.match(file('src/index.tsx'), /cart\\\/c/);
+  assert.match(file('src/index.tsx'), /checkouts\\\//);
+  assert.match(file('src/index.tsx'), /wallets\\\/checkouts/);
+  assert.match(file('src/index.tsx'), /orders\\\//);
+  assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/cart\/c\/\$1/);
+  assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/checkouts\/\$1/);
+  assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/wallets\/checkouts\/\$1/);
+  assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/orders\/\$1/);
+  assert.match(file('public/.htaccess'), /RewriteRule \. \/index\.html \[L\]/);
   assert.match(vercel, /"source":\s*"\/cart\/c\/:path\*"/);
   assert.match(vercel, /orise-6796\.myshopify\.com\/cart\/c\/:path\*/);
   assert.match(vercel, /"source":\s*"\/\(\.\*\)"/);
@@ -407,6 +415,7 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
 test('cart page supports local cart quantity controls, removal, and Shopify checkout handoff', () => {
   const app = file('src/App.tsx');
   const cart = file('src/components/CartPage.tsx');
+  const checkout = file('src/components/CheckoutPage.tsx');
   const cartLib = file('src/lib/cart.ts');
   const products = file('src/lib/products.ts');
   const shopify = file('src/lib/shopify.ts');
@@ -419,7 +428,10 @@ test('cart page supports local cart quantity controls, removal, and Shopify chec
   assert.match(cart, /Order Summary/);
   assert.match(cart, /\/products/);
   assert.match(cart, /handleCheckout/);
-  assert.match(cart, /buildShopifyCheckoutUrl/);
+  assert.match(cart, /pushState\(\{\}, '', '\/checkout'\)/);
+  assert.match(checkout, /createCheckoutCart/);
+  assert.match(checkout, /forceShopifyCheckoutDomain/);
+  assert.match(checkout, /window\.location\.href = target/);
   assert.match(cart, /updateCartItemQuantity/);
   assert.match(cart, /removeCartItem/);
   assert.match(cart, /Minus/);

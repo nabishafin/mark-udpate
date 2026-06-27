@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Shopify Storefront checkout URLs may use the primary domain. On Hostinger,
+# those paths must go back to Shopify before the React app fallback runs.
+RewriteRule ^cart/c/(.*)$ https://orise-6796.myshopify.com/cart/c/$1 [R=302,L,QSA]
+RewriteRule ^cart/([0-9].*)$ https://orise-6796.myshopify.com/cart/$1 [R=302,L,QSA]
+RewriteRule ^checkouts/(.*)$ https://orise-6796.myshopify.com/checkouts/$1 [R=302,L,QSA]
+RewriteRule ^checkout/(.*)$ https://orise-6796.myshopify.com/checkout/$1 [R=302,L,QSA]
+RewriteRule ^wallets/checkouts/(.*)$ https://orise-6796.myshopify.com/wallets/checkouts/$1 [R=302,L,QSA]
+RewriteRule ^orders/(.*)$ https://orise-6796.myshopify.com/orders/$1 [R=302,L,QSA]
+
+# React/Vite single-page app fallback.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]

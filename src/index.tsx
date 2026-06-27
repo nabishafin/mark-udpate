@@ -4,10 +4,17 @@ import { App } from './App';
 import './index.css';
 
 const SHOPIFY_CHECKOUT_HOST = 'orise-6796.myshopify.com';
+const SHOPIFY_CHECKOUT_PATHS = [
+  /^\/cart\/c\//,
+  /^\/cart\/\d/,
+  /^\/checkouts\//,
+  /^\/checkout\//,
+  /^\/wallets\/checkouts\//,
+  /^\/orders\//,
+];
 
 function redirectShopifyCheckoutPath() {
-  const isShopifyCheckoutPath = /^\/cart\/c\//.test(window.location.pathname)
-    || /^\/cart\/\d/.test(window.location.pathname);
+  const isShopifyCheckoutPath = SHOPIFY_CHECKOUT_PATHS.some((pattern) => pattern.test(window.location.pathname));
 
   if (!isShopifyCheckoutPath || window.location.hostname === SHOPIFY_CHECKOUT_HOST) return false;
 

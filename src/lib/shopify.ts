@@ -19,6 +19,7 @@ const DEFAULT_STOREFRONT_API_URL = 'https://orise-6796.myshopify.com/api/2026-04
 const DEFAULT_STOREFRONT_TOKEN = 'ea7c67f92e797d20ab1abd406684703f';
 const PRODUCT_VARIANT_GID_PREFIX = 'gid://shopify/ProductVariant/';
 const SELLING_PLAN_GID_PREFIX = 'gid://shopify/SellingPlan/';
+const PUBLIC_SITE_DOMAINS = new Set(['mdrnlifeddw.com', 'www.mdrnlifeddw.com']);
 
 function getStoreDomain() {
   const domain = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || DEFAULT_STORE_DOMAIN;
@@ -27,10 +28,13 @@ function getStoreDomain() {
 
 function getCheckoutDomain() {
   const domain = import.meta.env.VITE_SHOPIFY_CHECKOUT_DOMAIN || DEFAULT_CHECKOUT_DOMAIN;
-  return domain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  const normalized = domain.replace(/^https?:\/\//, '').replace(/\/+$/, '').toLowerCase();
+  return PUBLIC_SITE_DOMAINS.has(normalized) ? DEFAULT_CHECKOUT_DOMAIN : normalized;
 }
 
 function appendTracking(url: URL, source: string) {
+  url.searchParams.set('_fd', '0');
+  url.searchParams.set('_sc', '1');
   url.searchParams.set('utm_source', 'mdrn_life_external_site');
   url.searchParams.set('utm_medium', source);
   url.searchParams.set('utm_campaign', 'ddw_product_checkout');
@@ -39,7 +43,8 @@ function appendTracking(url: URL, source: string) {
 
 export function forceShopifyCheckoutDomain(value: string, source = 'storefront_cart_checkout') {
   const url = new URL(value);
-  url.hostname = getCheckoutDomain();
+  url.protocol = 'https:';
+  url.host = getCheckoutDomain();
   return appendTracking(url, source);
 }
 
