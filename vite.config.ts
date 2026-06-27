@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import shopifyChatHandler from './api/shopify-chat.js'
+import shopifyOrderLookupHandler from './api/shopify-order-lookup.js'
 
 // Shopify store origin that actually hosts checkout.
 const SHOPIFY_ORIGIN = 'https://orise-6796.myshopify.com'
@@ -47,9 +49,31 @@ function shopifyCheckoutProxy() {
   }
 }
 
+function localShopifyChatApi() {
+  return {
+    name: 'local-shopify-support-api',
+    configureServer(server: any) {
+      server.middlewares.use('/api/shopify-chat', async (req: any, res: any, next: any) => {
+        try {
+          await shopifyChatHandler(req, res)
+        } catch (error) {
+          next(error)
+        }
+      })
+      server.middlewares.use('/api/shopify-order-lookup', async (req: any, res: any, next: any) => {
+        try {
+          await shopifyOrderLookupHandler(req, res)
+        } catch (error) {
+          next(error)
+        }
+      })
+    },
+  }
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), localShopifyChatApi()],
   server: {
     proxy: {
       '/checkouts': shopifyCheckoutProxy(),

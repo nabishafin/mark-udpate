@@ -412,6 +412,51 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   }
 });
 
+test('Shopify Inbox uses the official backend with a theme-native chat launcher', () => {
+  const inbox = file('src/components/ShopifyInbox.tsx');
+  const css = file('src/index.css');
+  const api = file('api/shopify-chat.js');
+  const orderApi = file('api/shopify-order-lookup.js');
+  const vite = file('vite.config.ts');
+  const envExample = file('.env.example');
+
+  assert.match(inbox, /CHAT_CONTAINER_ID = 'chat-button-container'/);
+  assert.match(inbox, /shopifyWindow\.Shopify/);
+  assert.match(inbox, /designMode/);
+  assert.match(inbox, /DEFAULT_SHOP_ID = '58223198242'/);
+  assert.match(inbox, /VITE_SHOPIFY_INBOX_SHOP_ID/);
+  assert.match(inbox, /VITE_SHOPIFY_INBOX_LOADER_SRC/);
+  assert.match(inbox, /data-domain/);
+  assert.match(inbox, /data-color', '#3FB8FF'/);
+  assert.match(inbox, /panelOpen/);
+  assert.match(inbox, /closePanel/);
+  assert.match(inbox, /setPanelOpen\(false\)/);
+  assert.match(inbox, /Chat with us/);
+  assert.match(inbox, /Before we get started/);
+  assert.match(inbox, /Track my order/);
+  assert.match(inbox, /\/api\/shopify-order-lookup/);
+  assert.match(inbox, /Support@orisefinance\.com/);
+  assert.match(inbox, /\/api\/shopify-chat/);
+  assert.match(inbox, /Shopify-backed/);
+  assert.match(css, /inbox-online-store-chat\[is-open="false"\]/);
+  assert.match(css, /html\.shopify-inbox-custom-active inbox-online-store-chat/);
+  assert.match(api, /SHOPIFY_ADMIN_ACCESS_TOKEN/);
+  assert.match(api, /customerCreate/);
+  assert.match(api, /customerUpdate/);
+  assert.match(api, /metafieldsSet/);
+  assert.match(api, /website_chat/);
+  assert.match(orderApi, /SHOPIFY_ADMIN_ACCESS_TOKEN/);
+  assert.match(orderApi, /orders\.json/);
+  assert.match(orderApi, /order_status_url/);
+  assert.match(vite, /local-shopify-support-api/);
+  assert.match(vite, /\/api\/shopify-chat/);
+  assert.match(vite, /\/api\/shopify-order-lookup/);
+  assert.match(envExample, /SHOPIFY_ADMIN_SHOP_DOMAIN/);
+  assert.match(envExample, /SHOPIFY_ADMIN_API_VERSION/);
+  assert.match(envExample, /SHOPIFY_ADMIN_ACCESS_TOKEN=/);
+  assert.match(envExample, /read_customers, write_customers, read_orders/);
+});
+
 test('cart page supports local cart quantity controls, removal, and Shopify checkout handoff', () => {
   const app = file('src/App.tsx');
   const cart = file('src/components/CartPage.tsx');

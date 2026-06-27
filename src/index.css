@@ -314,3 +314,17 @@ body {
 .hpe-policy-content td,
 .hpe-policy-content th { min-width: 9rem; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.11); text-align: left; }
 .hpe-policy-content img { max-width: 100%; height: auto; margin: 1.5rem 0; border-radius: 1rem; }
+
+/* Use the custom React launcher while keeping Shopify Inbox as the live backend. */
+inbox-online-store-chat[is-open="false"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+html.shopify-inbox-unavailable inbox-online-store-chat {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+html.shopify-inbox-custom-active inbox-online-store-chat {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
