@@ -21,6 +21,7 @@ import { LearnPage } from './components/LearnPage';
 import { FloatingShopCTA } from './components/FloatingShopCTA';
 import { CheckoutPage } from './components/CheckoutPage';
 import { AccountPage } from './components/AccountPage';
+import { OrdersPage } from './components/OrderPages';
 import { Organ } from './components/organData';
 
 function normalizePath(pathname: string) {
@@ -129,6 +130,8 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       return <AccountPage mode="recover" />;
     case '/account':
       return <AccountPage mode="account" />;
+    case '/account/orders':
+      return <OrdersPage />;
     case '/research':
       return <Research />;
     case '/blogs':
@@ -141,6 +144,9 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
     default:
       if (pathname.startsWith('/blogs/news/') && pathname.length > '/blogs/news/'.length) {
         return <BlogArticlePage handle={pathname.slice('/blogs/news/'.length)} />;
+      }
+      if (pathname.startsWith('/account/orders/') && pathname.length > '/account/orders/'.length) {
+        return <OrdersPage orderId={pathname.slice('/account/orders/'.length)} />;
       }
       if (pathname.startsWith('/policies/')) {
         return <PolicyPage slug={pathname.replace('/policies/', '')} />;
@@ -174,4 +180,3 @@ function HomePage({
     <Hero onSelectOrgan={onSelectOrgan} activeId={activeId} />
   );
 }
-

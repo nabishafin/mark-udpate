@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Lock, LogOut, Mail, MessageCircle, ShieldCheck, UserPlus } from 'lucide-react';
+import { ArrowRight, KeyRound, ListOrdered, Lock, LogOut, Mail, MessageCircle, ShieldCheck, UserPlus } from 'lucide-react';
 import {
   CustomerSession,
   ShopifyCustomerOrder,
@@ -13,6 +13,8 @@ import {
   recoverCustomerPassword,
   registerCustomer,
   saveCustomerSession,
+  updateCustomerPassword,
+  updateCustomerProfile,
 } from '../lib/customer';
 import { SUPPORT_EMAIL, submitContactMessage } from '../lib/contact';
 
@@ -41,7 +43,7 @@ export function AccountPage({ mode }: Props) {
   }, [mode]);
 
   if (isAccount && session) {
-    return <CustomerDashboard session={session} onLogout={() => { clearCustomerSession(); setSession(null); }} />;
+    return <CustomerDashboard session={session} onSessionChange={setSession} onLogout={() => { clearCustomerSession(); setSession(null); }} />;
   }
 
   return (
@@ -225,7 +227,15 @@ function RecoverForm() {
   );
 }
 
-function CustomerDashboard({ session, onLogout }: { session: CustomerSession; onLogout: () => void }) {
+function CustomerDashboard({
+  session,
+  onSessionChange,
+  onLogout,
+}: {
+  session: CustomerSession;
+  onSessionChange: (session: CustomerSession) => void;
+  onLogout: () => void;
+}) {
   const customer = session.customer;
   const displayName = getCustomerDisplayName(customer);
   const messageSubject = `Support request from ${displayName}`;
@@ -272,7 +282,7 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
 
   return (
     <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
-      <div className="relative z-10 mx-auto grid max-w-6xl gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="relative z-10 mx-auto grid max-w-6xl gap-8 px-6 lg:grid-cols-[0.95fr_1.05fr]">
         <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }} className="hpe-glass rounded-2xl p-6 sm:p-8">
           <div className="hpe-hud-label">Logged in</div>
           <h1 className="mt-4 text-4xl font-medium tracking-tight text-white sm:text-5xl">
@@ -281,6 +291,7 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
           <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/58">
             <p><span className="text-white/35">Email:</span> {customer?.email ?? 'Connected customer'}</p>
             {customer?.phone && <p><span className="text-white/35">Phone:</span> {customer.phone}</p>}
+            {customer?.numberOfOrders && <p><span className="text-white/35">Shopify orders:</span> {customer.numberOfOrders}</p>}
             <p><span className="text-white/35">Session expires:</span> {new Date(session.expiresAt).toLocaleDateString()}</p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -293,12 +304,17 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
           </div>
 
           <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <h2 className="text-sm font-medium uppercase tracking-widest text-white/45">Recent Shopify orders</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-medium uppercase tracking-widest text-white/45">Recent Shopify orders</h2>
+              <a href="/account/orders" className="inline-flex items-center gap-2 text-sm text-cyan-200/75 hover:text-cyan-100">
+                Check all orders <ListOrdered size={14} />
+              </a>
+            </div>
             {ordersLoading ? (
               <p className="mt-4 text-sm text-white/45">Loading order history...</p>
             ) : orders.length ? (
               <ul className="mt-4 space-y-3">
-                {orders.map((order) => (
+                {orders.slice(0, 3).map((order) => (
                   <li key={order.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
@@ -317,11 +333,9 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
                       {order.financialStatus && <span>{order.financialStatus.replace(/_/g, ' ')}</span>}
                       {order.fulfillmentStatus && <span>{order.fulfillmentStatus.replace(/_/g, ' ')}</span>}
                     </div>
-                    {order.statusUrl && (
-                      <a href={order.statusUrl} className="mt-3 inline-block text-sm text-cyan-200/75 hover:text-cyan-100">
-                        View order status
-                      </a>
-                    )}
+                    <a href={`/account/orders/${encodeURIComponent(order.id)}`} className="mt-3 inline-block text-sm text-cyan-200/75 hover:text-cyan-100">
+                      View order status
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -331,7 +345,11 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.06 }} className="hpe-glass rounded-2xl p-6 sm:p-8">
+        <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.06 }} className="space-y-6">
+          <ProfileForm session={session} onSessionChange={onSessionChange} />
+          <PasswordForm session={session} onSessionChange={onSessionChange} />
+
+          <div className="hpe-glass rounded-2xl p-6 sm:p-8">
           <div className="flex items-center gap-3">
             <MessageCircle className="text-cyan-300" size={18} />
             <div className="hpe-hud-label">Message Shopify Admin</div>
@@ -368,9 +386,114 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
               Or open email directly
             </a>
           </form>
+          </div>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function ProfileForm({ session, onSessionChange }: { session: CustomerSession; onSessionChange: (session: CustomerSession) => void }) {
+  const customer = session.customer;
+  const [firstName, setFirstName] = useState(customer?.firstName ?? '');
+  const [lastName, setLastName] = useState(customer?.lastName ?? '');
+  const [email, setEmail] = useState(customer?.email ?? '');
+  const [phone, setPhone] = useState(customer?.phone ?? '');
+  const [acceptsMarketing, setAcceptsMarketing] = useState(Boolean(customer?.acceptsMarketing));
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setStatus('');
+    setError('');
+
+    try {
+      const updated = await updateCustomerProfile(session.accessToken, {
+        firstName,
+        lastName,
+        email,
+        phone: phone || undefined,
+        acceptsMarketing,
+      }, session.expiresAt);
+      onSessionChange(updated);
+      setStatus('Your Shopify account information was updated.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update your account information.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} className="hpe-glass grid gap-4 rounded-2xl p-6 sm:p-8">
+      <FormHeader icon={UserPlus} title="Account information" body="Update your Shopify customer profile." />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextField label="First name" value={firstName} onChange={setFirstName} autoComplete="given-name" required />
+        <TextField label="Last name" value={lastName} onChange={setLastName} autoComplete="family-name" required />
+      </div>
+      <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
+      <TextField label="Phone" type="tel" value={phone} onChange={setPhone} autoComplete="tel" />
+      <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-white/58">
+        <input
+          type="checkbox"
+          checked={acceptsMarketing}
+          onChange={(event) => setAcceptsMarketing(event.target.checked)}
+          className="mt-1"
+        />
+        Send me product education, subscription updates, and store news.
+      </label>
+      <Feedback error={error} status={status} />
+      <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+        {submitting ? 'Saving...' : 'Save account information'} <ArrowRight size={14} />
+      </button>
+    </form>
+  );
+}
+
+function PasswordForm({ session, onSessionChange }: { session: CustomerSession; onSessionChange: (session: CustomerSession) => void }) {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('');
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const updated = await updateCustomerPassword(session.accessToken, password);
+      onSessionChange(updated);
+      setPassword('');
+      setConfirmPassword('');
+      setStatus('Password changed in Shopify. Your session was refreshed.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not change password.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} className="hpe-glass grid gap-4 rounded-2xl p-6 sm:p-8">
+      <FormHeader icon={KeyRound} title="Change password" body="Update your Shopify customer password." />
+      <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} />
+      <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} />
+      <Feedback error={error} status={status} />
+      <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+        {submitting ? 'Changing...' : 'Change password'} <ArrowRight size={14} />
+      </button>
+    </form>
   );
 }
 
