@@ -12,6 +12,7 @@ import {
   updateCartBuyerIdentity,
 } from '../lib/checkout';
 import { buildShopifyCheckoutUrl, forceShopifyCheckoutDomain } from '../lib/shopify';
+import { getStoredCustomerSession } from '../lib/customer';
 
 type Step = 'information' | 'shipping' | 'review';
 
@@ -57,13 +58,20 @@ export function CheckoutPage() {
   const cartItems = useMemo(() => getCartItems(), []);
   const hydratedItems = useMemo(() => hydrateCartItemsWithProducts(cartItems, PRODUCTS), [cartItems]);
   const subtotalCents = useMemo(() => hydratedItems.reduce((t, i) => t + i.lineTotalCents, 0), [hydratedItems]);
+  const customerSession = useMemo(() => getStoredCustomerSession(), []);
 
   const [step, setStep] = useState<Step>('information');
   const [shopifyCart, setShopifyCart] = useState<CheckoutCart | null>(null);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState('');
 
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState<FormState>(() => ({
+    ...EMPTY_FORM,
+    email: customerSession?.customer?.email ?? '',
+    firstName: customerSession?.customer?.firstName ?? '',
+    lastName: customerSession?.customer?.lastName ?? '',
+    phone: customerSession?.customer?.phone ?? '',
+  }));
   const [selectedHandle, setSelectedHandle] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState('');
 
@@ -71,24 +79,27 @@ export function CheckoutPage() {
   const [stepError, setStepError] = useState('');
 
   const hasDeliveryOptions = useRef(false);
+  const checkoutLines = useMemo(() => hydratedItems.flatMap((item) => {
+    if (!item.product.variantId) return [];
+    return [{
+      variantId: item.product.variantId,
+      quantity: item.quantity,
+      sellingPlanId: item.purchaseOption === 'subscription' ? item.sellingPlanId : undefined,
+      purchaseOption: item.purchaseOption,
+    }];
+  }), [hydratedItems]);
 
   useEffect(() => {
     if (!hydratedItems.length) { setCartLoading(false); return; }
 
-    const lines = hydratedItems
-      .filter((i) => i.product.variantId)
-      .map((i) => ({
-        variantId: i.product.variantId!,
-        quantity: i.quantity,
-        sellingPlanId: i.purchaseOption === 'subscription' ? i.sellingPlanId : undefined,
-        purchaseOption: i.purchaseOption,
-      }));
-
-    createCheckoutCart(lines)
+    createCheckoutCart(checkoutLines, {
+      email: customerSession?.customer?.email,
+      customerAccessToken: customerSession?.accessToken,
+    })
       .then((cart) => setShopifyCart(cart))
       .catch((err) => setCartError(err.message))
       .finally(() => setCartLoading(false));
-  }, []);
+  }, [checkoutLines, customerSession?.accessToken, customerSession?.customer?.email, hydratedItems.length]);
 
   const allDeliveryOptions: (DeliveryOption & { groupId: string })[] = (shopifyCart?.deliveryGroups ?? []).flatMap(
     (g) => g.deliveryOptions.map((o) => ({ ...o, groupId: g.id })),
@@ -127,13 +138,18 @@ export function CheckoutPage() {
 
     try {
       const { email, ...address } = form;
-      const updated = await updateCartBuyerIdentity(shopifyCart.id, email, address);
+      const updated = await updateCartBuyerIdentity(shopifyCart.id, email, address, customerSession?.accessToken);
       setShopifyCart(updated);
 
       const opts = (updated.deliveryGroups ?? []).flatMap((g) => g.deliveryOptions);
       if (opts.length > 0) {
         hasDeliveryOptions.current = true;
-        const firstGroup = updated.deliveryGroups.find((g) => g.deliveryOptions.length > 0)!;
+        const firstGroup = updated.deliveryGroups.find((g) => g.deliveryOptions.length > 0);
+        if (!firstGroup) {
+          hasDeliveryOptions.current = false;
+          setStep('review');
+          return;
+        }
         setSelectedGroupId(firstGroup.id);
         setSelectedHandle(firstGroup.deliveryOptions[0].handle);
         setStep('shipping');
@@ -167,11 +183,13 @@ export function CheckoutPage() {
   const handlePayment = () => {
     if (!canPay) return;
     // Hand off to Shopify's hosted checkout on the myshopify domain
-    // (e.g. https://orise-6796.myshopify.com/cart/c/TOKEN?key=...). This is the
-    // standard, always-works payment page — no domain proxy required.
+    // using the Storefront cart URL whenever available, so Shopify keeps the
+    // cart identity, shipping selection, taxes, discounts, and subscriptions.
     let target: string;
     try {
-      target = buildShopifyCheckoutUrl(checkoutItems, 'local_checkout_payment');
+      target = shopifyCart?.checkoutUrl
+        ? forceShopifyCheckoutDomain(shopifyCart.checkoutUrl, 'storefront_cart_payment')
+        : buildShopifyCheckoutUrl(checkoutItems, 'local_checkout_payment');
     } catch {
       if (!shopifyCart?.checkoutUrl) return;
       target = forceShopifyCheckoutDomain(shopifyCart.checkoutUrl);
@@ -467,7 +485,7 @@ export function CheckoutPage() {
 
             <ul className="space-y-4">
               {hydratedItems.map((item) => (
-                <li key={item.productId} className="flex gap-3">
+                <li key={item.key} className="flex gap-3">
                   <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
                     <img
                       src={item.product.image.src}

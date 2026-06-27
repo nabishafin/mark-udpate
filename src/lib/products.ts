@@ -16,6 +16,7 @@ export type SubscriptionPlan = {
 
 export type Product = ShopifyProductConfig & {
   id: 'glass' | 'pet';
+  availableForSale?: boolean;
   badge: string;
   name: string;
   tagline: string;
@@ -176,13 +177,21 @@ export function getProduct(productId: Product['id']) {
 type ShopifyProductNode = {
   title?: string;
   onlineStoreUrl?: string;
+  availableForSale?: boolean;
   featuredImage?: { url: string; altText?: string };
   variants?: {
     nodes?: {
       id: string;
       title?: string;
+      availableForSale?: boolean;
       image?: { url: string; altText?: string };
       price?: { amount: string; currencyCode: string };
+      sellingPlanAllocations?: {
+        nodes?: {
+          sellingPlan: { id: string; name?: string };
+          priceAdjustments?: { price?: { amount: string; currencyCode: string } }[];
+        }[];
+      };
     }[];
   };
 };
@@ -206,6 +215,33 @@ function formatShopifyPrice(price?: { amount: string; currencyCode: string }) {
   }).format(Number(price.amount));
 }
 
+function mergeSubscriptionPlans(product: Product, variant?: NonNullable<ShopifyProductNode['variants']>['nodes'][number]) {
+  const allocations = variant?.sellingPlanAllocations?.nodes || [];
+  if (!allocations.length) return product.subscription;
+
+  const plans = product.subscription.plans.map((plan) => {
+    const allocation = allocations.find((node) => gidToNumericId(node.sellingPlan?.id) === plan.sellingPlanId);
+    const livePrice = allocation?.priceAdjustments?.[0]?.price;
+    const price = formatShopifyPrice(livePrice);
+    const priceCents = livePrice?.amount ? Math.round(Number(livePrice.amount) * 100) : plan.priceCents;
+
+    return {
+      ...plan,
+      useCase: allocation?.sellingPlan?.name || plan.useCase,
+      price: price || plan.price,
+      priceCents,
+    };
+  });
+
+  const primaryPlan = plans[0] || product.subscription.plans[0];
+  return {
+    ...product.subscription,
+    price: primaryPlan?.price || product.subscription.price,
+    priceCents: primaryPlan?.priceCents || product.subscription.priceCents,
+    plans,
+  };
+}
+
 function mergeShopifyProduct(product: Product, shopifyProduct?: ShopifyProductNode | null): Product {
   if (!shopifyProduct) return product;
 
@@ -218,11 +254,13 @@ function mergeShopifyProduct(product: Product, shopifyProduct?: ShopifyProductNo
 
   return {
     ...product,
+    availableForSale: variant?.availableForSale ?? shopifyProduct.availableForSale ?? product.availableForSale,
     name: shopifyProduct.title || product.name,
     productUrl: shopifyProduct.onlineStoreUrl || product.productUrl,
     variantId: gidToNumericId(variant?.id) || product.variantId,
     price: price || product.price,
     priceCents,
+    subscription: mergeSubscriptionPlans(product, variant),
     image: {
       src: image?.url || product.image.src,
       alt: imageAlt,
@@ -244,13 +282,21 @@ export async function getLiveProducts(signal?: AbortSignal): Promise<Product[]> 
     fragment ProductCardFields on Product {
       title
       onlineStoreUrl
+      availableForSale
       featuredImage { url altText }
       variants(first: 20) {
         nodes {
           id
           title
+          availableForSale
           image { url altText }
           price { amount currencyCode }
+          sellingPlanAllocations(first: 20) {
+            nodes {
+              sellingPlan { id name }
+              priceAdjustments { price { amount currencyCode } }
+            }
+          }
         }
       }
     }`,

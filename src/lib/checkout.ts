@@ -42,6 +42,11 @@ export type CheckoutLineItem = {
   purchaseOption?: 'subscription' | 'one-time';
 };
 
+export type CheckoutBuyerIdentity = {
+  email?: string;
+  customerAccessToken?: string;
+};
+
 const VARIANT_GID = 'gid://shopify/ProductVariant/';
 const PLAN_GID = 'gid://shopify/SellingPlan/';
 
@@ -88,7 +93,10 @@ function normalizeCart(raw: RawCart): CheckoutCart {
   };
 }
 
-export async function createCheckoutCart(items: CheckoutLineItem[]): Promise<CheckoutCart> {
+export async function createCheckoutCart(
+  items: CheckoutLineItem[],
+  buyerIdentity?: CheckoutBuyerIdentity,
+): Promise<CheckoutCart> {
   const lines = items
     .filter((item) => item.variantId)
     .map((item) => ({
@@ -108,7 +116,14 @@ export async function createCheckoutCart(items: CheckoutLineItem[]): Promise<Che
         userErrors { field message }
       }
     }`,
-    variables: { input: { lines } },
+    variables: {
+      input: {
+        lines,
+        ...(buyerIdentity?.email || buyerIdentity?.customerAccessToken
+          ? { buyerIdentity }
+          : {}),
+      },
+    },
   });
 
   const errors = payload?.data?.cartCreate?.userErrors ?? [];
@@ -123,6 +138,7 @@ export async function updateCartBuyerIdentity(
   cartId: string,
   email: string,
   address: CheckoutAddress,
+  customerAccessToken?: string,
 ): Promise<CheckoutCart> {
   const payload = await shopifyStorefrontFetch({
     query: `mutation CartBuyerIdentityUpdate($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
@@ -135,6 +151,7 @@ export async function updateCartBuyerIdentity(
       cartId,
       buyerIdentity: {
         email,
+        ...(customerAccessToken ? { customerAccessToken } : {}),
         countryCode: address.country,
         deliveryAddressPreferences: [
           {

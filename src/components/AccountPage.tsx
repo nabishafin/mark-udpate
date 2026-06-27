@@ -3,23 +3,24 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Lock, LogOut, Mail, MessageCircle, ShieldCheck, UserPlus } from 'lucide-react';
 import {
   CustomerSession,
+  ShopifyCustomerOrder,
   clearCustomerSession,
   getCustomer,
   getCustomerDisplayName,
+  getCustomerOrders,
   getStoredCustomerSession,
   loginCustomer,
   recoverCustomerPassword,
   registerCustomer,
   saveCustomerSession,
 } from '../lib/customer';
+import { SUPPORT_EMAIL, submitContactMessage } from '../lib/contact';
 
 type AuthMode = 'login' | 'register' | 'recover' | 'account';
 
 type Props = {
   mode: AuthMode;
 };
-
-const SUPPORT_EMAIL = 'support@orisefinance.com';
 
 export function AccountPage({ mode }: Props) {
   const [session, setSession] = useState<CustomerSession | null>(() => getStoredCustomerSession());
@@ -228,6 +229,46 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
   const customer = session.customer;
   const displayName = getCustomerDisplayName(customer);
   const messageSubject = `Support request from ${displayName}`;
+  const [orders, setOrders] = useState<ShopifyCustomerOrder[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [messageStatus, setMessageStatus] = useState('');
+  const [messageError, setMessageError] = useState('');
+  const [messageSubmitting, setMessageSubmitting] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    getCustomerOrders(session.accessToken)
+      .then((nextOrders) => {
+        if (active) setOrders(nextOrders);
+      })
+      .catch(() => {
+        if (active) setOrders([]);
+      })
+      .finally(() => {
+        if (active) setOrdersLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [session.accessToken]);
+
+  const submitMessage = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setMessageSubmitting(true);
+    setMessageStatus('');
+    setMessageError('');
+
+    try {
+      const result = await submitContactMessage(new FormData(event.currentTarget));
+      setMessageStatus(result.mode === 'email' ? 'Opening your email app with the support message ready.' : 'Message sent to store support.');
+      if (result.mode === 'endpoint') event.currentTarget.reset();
+    } catch (err) {
+      setMessageError(err instanceof Error ? err.message : 'Message could not be sent. Please email support directly.');
+    } finally {
+      setMessageSubmitting(false);
+    }
+  };
 
   return (
     <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
@@ -250,6 +291,44 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
               <LogOut size={14} /> Logout
             </button>
           </div>
+
+          <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <h2 className="text-sm font-medium uppercase tracking-widest text-white/45">Recent Shopify orders</h2>
+            {ordersLoading ? (
+              <p className="mt-4 text-sm text-white/45">Loading order history...</p>
+            ) : orders.length ? (
+              <ul className="mt-4 space-y-3">
+                {orders.map((order) => (
+                  <li key={order.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-white">{order.name || `Order #${order.orderNumber}`}</p>
+                        {order.processedAt && (
+                          <p className="mt-1 text-xs text-white/42">{new Date(order.processedAt).toLocaleDateString()}</p>
+                        )}
+                      </div>
+                      {order.totalPrice && (
+                        <p className="font-mono text-sm text-white/75">
+                          {formatShopifyMoney(order.totalPrice)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-wider text-white/38">
+                      {order.financialStatus && <span>{order.financialStatus.replace(/_/g, ' ')}</span>}
+                      {order.fulfillmentStatus && <span>{order.fulfillmentStatus.replace(/_/g, ' ')}</span>}
+                    </div>
+                    {order.statusUrl && (
+                      <a href={order.statusUrl} className="mt-3 inline-block text-sm text-cyan-200/75 hover:text-cyan-100">
+                        View order status
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-white/45">No Shopify orders found for this account yet.</p>
+            )}
+          </div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.06 }} className="hpe-glass rounded-2xl p-6 sm:p-8">
@@ -263,7 +342,7 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
             can match the request to the Shopify customer record.
           </p>
 
-          <form action={import.meta.env.VITE_CONTACT_FORM_ENDPOINT || `mailto:${SUPPORT_EMAIL}`} method="post" className="mt-6 grid gap-4">
+          <form onSubmit={submitMessage} className="mt-6 grid gap-4">
             <input type="hidden" name="customer_id" value={customer?.id ?? ''} />
             <input type="hidden" name="email" value={customer?.email ?? ''} />
             <input type="hidden" name="subject" value={messageSubject} />
@@ -277,9 +356,14 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
                 placeholder="Tell the Shopify admin what you need help with."
               />
             </label>
-            <button type="submit" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-              Message admin <MessageCircle size={14} />
+            <button type="submit" disabled={messageSubmitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+              {messageSubmitting ? 'Sending...' : 'Message admin'} <MessageCircle size={14} />
             </button>
+            {(messageStatus || messageError) && (
+              <div className={`rounded-xl border p-3 text-sm ${messageError ? 'border-red-300/20 bg-red-300/[0.06] text-red-100' : 'border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-100'}`}>
+                {messageError || messageStatus}
+              </div>
+            )}
             <a href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(messageSubject)}`} className="text-sm text-cyan-200/75 hover:text-cyan-100">
               Or open email directly
             </a>
@@ -288,6 +372,13 @@ function CustomerDashboard({ session, onLogout }: { session: CustomerSession; on
       </div>
     </section>
   );
+}
+
+function formatShopifyMoney(money: { amount: string; currencyCode: string }) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: money.currencyCode || 'USD',
+  }).format(Number(money.amount));
 }
 
 function FormHeader({ icon: Icon, title, body }: { icon: typeof Lock; title: string; body: string }) {

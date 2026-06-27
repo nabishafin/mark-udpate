@@ -112,9 +112,10 @@ function ProductCard({
 
   const selectedPlan = product.subscription.plans.find((p) => p.id === selectedPlanId) ?? product.subscription.plans[0];
   const displayPrice = purchaseOption === 'subscription' ? (selectedPlan?.price ?? product.subscription.price) : product.price;
+  const soldOut = product.availableForSale === false;
 
   const handleAddToCart = () => {
-    if (adding) return;
+    if (adding || soldOut) return;
     setAdding(true);
     const planId = purchaseOption === 'subscription' ? selectedPlan?.sellingPlanId : undefined;
     addCartItem(product.id, 1, purchaseOption, planId);
@@ -283,10 +284,15 @@ function ProductCard({
         <button
           type="button"
           onClick={handleAddToCart}
-          disabled={adding}
+          disabled={adding || soldOut}
           className={`${isGold ? 'hpe-btn-ghost' : 'hpe-btn-primary'} mt-5 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium tracking-wide disabled:cursor-wait disabled:opacity-80`}
         >
-          {adding ? (
+          {soldOut ? (
+            <>
+              <ShoppingCart size={14} />
+              Sold out
+            </>
+          ) : adding ? (
             <>
               <Loader2 size={14} className="animate-spin" />
               Adding

@@ -8,6 +8,7 @@ export type CartItem = {
 };
 
 export type HydratedCartItem = CartItem & {
+  key: string;
   product: Product;
   lineTotalCents: number;
 };
@@ -27,6 +28,10 @@ function emitCartUpdate() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent(CART_EVENT));
   }
+}
+
+export function getCartItemKey(item: Pick<CartItem, 'productId' | 'purchaseOption' | 'sellingPlanId'>) {
+  return [item.productId, item.purchaseOption, item.sellingPlanId || 'none'].join(':');
 }
 
 export function getCartItems(): CartItem[] {
@@ -84,6 +89,7 @@ export function hydrateCartItemsWithProducts(items = getCartItems(), products?: 
 
     return [
       {
+        key: getCartItemKey(item),
         productId: item.productId,
         quantity,
         purchaseOption: item.purchaseOption,
@@ -110,30 +116,45 @@ export function addCartItem(
   sellingPlanId?: string,
 ) {
   const current = getCartItems();
-  const existing = current.find((item) => item.productId === productId);
+  const nextItem = { productId, quantity: normalizeQuantity(quantity), purchaseOption, sellingPlanId };
+  const existing = current.find((item) => getCartItemKey(item) === getCartItemKey(nextItem));
 
   if (existing) {
     existing.quantity = normalizeQuantity(existing.quantity + quantity);
-    existing.purchaseOption = purchaseOption;
-    existing.sellingPlanId = sellingPlanId;
     saveCartItems(current);
     return;
   }
 
-  saveCartItems([...current, { productId, quantity: normalizeQuantity(quantity), purchaseOption, sellingPlanId }]);
+  saveCartItems([...current, nextItem]);
 }
 
-export function updateCartItemQuantity(productId: Product['id'], quantity: number) {
+export function updateCartItemQuantity(
+  productId: Product['id'],
+  quantity: number,
+  purchaseOption?: CartItem['purchaseOption'],
+  sellingPlanId?: string,
+) {
   const normalized = normalizeQuantity(quantity);
+  const targetKey = getCartItemKey({
+    productId,
+    purchaseOption: purchaseOption || 'one-time',
+    sellingPlanId,
+  });
   saveCartItems(
     getCartItems().map((item) =>
-      item.productId === productId ? { ...item, quantity: normalized } : item,
+      getCartItemKey(item) === targetKey ? { ...item, quantity: normalized } : item,
     ),
   );
 }
 
-export function removeCartItem(productId: Product['id']) {
-  saveCartItems(getCartItems().filter((item) => item.productId !== productId));
+export function removeCartItem(productId: Product['id'], purchaseOption?: CartItem['purchaseOption'], sellingPlanId?: string) {
+  if (!purchaseOption) {
+    saveCartItems(getCartItems().filter((item) => item.productId !== productId));
+    return;
+  }
+
+  const targetKey = getCartItemKey({ productId, purchaseOption, sellingPlanId });
+  saveCartItems(getCartItems().filter((item) => getCartItemKey(item) !== targetKey));
 }
 
 export function clearCart() {

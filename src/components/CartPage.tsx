@@ -47,13 +47,13 @@ export function CartPage() {
 
   const syncCart = () => setCartItems(getCartItems());
 
-  const handleQuantity = (productId: Product['id'], quantity: number) => {
-    updateCartItemQuantity(productId, quantity);
+  const handleQuantity = (item: (typeof hydratedItems)[number], quantity: number) => {
+    updateCartItemQuantity(item.productId, quantity, item.purchaseOption, item.sellingPlanId);
     syncCart();
   };
 
-  const handleRemove = (productId: Product['id']) => {
-    removeCartItem(productId);
+  const handleRemove = (item: (typeof hydratedItems)[number]) => {
+    removeCartItem(item.productId, item.purchaseOption, item.sellingPlanId);
     syncCart();
   };
 
@@ -140,7 +140,7 @@ export function CartPage() {
 
               {hydratedItems.map((item, index) => (
                 <motion.article
-                  key={item.productId}
+                  key={item.key}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.45, delay: index * 0.06 }}
@@ -185,7 +185,7 @@ export function CartPage() {
                       <button
                         type="button"
                         aria-label={`Decrease ${item.product.name} quantity`}
-                        onClick={() => handleQuantity(item.productId, item.quantity - 1)}
+                        onClick={() => handleQuantity(item, item.quantity - 1)}
                         className="flex h-full w-12 items-center justify-center text-white/70 transition hover:text-white"
                       >
                         <Minus size={14} />
@@ -196,7 +196,7 @@ export function CartPage() {
                       <button
                         type="button"
                         aria-label={`Increase ${item.product.name} quantity`}
-                        onClick={() => handleQuantity(item.productId, item.quantity + 1)}
+                        onClick={() => handleQuantity(item, item.quantity + 1)}
                         className="flex h-full w-12 items-center justify-center text-white/70 transition hover:text-white"
                       >
                         <Plus size={14} />
@@ -205,7 +205,7 @@ export function CartPage() {
                     <button
                       type="button"
                       aria-label={`Remove ${item.product.name}`}
-                      onClick={() => handleRemove(item.productId)}
+                      onClick={() => handleRemove(item)}
                       className="flex h-10 w-10 items-center justify-center rounded-lg text-white/55 transition hover:bg-white/[0.05] hover:text-white"
                     >
                       <Trash2 size={16} />

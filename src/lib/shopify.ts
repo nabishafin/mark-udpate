@@ -101,9 +101,12 @@ export function buildShopifyCheckoutUrl(items: ShopifyCheckoutItem[], source = '
     .map((item) => `${item.variantId}:${normalizeQuantity(item.quantity)}`);
 
   const url = new URL(`https://${getCheckoutDomain()}/cart/${cartLines.join(',')}`);
-  const sellingPlans = [...new Set(items.map((item) => item.sellingPlanId).filter(Boolean))];
-  if (sellingPlans.length === 1 && items.every((item) => item.sellingPlanId === sellingPlans[0])) {
+  const sellingPlanItems = items.filter((item) => item.purchaseOption === 'subscription');
+  const sellingPlans = [...new Set(sellingPlanItems.map((item) => item.sellingPlanId).filter(Boolean))];
+  if (sellingPlans.length === 1 && items.every((item) => item.purchaseOption === 'subscription' && item.sellingPlanId === sellingPlans[0])) {
     url.searchParams.set('selling_plan', sellingPlans[0] as string);
+  } else if (sellingPlanItems.length > 0) {
+    throw new Error('Subscription checkout requires a Shopify Storefront cart URL.');
   }
   return appendTracking(url, source);
 }

@@ -13,6 +13,17 @@ export type ShopifyCustomer = {
   createdAt?: string;
 };
 
+export type ShopifyCustomerOrder = {
+  id: string;
+  name?: string;
+  orderNumber?: number;
+  processedAt?: string;
+  financialStatus?: string;
+  fulfillmentStatus?: string;
+  statusUrl?: string;
+  totalPrice?: { amount: string; currencyCode: string };
+};
+
 export type CustomerSession = {
   accessToken: string;
   expiresAt: string;
@@ -150,6 +161,30 @@ export async function getCustomer(accessToken: string): Promise<ShopifyCustomer 
   });
 
   return payload?.data?.customer ?? null;
+}
+
+export async function getCustomerOrders(accessToken: string): Promise<ShopifyCustomerOrder[]> {
+  const payload = await shopifyStorefrontFetch({
+    query: `query CustomerOrders($customerAccessToken: String!) {
+      customer(customerAccessToken: $customerAccessToken) {
+        orders(first: 10, sortKey: PROCESSED_AT, reverse: true) {
+          nodes {
+            id
+            name
+            orderNumber
+            processedAt
+            financialStatus
+            fulfillmentStatus
+            statusUrl
+            totalPrice { amount currencyCode }
+          }
+        }
+      }
+    }`,
+    variables: { customerAccessToken: accessToken },
+  });
+
+  return payload?.data?.customer?.orders?.nodes ?? [];
 }
 
 export async function recoverCustomerPassword(email: string): Promise<void> {

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { FormEvent, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Beaker, Briefcase, Mail, MapPin, Phone, Send, ShieldCheck, Users } from 'lucide-react';
+import { submitContactMessage } from '../lib/contact';
 
 const CONTACT_DETAILS = [
   {
@@ -24,6 +25,27 @@ const CONTACT_DETAILS = [
 ];
 
 export function ContactPage() {
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setStatus('');
+    setError('');
+
+    try {
+      const result = await submitContactMessage(new FormData(event.currentTarget));
+      setStatus(result.mode === 'email' ? 'Opening your email app with the message ready to send.' : 'Message sent to store support.');
+      if (result.mode === 'endpoint') event.currentTarget.reset();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Message could not be sent. Please email support directly.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <section className="hpe-section relative min-h-screen overflow-hidden pt-32">
       <div className="relative z-10 mx-auto max-w-7xl px-6">
@@ -91,9 +113,10 @@ export function ContactPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.08 }}
           className="hpe-glass rounded-2xl p-6 sm:p-8 grid gap-4"
-          action={import.meta.env.VITE_CONTACT_FORM_ENDPOINT || '/contact'}
-          method="post"
+          data-contact-endpoint={import.meta.env.VITE_CONTACT_FORM_ENDPOINT ? 'configured' : 'email'}
+          onSubmit={submit}
         >
+          <input type="hidden" name="subject" value="Mdrn-Life DDW website message" />
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-sm text-white/70">
               Name
@@ -139,11 +162,17 @@ export function ContactPage() {
           </label>
           <button
             type="submit"
-            className="hpe-btn-primary w-full rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2 sm:w-auto"
+            disabled={submitting}
+            className="hpe-btn-primary w-full rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center justify-center gap-2 disabled:opacity-50 sm:w-auto"
           >
-            Send Message
+            {submitting ? 'Sending...' : 'Send Message'}
             <Send size={14} />
           </button>
+          {(status || error) && (
+            <div className={`rounded-xl border p-3 text-sm ${error ? 'border-red-300/20 bg-red-300/[0.06] text-red-100' : 'border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-100'}`}>
+              {error || status}
+            </div>
+          )}
         </motion.form>
         </div>
 
