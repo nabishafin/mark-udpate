@@ -37,7 +37,7 @@ function appendTracking(url: URL, source: string) {
   return url.toString();
 }
 
-function forceShopifyCheckoutDomain(value: string, source = 'storefront_cart_checkout') {
+export function forceShopifyCheckoutDomain(value: string, source = 'storefront_cart_checkout') {
   const url = new URL(value);
   url.hostname = getCheckoutDomain();
   return appendTracking(url, source);

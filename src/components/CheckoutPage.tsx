@@ -11,6 +11,7 @@ import {
   selectCartDeliveryOption,
   updateCartBuyerIdentity,
 } from '../lib/checkout';
+import { forceShopifyCheckoutDomain } from '../lib/shopify';
 
 type Step = 'information' | 'shipping' | 'review';
 
@@ -158,15 +159,14 @@ export function CheckoutPage() {
 
   const handlePayment = () => {
     if (!shopifyCart?.checkoutUrl) return;
-    // Shopify returns an absolute checkout URL (e.g. https://mdrnlifeddw.com/cart/c/TOKEN?key=...).
-    // Navigate to its path on the CURRENT origin so it stays on localhost in dev (Vite proxy)
-    // and on the production domain in prod (nginx proxy) instead of jumping to another host.
-    let target = shopifyCart.checkoutUrl;
+    // Hand off to Shopify's hosted checkout on the myshopify domain
+    // (e.g. https://orise-6796.myshopify.com/cart/c/TOKEN?key=...). This is the
+    // standard, always-works payment page — no domain proxy required.
+    let target: string;
     try {
-      const url = new URL(shopifyCart.checkoutUrl);
-      target = `${url.pathname}${url.search}${url.hash}`;
+      target = forceShopifyCheckoutDomain(shopifyCart.checkoutUrl);
     } catch {
-      /* fall back to the raw URL if it isn't parseable */
+      target = shopifyCart.checkoutUrl;
     }
     window.location.href = target;
   };
