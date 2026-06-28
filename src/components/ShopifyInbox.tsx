@@ -280,7 +280,7 @@ export function ShopifyInbox() {
               </button>
               <div className="text-center">
                 <h2 className="text-sm font-semibold leading-tight text-white">Mdrn-Life DDW</h2>
-                <p className="mt-1 text-[11px] leading-none text-cyan-100/55">Shopify-backed support</p>
+                <p className="mt-1 text-[11px] leading-none text-cyan-100/55">Support team</p>
               </div>
               <button
                 type="button"
@@ -382,7 +382,7 @@ export function ShopifyInbox() {
                 </div>
 
                 <p className="rounded-xl border border-white/10 bg-white/[0.035] p-3 text-center text-xs leading-5 text-white/42">
-                  By proceeding, you agree that your message may be stored in Shopify Admin so store support can respond.
+                  By proceeding, you agree that your message may be stored so store support can respond.
                 </p>
 
                 <button
@@ -537,7 +537,7 @@ export function ShopifyInbox() {
           </span>
           <span className="relative hidden text-left sm:block">
             <span className="block text-xs font-medium leading-none text-white">Chat with us</span>
-            <span className="mt-1 block text-[11px] leading-none text-cyan-100/65">Shopify-backed</span>
+            <span className="mt-1 block text-[11px] leading-none text-cyan-100/65">Support team</span>
           </span>
         </motion.button>
       )}

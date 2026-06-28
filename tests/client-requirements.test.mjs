@@ -437,7 +437,9 @@ test('Shopify Inbox uses the official backend with a theme-native chat launcher'
   assert.match(inbox, /\/api\/shopify-order-lookup/);
   assert.match(inbox, /Support@orisefinance\.com/);
   assert.match(inbox, /\/api\/shopify-chat/);
-  assert.match(inbox, /Shopify-backed/);
+  assert.match(inbox, /Support team/);
+  assert.doesNotMatch(inbox, />Shopify-backed/);
+  assert.doesNotMatch(inbox, /stored in Shopify Admin so store support can respond/);
   assert.match(css, /inbox-online-store-chat\[is-open="false"\]/);
   assert.match(css, /html\.shopify-inbox-custom-active inbox-online-store-chat/);
   assert.match(api, /SHOPIFY_ADMIN_ACCESS_TOKEN/);
