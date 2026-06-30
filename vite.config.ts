@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import shopifyChatHandler from './api/shopify-chat.js'
-import shopifyOrderLookupHandler from './api/shopify-order-lookup.js'
+import emailSupportHandler from './api/email-support.js'
+import marketingSignupHandler from './api/marketing-signup.js'
 
 // Shopify store origin that actually hosts checkout.
 const SHOPIFY_ORIGIN = 'https://orise-6796.myshopify.com'
@@ -53,16 +53,16 @@ function localShopifyChatApi() {
   return {
     name: 'local-shopify-support-api',
     configureServer(server: any) {
-      server.middlewares.use('/api/shopify-chat', async (req: any, res: any, next: any) => {
+      server.middlewares.use('/api/email-support', async (req: any, res: any, next: any) => {
         try {
-          await shopifyChatHandler(req, res)
+          await emailSupportHandler(req, res)
         } catch (error) {
           next(error)
         }
       })
-      server.middlewares.use('/api/shopify-order-lookup', async (req: any, res: any, next: any) => {
+      server.middlewares.use('/api/marketing-signup', async (req: any, res: any, next: any) => {
         try {
-          await shopifyOrderLookupHandler(req, res)
+          await marketingSignupHandler(req, res)
         } catch (error) {
           next(error)
         }
@@ -72,20 +72,24 @@ function localShopifyChatApi() {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react(), localShopifyChatApi()],
-  server: {
-    proxy: {
-      '/checkouts': shopifyCheckoutProxy(),
-      '/cart/c': shopifyCheckoutProxy(),
-      '/a/checkout': shopifyCheckoutProxy(),
-      // The Shopify checkout page loads its CSS/JS and other assets from these
-      // same-origin paths; without forwarding them the page renders unstyled.
-      '/cdn': shopifyCheckoutProxy(),
-      '/wpm': shopifyCheckoutProxy(),
-      '/payments': shopifyCheckoutProxy(),
-      '/services': shopifyCheckoutProxy(),
-      '/.well-known': shopifyCheckoutProxy(),
+export default defineConfig(({ mode }) => {
+  Object.assign(process.env, loadEnv(mode, process.cwd(), ''))
+
+  return {
+    plugins: [react(), localShopifyChatApi()],
+    server: {
+      proxy: {
+        '/checkouts': shopifyCheckoutProxy(),
+        '/cart/c': shopifyCheckoutProxy(),
+        '/a/checkout': shopifyCheckoutProxy(),
+        // The Shopify checkout page loads its CSS/JS and other assets from these
+        // same-origin paths; without forwarding them the page renders unstyled.
+        '/cdn': shopifyCheckoutProxy(),
+        '/wpm': shopifyCheckoutProxy(),
+        '/payments': shopifyCheckoutProxy(),
+        '/services': shopifyCheckoutProxy(),
+        '/.well-known': shopifyCheckoutProxy(),
+      },
     },
-  },
+  }
 })

@@ -4,6 +4,7 @@ import { Check, Loader2, X } from 'lucide-react';
 import { subscribeEmailToMarketing } from '../lib/marketing';
 
 const STORAGE_KEY = 'mdrn-life-ddw-email-popup';
+const SESSION_KEY = 'mdrn-life-ddw-marketing-session';
 const SHOW_DELAY_MS = 1400;
 
 // Don't interrupt active commerce / account flows with the marketing popup.
@@ -42,9 +43,23 @@ function remember(value: string) {
   }
 }
 
+function getSessionId() {
+  try {
+    const existing = window.localStorage.getItem(SESSION_KEY);
+    if (existing) return existing;
+
+    const sessionId = `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+    window.localStorage.setItem(SESSION_KEY, sessionId);
+    return sessionId;
+  } catch {
+    return `lead_${Date.now().toString(36)}`;
+  }
+}
+
 export function EmailPopup() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
@@ -80,7 +95,13 @@ export function EmailPopup() {
     setSubmitting(true);
     setError('');
     try {
-      await subscribeEmailToMarketing({ email, acceptsMarketing: true });
+      await subscribeEmailToMarketing({
+        email,
+        acceptsMarketing: true,
+        website,
+        page: window.location.href,
+        sessionId: getSessionId(),
+      });
       setDone(true);
       remember('subscribed');
     } catch (err) {
@@ -146,7 +167,7 @@ export function EmailPopup() {
             ) : (
               <>
                 <h2 id="email-popup-title" className="pr-8 text-2xl font-medium leading-tight tracking-tight text-white sm:text-3xl">
-                  🚀 Unlock a world of opportunities for wellness and prosperity!
+                  Unlock a world of opportunities for wellness and prosperity!
                 </h2>
 
                 <ul className="mt-5 space-y-2.5">
@@ -159,6 +180,14 @@ export function EmailPopup() {
                 </ul>
 
                 <form onSubmit={submit} className="mt-6">
+                  <input
+                    className="hidden"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(event) => setWebsite(event.target.value)}
+                    name="website"
+                  />
                   <input
                     type="email"
                     required
@@ -175,7 +204,7 @@ export function EmailPopup() {
                   >
                     {submitting ? (
                       <>
-                        <Loader2 size={15} className="animate-spin" /> Saving…
+                        <Loader2 size={15} className="animate-spin" /> Saving...
                       </>
                     ) : (
                       'Start earning today'

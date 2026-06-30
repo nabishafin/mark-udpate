@@ -31,14 +31,15 @@ export function ContactPage() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
     setSubmitting(true);
     setStatus('');
     setError('');
 
     try {
-      const result = await submitContactMessage(new FormData(event.currentTarget));
-      setStatus(result.mode === 'email' ? 'Opening your email app with the message ready to send.' : 'Message sent to store support.');
-      if (result.mode === 'endpoint') event.currentTarget.reset();
+      const result = await submitContactMessage(new FormData(form));
+      setStatus('Message sent to store support.');
+      if (result.mode === 'endpoint') form.reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Message could not be sent. Please email support directly.');
     } finally {
@@ -113,10 +114,12 @@ export function ContactPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.08 }}
           className="hpe-glass rounded-2xl p-6 sm:p-8 grid gap-4"
-          data-contact-endpoint={import.meta.env.VITE_CONTACT_FORM_ENDPOINT ? 'configured' : 'email'}
+          data-contact-endpoint={import.meta.env.VITE_CONTACT_FORM_ENDPOINT ? 'configured' : 'default'}
           onSubmit={submit}
         >
           <input type="hidden" name="subject" value="Mdrn-Life DDW website message" />
+          <input type="hidden" name="issue" value="Contact form" />
+          <input className="hidden" tabIndex={-1} autoComplete="off" name="website" />
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-sm text-white/70">
               Name

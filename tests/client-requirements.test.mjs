@@ -238,6 +238,7 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   const nav = file('src/components/Nav.tsx');
   const footer = file('src/components/CTAFooter.tsx');
   const contact = file('src/components/ContactPage.tsx');
+  const contactLib = file('src/lib/contact.ts');
   const app = file('src/App.tsx');
 
   assert.match(nav, /aria-label=\{mobileOpen \? 'Close navigation menu' : 'Open navigation menu'\}/);
@@ -271,7 +272,13 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   assert.doesNotMatch(contact, /Hydroisotop GmbH, USGS Reston, and verification questions/);
   assert.doesNotMatch(footer, /Current Store/);
   assert.match(contact, /<motion\.form[\s\S]*name="name"[\s\S]*name="email"[\s\S]*name="message"/);
+  assert.match(contact, /name="issue" value="Contact form"/);
+  assert.match(contact, /name="website"/);
   assert.match(contact, /VITE_CONTACT_FORM_ENDPOINT/);
+  assert.match(contactLib, /\/api\/email-support/);
+  assert.match(contactLib, /source:\s*'Contact form'/);
+  assert.match(contactLib, /headers:\s*\{ 'Content-Type': 'application\/json' \}/);
+  assert.doesNotMatch(contactLib, /mailto:/);
   assert.match(app, /case '\/contact':\s*return <ContactPage \/>/);
 });
 
@@ -412,51 +419,102 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   }
 });
 
-test('Shopify Inbox uses the official backend with a theme-native chat launcher', () => {
+test('support widget provides WhatsApp and email support without Shopify Admin tracking', () => {
   const inbox = file('src/components/ShopifyInbox.tsx');
-  const css = file('src/index.css');
-  const api = file('api/shopify-chat.js');
-  const orderApi = file('api/shopify-order-lookup.js');
+  const emailApi = file('api/email-support.js');
+  const phpEmailApi = file('public/api/email-support.php');
+  const phpSmtp = file('public/api/_smtp.php');
   const vite = file('vite.config.ts');
   const envExample = file('.env.example');
+  const htaccess = file('public/.htaccess');
 
-  assert.match(inbox, /CHAT_CONTAINER_ID = 'chat-button-container'/);
-  assert.match(inbox, /shopifyWindow\.Shopify/);
-  assert.match(inbox, /designMode/);
-  assert.match(inbox, /DEFAULT_SHOP_ID = '58223198242'/);
-  assert.match(inbox, /VITE_SHOPIFY_INBOX_SHOP_ID/);
-  assert.match(inbox, /VITE_SHOPIFY_INBOX_LOADER_SRC/);
-  assert.match(inbox, /data-domain/);
-  assert.match(inbox, /data-color', '#3FB8FF'/);
+  assert.match(inbox, /WHATSAPP_NUMBER = '19544105042'/);
+  assert.match(inbox, /https:\/\/wa\.me\/\$\{WHATSAPP_NUMBER\}/);
   assert.match(inbox, /panelOpen/);
   assert.match(inbox, /closePanel/);
   assert.match(inbox, /setPanelOpen\(false\)/);
-  assert.match(inbox, /Chat with us/);
-  assert.match(inbox, /Before we get started/);
-  assert.match(inbox, /Track my order/);
-  assert.match(inbox, /\/api\/shopify-order-lookup/);
-  assert.match(inbox, /Support@orisefinance\.com/);
-  assert.match(inbox, /\/api\/shopify-chat/);
+  assert.match(inbox, /WhatsApp support/);
+  assert.match(inbox, /Email support/);
+  assert.match(inbox, /Issue type/);
+  assert.match(inbox, /Describe the issue/);
+  assert.match(inbox, /\/api\/email-support/);
+  assert.match(inbox, /support@orisefinance\.com/);
   assert.match(inbox, /Support team/);
+  assert.match(inbox, /WhatsApp and email/);
+  assert.doesNotMatch(inbox, /Chat with us/);
+  assert.doesNotMatch(inbox, /Before we get started/);
+  assert.doesNotMatch(inbox, /Track my order/);
+  assert.doesNotMatch(inbox, /\/api\/shopify-order-lookup/);
+  assert.doesNotMatch(inbox, /tracking\?: OrderTracking\[\]/);
+  assert.doesNotMatch(inbox, /View order status/);
   assert.doesNotMatch(inbox, />Shopify-backed/);
   assert.doesNotMatch(inbox, /stored in Shopify Admin so store support can respond/);
-  assert.match(css, /inbox-online-store-chat\[is-open="false"\]/);
-  assert.match(css, /html\.shopify-inbox-custom-active inbox-online-store-chat/);
-  assert.match(api, /SHOPIFY_ADMIN_ACCESS_TOKEN/);
-  assert.match(api, /customerCreate/);
-  assert.match(api, /customerUpdate/);
-  assert.match(api, /metafieldsSet/);
-  assert.match(api, /website_chat/);
-  assert.match(orderApi, /SHOPIFY_ADMIN_ACCESS_TOKEN/);
-  assert.match(orderApi, /orders\.json/);
-  assert.match(orderApi, /order_status_url/);
+  assert.doesNotMatch(inbox, /\/api\/shopify-chat/);
+  assert.match(emailApi, /node:tls/);
+  assert.match(emailApi, /SMTP_APP_PASSWORD/);
+  assert.match(emailApi, /SUPPORT_ALLOWED_ORIGINS/);
+  assert.match(emailApi, /rateLimit/);
+  assert.match(emailApi, /website/);
+  assert.match(emailApi, /Reply-To/);
+  assert.match(emailApi, /New website message/);
+  assert.match(emailApi, /detailRow/);
+  assert.match(emailApi, /Customer Message/);
+  assert.doesNotMatch(emailApi, /Page: \$\{page\}/);
+  assert.doesNotMatch(emailApi, /Session: \$\{sessionId\}/);
+  assert.match(phpEmailApi, /send_smtp_email\('SUPPORT_EMAIL_TO'/);
+  assert.match(phpEmailApi, /support_email_html/);
+  assert.doesNotMatch(phpEmailApi, /Page: ' \. \$page/);
+  assert.doesNotMatch(phpEmailApi, /Session: ' \. \$sessionId/);
+  assert.match(phpSmtp, /SMTP_APP_PASSWORD/);
+  assert.match(phpSmtp, /stream_socket_client/);
+  assert.match(phpSmtp, /AUTH PLAIN/);
+  assert.match(phpSmtp, /New website message/);
+  assert.match(phpSmtp, /Customer Message/);
+  assert.match(htaccess, /RewriteRule \^api\/email-support\/\?\$ \/api\/email-support\.php/);
   assert.match(vite, /local-shopify-support-api/);
-  assert.match(vite, /\/api\/shopify-chat/);
-  assert.match(vite, /\/api\/shopify-order-lookup/);
-  assert.match(envExample, /SHOPIFY_ADMIN_SHOP_DOMAIN/);
-  assert.match(envExample, /SHOPIFY_ADMIN_API_VERSION/);
-  assert.match(envExample, /SHOPIFY_ADMIN_ACCESS_TOKEN=/);
-  assert.match(envExample, /read_customers, write_customers, read_orders/);
+  assert.match(vite, /\/api\/email-support/);
+  assert.doesNotMatch(vite, /\/api\/shopify-order-lookup/);
+  assert.doesNotMatch(vite, /\/api\/shopify-chat/);
+  assert.match(vite, /loadEnv/);
+  assert.doesNotMatch(envExample, /SHOPIFY_ADMIN_SHOP_DOMAIN/);
+  assert.doesNotMatch(envExample, /SHOPIFY_ADMIN_API_VERSION/);
+  assert.doesNotMatch(envExample, /SHOPIFY_ADMIN_ACCESS_TOKEN=/);
+  assert.doesNotMatch(envExample, /VITE_SHOPIFY_INBOX/);
+  assert.match(envExample, /SMTP_HOST=smtp\.gmail\.com/);
+  assert.match(envExample, /SMTP_APP_PASSWORD=/);
+  assert.match(envExample, /SUPPORT_EMAIL_TO=support@orisefinance\.com/);
+  assert.doesNotMatch(envExample, /read_customers, write_customers, read_orders/);
+});
+
+test('opportunity email popup submits leads through the secure SMTP backend', () => {
+  const popup = file('src/components/EmailPopup.tsx');
+  const marketing = file('src/lib/marketing.ts');
+  const api = file('api/marketing-signup.js');
+  const phpApi = file('public/api/marketing-signup.php');
+  const vite = file('vite.config.ts');
+  const envExample = file('.env.example');
+  const htaccess = file('public/.htaccess');
+
+  assert.match(popup, /Unlock a world of opportunities for wellness and prosperity!/);
+  assert.match(popup, /subscribeEmailToMarketing/);
+  assert.match(popup, /name="website"/);
+  assert.match(popup, /getSessionId/);
+  assert.match(popup, /Saving\.\.\./);
+  assert.doesNotMatch(popup, /ðŸš€|Savingâ€¦/);
+  assert.match(marketing, /\/api\/marketing-signup/);
+  assert.match(marketing, /acceptsMarketing/);
+  assert.doesNotMatch(marketing, /customerCreate/);
+  assert.doesNotMatch(marketing, /shopifyStorefrontFetch/);
+  assert.match(api, /node:tls/);
+  assert.match(api, /MARKETING_SIGNUP_TO/);
+  assert.match(api, /SUPPORT_ALLOWED_ORIGINS/);
+  assert.match(api, /rateLimit/);
+  assert.match(api, /website/);
+  assert.match(api, /Reply-To/);
+  assert.match(phpApi, /send_smtp_email\('MARKETING_SIGNUP_TO'/);
+  assert.match(htaccess, /RewriteRule \^api\/marketing-signup\/\?\$ \/api\/marketing-signup\.php/);
+  assert.match(vite, /\/api\/marketing-signup/);
+  assert.match(envExample, /MARKETING_SIGNUP_TO=support@orisefinance\.com/);
 });
 
 test('cart page supports local cart quantity controls, removal, and Shopify checkout handoff', () => {
