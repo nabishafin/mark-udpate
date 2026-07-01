@@ -22,6 +22,31 @@ Preferred Hostinger Node setup:
 
 Do not commit the real SMTP app password. Keep it in Hostinger/Vercel/server environment variables.
 
+## VPS/nginx Fix For 405
+
+The live error `POST /api/email-support -> 405 Method Not Allowed` means nginx is serving the static frontend instead of proxying `/api` to Node.
+
+Use the included config:
+
+```bash
+sudo cp deploy/nginx/mdrnlifeddw.com.conf /etc/nginx/sites-available/mdrnlifeddw.com
+sudo ln -sf /etc/nginx/sites-available/mdrnlifeddw.com /etc/nginx/sites-enabled/mdrnlifeddw.com
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Run the app with PM2:
+
+```bash
+npm install
+npm run build
+pm2 start ecosystem.config.cjs
+pm2 save
+pm2 startup
+```
+
+If SSL is managed separately, keep the same `/api/` proxy block inside the HTTPS `server { listen 443 ssl; ... }` block.
+
 Expected checks after deploy:
 
 - `GET /api/email-support` returns JSON `405 Method not allowed`, not React HTML.
