@@ -9,15 +9,18 @@ Preferred Hostinger Node setup:
 3. Set the build command to `npm run build`.
 4. Set the app port from Hostinger through `PORT`.
 5. Configure these server environment variables:
-   - `SMTP_HOST`
-   - `SMTP_PORT`
-   - `SMTP_USER`
-   - `SMTP_APP_PASSWORD`
-   - `SUPPORT_EMAIL_TO`
-   - `SUPPORT_EMAIL_FROM`
-   - `MARKETING_SIGNUP_TO`
-   - `SUPPORT_ALLOWED_ORIGINS`
+   - `VITE_CONTACT_FORM_ENDPOINT=/api/email-support`
+   - `SMTP_HOST=smtp.gmail.com`
+   - `SMTP_PORT=465`
+   - `SMTP_USER=support@orisefinance.com`
+   - `SMTP_APP_PASSWORD=<set in hosting only>`
+   - `SUPPORT_EMAIL_TO=support@orisefinance.com`
+   - `SUPPORT_EMAIL_FROM=support@orisefinance.com`
+   - `MARKETING_SIGNUP_TO=support@orisefinance.com`
+   - `SUPPORT_ALLOWED_ORIGINS=https://mdrnlifeddw.com,https://www.mdrnlifeddw.com`
 6. Route/proxy the domain to the Node app so `/api/email-support` reaches `server.js`.
+
+Do not commit the real SMTP app password. Keep it in Hostinger/Vercel/server environment variables.
 
 Expected checks after deploy:
 
