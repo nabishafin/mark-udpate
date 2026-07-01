@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "preview": "vite preview",
+    "start": "node server.js",
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {

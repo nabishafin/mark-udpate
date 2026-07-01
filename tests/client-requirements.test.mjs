@@ -554,6 +554,9 @@ test('cart page supports local cart quantity controls, removal, and Shopify chec
 test('developer handoff documents required Shopify, tracking, subscription, and social inputs', () => {
   const doc = file('docs/shopify-integration-handoff.md');
   const contactDoc = file('docs/contact-form-handoff.md');
+  const liveEmailDoc = file('docs/live-email-deployment.md');
+  const server = file('server.js');
+  const pkg = file('package.json');
 
   for (const phrase of [
     'Shopify store domain',
@@ -579,6 +582,13 @@ test('developer handoff documents required Shopify, tracking, subscription, and 
   assert.match(contactDoc, /VITE_CONTACT_FORM_ENDPOINT/);
   assert.match(contactDoc, /Resend|SendGrid|Mailgun|Postmark/);
   assert.match(contactDoc, /Cloudflare Turnstile|Google reCAPTCHA/);
+  assert.match(liveEmailDoc, /npm run start/);
+  assert.match(liveEmailDoc, /POST \/api\/email-support/);
+  assert.match(liveEmailDoc, /SUPPORT_EMAIL_TO/);
+  assert.match(server, /emailSupportHandler/);
+  assert.match(server, /marketingSignupHandler/);
+  assert.match(server, /serveFile\(join\(distDir, 'index\.html'\)/);
+  assert.match(pkg, /"start":\s*"node server\.js"/);
 });
 
 test('side panel content matches the client PDF copy and keeps internal labels out of the UI', () => {
