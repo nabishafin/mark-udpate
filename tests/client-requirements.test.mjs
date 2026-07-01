@@ -278,7 +278,8 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   assert.match(contactLib, /\/api\/email-support/);
   assert.match(contactLib, /source:\s*'Contact form'/);
   assert.match(contactLib, /headers:\s*\{ 'Content-Type': 'application\/json' \}/);
-  assert.doesNotMatch(contactLib, /mailto:/);
+  assert.match(contactLib, /openEmailFallback/);
+  assert.match(contactLib, /mailto:/);
   assert.match(app, /case '\/contact':\s*return <ContactPage \/>/);
 });
 

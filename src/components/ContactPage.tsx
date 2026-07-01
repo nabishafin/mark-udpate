@@ -38,7 +38,7 @@ export function ContactPage() {
 
     try {
       const result = await submitContactMessage(new FormData(form));
-      setStatus('Message sent to store support.');
+      setStatus(result.mode === 'email' ? 'Opening your email app with the message ready to send.' : 'Message sent to store support.');
       if (result.mode === 'endpoint') form.reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Message could not be sent. Please email support directly.');
