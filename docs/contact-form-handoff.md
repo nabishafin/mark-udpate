@@ -2,6 +2,7 @@
 
 The contact page posts JSON to `/api/contact`. The frontend builds the URL from `VITE_API_URL`:
 
+- Current direct VPS API target: `VITE_API_URL=http://2.25.199.73:3000`.
 - Production on the same domain: keep `VITE_API_URL=` blank so the browser posts to `/api/contact`.
 - Local frontend with a separate Node backend: set `VITE_API_URL=http://localhost:3000`.
 - Production with an external backend domain: set `VITE_API_URL=https://mdrnlifeddw.com`.

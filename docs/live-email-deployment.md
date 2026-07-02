@@ -9,7 +9,7 @@ Preferred Hostinger Node setup:
 3. Set the build command to `npm run build`.
 4. Set the app port from Hostinger through `PORT`.
 5. Configure these server environment variables:
-   - `VITE_API_URL=` for same-domain production, or `VITE_API_URL=https://mdrnlifeddw.com`
+   - `VITE_API_URL=http://2.25.199.73:3000` for the direct VPS API target
    - `SMTP_HOST=smtp.gmail.com`
    - `SMTP_PORT=465`
    - `SMTP_USER=support@orisefinance.com`
