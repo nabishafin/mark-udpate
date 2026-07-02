@@ -1,6 +1,12 @@
 # Contact Form Handoff
 
-The contact page can still use `VITE_CONTACT_FORM_ENDPOINT` for an external form provider such as Resend, SendGrid, Mailgun, or Postmark. If that variable is blank, the page falls back to a direct email handoff.
+The contact page posts JSON to `/api/contact`. The frontend builds the URL from `VITE_API_URL`:
+
+- Production on the same domain: keep `VITE_API_URL=` blank so the browser posts to `/api/contact`.
+- Local frontend with a separate Node backend: set `VITE_API_URL=http://localhost:3000`.
+- Production with an external backend domain: set `VITE_API_URL=https://mdrnlifeddw.com`.
+
+The built-in Node/PHP backend sends mail through SMTP. If the client later replaces SMTP with an email API provider such as Resend, SendGrid, Mailgun, or Postmark, keep the same `/api/contact` response contract so the frontend does not need to change.
 
 The floating support widget now uses the server-side `/api/email-support` endpoint for email support. Required SMTP variables:
 
@@ -15,9 +21,9 @@ The floating support widget now uses the server-side `/api/email-support` endpoi
 
 Security notes:
 
-- Store SMTP credentials only as server-side environment variables in Vercel.
-- On Apache/Hostinger/cPanel hosting, the same routes are provided by `public/api/email-support.php` and `public/api/marketing-signup.php`. Configure the same SMTP variables in the hosting control panel or server environment before uploading the build.
+- Store SMTP credentials only as server-side environment variables.
+- On Apache/Hostinger/cPanel hosting, fallback routes are provided by `public/api/contact.php`, `public/api/email-support.php`, and `public/api/marketing-signup.php`. Configure the same SMTP variables in the hosting control panel or server environment before uploading the build.
 - Do not prefix SMTP credentials with `VITE_`.
-- The endpoint validates same-origin requests, applies a basic per-IP rate limit, limits payload size, uses a honeypot field, and sends customer email as `Reply-To`.
+- The endpoints validate origin, apply a basic per-IP rate limit, limit payload size, and send customer email as `Reply-To`.
 - The opportunity popup uses `/api/marketing-signup` with the same SMTP credentials and emails new leads to `MARKETING_SIGNUP_TO`.
 - For higher abuse protection, add Cloudflare Turnstile or Google reCAPTCHA before the SMTP send.

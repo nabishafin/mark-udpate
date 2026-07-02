@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import contactHandler from './api/contact.js';
 import emailSupportHandler from './api/email-support.js';
 import marketingSignupHandler from './api/marketing-signup.js';
 
@@ -75,6 +76,11 @@ const server = createServer(async (request, response) => {
 
     if (url.pathname === '/api/email-support') {
       await emailSupportHandler(request, response);
+      return;
+    }
+
+    if (url.pathname === '/api/contact') {
+      await contactHandler(request, response);
       return;
     }
 

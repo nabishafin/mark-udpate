@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import contactHandler from './api/contact.js'
 import emailSupportHandler from './api/email-support.js'
 import marketingSignupHandler from './api/marketing-signup.js'
 
@@ -56,6 +57,13 @@ function localShopifyChatApi() {
       server.middlewares.use('/api/email-support', async (req: any, res: any, next: any) => {
         try {
           await emailSupportHandler(req, res)
+        } catch (error) {
+          next(error)
+        }
+      })
+      server.middlewares.use('/api/contact', async (req: any, res: any, next: any) => {
+        try {
+          await contactHandler(req, res)
         } catch (error) {
           next(error)
         }

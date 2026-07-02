@@ -19,6 +19,7 @@ RewriteRule ^orders/(.*)$ https://orise-6796.myshopify.com/orders/$1 [R=302,L,QS
 RewriteRule ^([0-9]+)/orders/(.*)$ https://orise-6796.myshopify.com/$1/orders/$2 [R=302,L,QSA]
 
 # Static Apache/Hostinger fallback for website email APIs.
+RewriteRule ^api/contact/?$ /api/contact.php [L,QSA]
 RewriteRule ^api/email-support/?$ /api/email-support.php [L,QSA]
 RewriteRule ^api/marketing-signup/?$ /api/marketing-signup.php [L,QSA]
 

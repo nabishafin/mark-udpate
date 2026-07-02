@@ -237,8 +237,8 @@ test('mobile body interaction uses a split view instead of blocking the hotspots
 test('navigation follows the client supplied IA and keeps shop/contact paths explicit', () => {
   const nav = file('src/components/Nav.tsx');
   const footer = file('src/components/CTAFooter.tsx');
-  const contact = file('src/components/ContactPage.tsx');
-  const contactLib = file('src/lib/contact.ts');
+  const contact = file('src/components/ContactPage.jsx');
+  const contactApi = file('api/contact.js');
   const app = file('src/App.tsx');
 
   assert.match(nav, /aria-label=\{mobileOpen \? 'Close navigation menu' : 'Open navigation menu'\}/);
@@ -263,23 +263,21 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   assert.doesNotMatch(footer, /<footer id="contact"/);
   assert.doesNotMatch(footer, /<form[\s\S]*name="name"[\s\S]*name="email"[\s\S]*name="message"/);
   assert.doesNotMatch(footer, /VITE_CONTACT_FORM_ENDPOINT/);
-  assert.match(contact, /Contact Mdrn-Life DDW/);
-  assert.match(contact, /Questions about 5 ppm DDW, lab reports, wholesale, subscriptions,\s+or practitioner support/);
-  assert.match(contact, /\(888\) 391-8023/);
-  assert.match(contact, /Support@orisefinance\.com/);
-  assert.match(contact, /1436 E Atlantic Blvd Unit C, Pompano Beach, FL 33060/);
+  assert.match(contact, /Get in touch/);
+  assert.match(contact, /Send the Mdrn-Life DDW team a message about products, wholesale,\s+subscriptions, lab reports, or practitioner support/);
   assert.doesNotMatch(contact, /Lab report requests/);
   assert.doesNotMatch(contact, /Hydroisotop GmbH, USGS Reston, and verification questions/);
   assert.doesNotMatch(footer, /Current Store/);
-  assert.match(contact, /<motion\.form[\s\S]*name="name"[\s\S]*name="email"[\s\S]*name="message"/);
-  assert.match(contact, /name="issue" value="Contact form"/);
-  assert.match(contact, /name="website"/);
-  assert.match(contact, /VITE_CONTACT_FORM_ENDPOINT/);
-  assert.match(contactLib, /\/api\/email-support/);
-  assert.match(contactLib, /source:\s*'Contact form'/);
-  assert.match(contactLib, /headers:\s*\{ 'Content-Type': 'application\/json' \}/);
-  assert.match(contactLib, /openEmailFallback/);
-  assert.match(contactLib, /mailto:/);
+  assert.match(contact, /<form[\s\S]*name="name"[\s\S]*name="email"[\s\S]*name="subject"[\s\S]*name="message"/);
+  assert.match(contact, /VITE_API_URL/);
+  assert.match(contact, /\/api\/contact/);
+  assert.match(contact, /headers:\s*\{ 'Content-Type': 'application\/json' \}/);
+  assert.match(contact, /Sending\.\.\./);
+  assert.match(contact, /Your message has been sent successfully\./);
+  assert.match(contactApi, /success:\s*true/);
+  assert.match(contactApi, /messageId/);
+  assert.match(contactApi, /Validation failed/);
+  assert.match(contactApi, /field'?\]?\s*=>|field/);
   assert.match(app, /case '\/contact':\s*return <ContactPage \/>/);
 });
 
@@ -580,7 +578,7 @@ test('developer handoff documents required Shopify, tracking, subscription, and 
     assert.match(doc, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
   }
   assert.match(doc, /\/products\/cart/);
-  assert.match(contactDoc, /VITE_CONTACT_FORM_ENDPOINT/);
+  assert.match(contactDoc, /VITE_API_URL/);
   assert.match(contactDoc, /Resend|SendGrid|Mailgun|Postmark/);
   assert.match(contactDoc, /Cloudflare Turnstile|Google reCAPTCHA/);
   assert.match(liveEmailDoc, /npm run start/);
@@ -703,7 +701,7 @@ test('page sections blend into the site background without divider grids or foot
     file('src/components/OrganShowcase.tsx'),
     file('src/components/Products.tsx'),
     file('src/components/Research.tsx'),
-    file('src/components/ContactPage.tsx'),
+    file('src/components/ContactPage.jsx'),
     file('src/components/CTAFooter.tsx'),
   ].join('\n');
 
@@ -721,7 +719,7 @@ test('page sections do not use independent glow or particle background layers', 
     file('src/components/OrganShowcase.tsx'),
     file('src/components/Products.tsx'),
     file('src/components/Research.tsx'),
-    file('src/components/ContactPage.tsx'),
+    file('src/components/ContactPage.jsx'),
     file('src/components/CTAFooter.tsx'),
   ].join('\n');
 
