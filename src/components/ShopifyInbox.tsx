@@ -15,6 +15,10 @@ const SESSION_KEY = 'mdrnLifeSupportSessionId';
 const WHATSAPP_NUMBER = '19544105042';
 const SUPPORT_EMAIL = 'support@orisefinance.com';
 
+// Base URL of the support/API server (e.g. http://2.25.199.73:3000). Falls back
+// to same-origin when unset. Requests must hit this host, not the site origin.
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 type ChatView = 'home' | 'email' | 'emailSent';
 
 function getSessionId() {
@@ -68,7 +72,7 @@ export function ShopifyInbox() {
     setError('');
 
     try {
-      const response = await fetch('/api/email-support', {
+      const response = await fetch(`${API_BASE}/api/email-support`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

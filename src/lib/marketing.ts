@@ -14,6 +14,10 @@ export type SubscribeResult = {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Base URL of the support/API server (e.g. http://2.25.199.73:3000). Falls back
+// to same-origin when unset.
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 export function isValidEmail(email: string) {
   return EMAIL_PATTERN.test(email.trim());
 }
@@ -29,7 +33,7 @@ export async function subscribeEmailToMarketing(input: SubscribeInput): Promise<
     throw new Error('Please enter a valid email address.');
   }
 
-  const response = await fetch('/api/marketing-signup', {
+  const response = await fetch(`${API_BASE}/api/marketing-signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
