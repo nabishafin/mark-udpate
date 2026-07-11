@@ -91,11 +91,11 @@ export async function shopifyStorefrontFetch<T = unknown>(body: object, signal?:
     body: JSON.stringify(body),
   });
 
-  if (!response.ok) throw new Error(`Shopify request failed: ${response.status}`);
+  if (!response.ok) throw new Error(`Store request failed: ${response.status}`);
 
   const payload = await response.json();
   if (payload?.errors?.length) {
-    throw new Error(payload.errors.map((error: { message?: string }) => error.message).filter(Boolean).join(' ') || 'Shopify request failed.');
+    throw new Error(payload.errors.map((error: { message?: string }) => error.message).filter(Boolean).join(' ') || 'Store request failed.');
   }
 
   return payload as T;
@@ -120,7 +120,7 @@ export function buildShopifyCheckoutUrl(items: ShopifyCheckoutItem[], source = '
   if (sellingPlans.length === 1 && items.every((item) => item.purchaseOption === 'subscription' && item.sellingPlanId === sellingPlans[0])) {
     url.searchParams.set('selling_plan', sellingPlans[0] as string);
   } else if (sellingPlanItems.length > 0) {
-    throw new Error('Subscription checkout requires a Shopify Storefront cart URL.');
+    throw new Error('Subscription checkout requires a secure cart URL.');
   }
   return appendTracking(url, source);
 }
@@ -158,11 +158,11 @@ export async function createShopifyCartCheckoutUrl(items: ShopifyCheckoutItem[])
   });
   const errors = payload?.errors || payload?.data?.cartCreate?.userErrors || [];
   if (errors.length) {
-    throw new Error(errors.map((error: { message?: string }) => error.message).filter(Boolean).join(' ') || 'Shopify cart could not be created.');
+    throw new Error(errors.map((error: { message?: string }) => error.message).filter(Boolean).join(' ') || 'Cart could not be created.');
   }
 
   const checkoutUrl = payload?.data?.cartCreate?.cart?.checkoutUrl;
-  if (!checkoutUrl) throw new Error('Shopify did not return a checkout URL.');
+  if (!checkoutUrl) throw new Error('Could not start checkout.');
 
   return forceShopifyCheckoutDomain(checkoutUrl as string);
 }

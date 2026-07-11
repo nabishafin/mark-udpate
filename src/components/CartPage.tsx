@@ -77,13 +77,13 @@ export function CartPage() {
           className="grid gap-8 lg:grid-cols-[1fr_420px] lg:items-end"
         >
           <div>
-            <div className="hpe-hud-label mb-3">Secure Shopify Checkout</div>
+            <div className="hpe-hud-label mb-3">Secure Checkout</div>
             <h1 className="text-4xl font-medium tracking-tight text-white sm:text-6xl">
               Your Cart
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
               Review your Mdrn-Life DDW order here. Payment, shipping, taxes,
-              and order confirmation continue securely through Shopify.
+              and order confirmation continue securely.
             </p>
           </div>
 
@@ -122,7 +122,7 @@ export function CartPage() {
             <h2 className="mt-5 text-2xl font-medium text-white">Your cart is empty.</h2>
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/55">
               Add Mdrn-Life DDW Glass or PET Plastic bottles from the shop page,
-              then return here to adjust quantities before Shopify checkout.
+              then return here to adjust quantities before checkout.
             </p>
             <a href="/products" className="hpe-btn-primary mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
               Continue shopping
@@ -175,7 +175,7 @@ export function CartPage() {
                       </div>
                       <div className="mt-4 flex items-center gap-2 text-xs text-cyan-100/70">
                         <ShieldCheck size={13} />
-                        <span>Shopify checkout ready</span>
+                        <span>Secure checkout ready</span>
                       </div>
                     </div>
                   </div>
@@ -233,7 +233,7 @@ export function CartPage() {
                 </div>
                 <div className="flex items-center justify-between gap-6 text-sm text-white/62">
                   <span>Shipping & taxes</span>
-                  <span>Shopify checkout</span>
+                  <span>Calculated at checkout</span>
                 </div>
               </div>
               <div className="mt-5 flex items-center justify-between gap-6 text-lg text-white">
@@ -242,11 +242,11 @@ export function CartPage() {
               </div>
               <p className="mt-4 text-sm leading-relaxed text-white/50">
                 Taxes, discounts, shipping, payment, and customer information are
-                calculated securely in Shopify.
+                calculated securely at checkout.
               </p>
               {!canCheckout && hydratedItems.length > 0 && (
                 <p className="mt-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-xs leading-relaxed text-amber-100/75">
-                  Complete one purchase plan at a time until the Shopify Storefront cart API is connected.
+                  Complete one purchase plan at a time for the most reliable checkout experience.
                 </p>
               )}
               <button

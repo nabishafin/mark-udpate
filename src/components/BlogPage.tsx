@@ -55,7 +55,7 @@ export function BlogPage() {
 
         {loading && (
           <div className="mt-10 inline-flex items-center gap-2 text-sm text-cyan-100/70">
-            <Loader2 className="animate-spin" size={15} /> Syncing the latest Shopify articles
+            <Loader2 className="animate-spin" size={15} /> Syncing the latest articles
           </div>
         )}
 

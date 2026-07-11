@@ -110,7 +110,7 @@ export function BlogArticlePage({ handle }: Props) {
         >
           {loading && (
             <div className="mb-6 inline-flex items-center gap-2 text-sm text-cyan-100/60">
-              <Loader2 className="animate-spin" size={14} /> Loading full article from Shopify
+              <Loader2 className="animate-spin" size={14} /> Loading full article
             </div>
           )}
 
@@ -166,7 +166,7 @@ export function BlogArticlePage({ handle }: Props) {
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
                 <div className="hpe-hud-label">Recommended</div>
-                <h2 className="mt-2 text-2xl font-medium text-white">More from the Shopify journal</h2>
+                <h2 className="mt-2 text-2xl font-medium text-white">More from the journal</h2>
               </div>
               <a href="/blogs/news" className="hidden items-center gap-2 text-sm text-cyan-200/75 transition hover:text-cyan-100 sm:inline-flex">
                 View all <ArrowUpRight size={14} />

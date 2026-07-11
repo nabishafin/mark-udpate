@@ -405,7 +405,7 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.match(products, /\/products\/cart/);
   assert.match(products, /useState<Product\[\] \| null>\(null\)/);
   assert.match(products, /loadingImage=\{loadingProducts\}/);
-  assert.match(products, /Loading Shopify product image/);
+  assert.match(products, /Loading product image/);
   assert.doesNotMatch(products, />\s*Buy Now\s*</);
   assert.doesNotMatch(products, />\s*Subscribe\s*</);
   assert.doesNotMatch(products, />\s*View\s*</);
@@ -436,10 +436,16 @@ test('customer password reset uses secure email links without paste-a-link UX', 
   assert.match(account, /window\.history\.replaceState\(\{\}, '', '\/reset-password'\)/);
   assert.match(account, /Back to forgot password/);
   assert.match(account, /Open the reset link from your email to continue/);
+  assert.match(account, /Check your email for a link to reset your password/);
   assert.doesNotMatch(account, /Paste the full Shopify password reset link/);
   assert.doesNotMatch(account, /I have a reset link/);
   assert.doesNotMatch(account, /Secure reset link verified/);
   assert.doesNotMatch(account, /Need a new Shopify reset link/);
+  assert.doesNotMatch(account, /Shopify Customer Account/);
+  assert.doesNotMatch(account, /Login with Shopify/);
+  assert.doesNotMatch(account, /Register with Shopify/);
+  assert.doesNotMatch(account, /Send a Shopify password reset email/);
+  assert.doesNotMatch(account, /If that email belongs to a Shopify customer account/);
 
   assert.match(customer, /customerResetByUrl/);
   assert.match(customer, /normalizeCustomerResetUrl/);
@@ -570,8 +576,13 @@ test('cart page supports local cart quantity controls, removal, and Shopify chec
   assert.match(cart, /Your Cart/);
   assert.match(cart, /Continue shopping/);
   assert.match(cart, /Estimated total/);
-  assert.match(cart, /Secure Shopify Checkout/);
+  assert.match(cart, /Secure Checkout/);
   assert.match(cart, /Order Summary/);
+  assert.doesNotMatch(cart, /Secure Shopify Checkout/);
+  assert.doesNotMatch(cart, /Shopify checkout ready/);
+  assert.doesNotMatch(cart, /calculated securely in Shopify/);
+  assert.doesNotMatch(checkout, /Payment processed securely by Shopify/);
+  assert.doesNotMatch(checkout, /Powered by Shopify/);
   assert.match(cart, /\/products/);
   assert.match(cart, /handleCheckout/);
   assert.match(cart, /pushState\(\{\}, '', '\/checkout'\)/);
@@ -785,6 +796,28 @@ test('blog archive is routed, theme-native, and ready for Shopify Storefront art
   assert.match(blogData, /shopifyStorefrontFetch/);
   assert.match(file('src/lib/shopify.ts'), /X-Shopify-Storefront-Access-Token/);
   assert.match(blogData, /blog\(handle: "news"\)/);
+});
+
+test('customer-facing account, order, checkout, and blog copy stays brand-native', () => {
+  const account = file('src/components/AccountPage.tsx');
+  const orders = file('src/components/OrderPages.tsx');
+  const cart = file('src/components/CartPage.tsx');
+  const checkout = file('src/components/CheckoutPage.tsx');
+  const blog = file('src/components/BlogPage.tsx');
+  const article = file('src/components/BlogArticlePage.tsx');
+  const products = file('src/components/Products.tsx');
+
+  const rejectedCopy = [
+    [account, /Shopify Customer Account|Shopify customer account|Login with Shopify|Register with Shopify|Shopify reset flow|Signed in through Shopify|Account created in Shopify|Password changed in Shopify/],
+    [orders, /Shopify Account|Shopify Orders|Loading Shopify orders|Latest Shopify order details|Open Shopify status|No Shopify orders/],
+    [cart, /Secure Shopify Checkout|Shopify checkout ready|Shopify checkout|calculated securely in Shopify/],
+    [checkout, /Payment processed securely by Shopify|Powered by Shopify/],
+    [blog, /latest Shopify articles/],
+    [article, /from Shopify|Shopify journal/],
+    [products, /Loading Shopify product image/],
+  ];
+
+  for (const [source, pattern] of rejectedCopy) assert.doesNotMatch(source, pattern);
 });
 
 test('technical SEO covers approved metadata, dynamic articles, generated sitemap, and noindex routes', () => {

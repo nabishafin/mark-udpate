@@ -54,7 +54,7 @@ export function OrdersPage({ orderId }: OrdersPageProps) {
 
     request
       .catch((err) => {
-        if (active) setError(err instanceof Error ? err.message : 'Could not load Shopify orders.');
+        if (active) setError(err instanceof Error ? err.message : 'Could not load orders.');
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -69,10 +69,10 @@ export function OrdersPage({ orderId }: OrdersPageProps) {
     return (
       <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
         <div className="relative z-10 mx-auto max-w-xl px-6 text-center">
-          <div className="hpe-hud-label">Shopify Account</div>
+          <div className="hpe-hud-label">Customer Account</div>
           <h1 className="mt-4 text-4xl font-medium tracking-tight text-white">Login required</h1>
           <p className="mt-4 text-sm leading-relaxed text-white/55">
-            Sign in to your Shopify customer account to view order status and account-specific order details.
+            Sign in to your account to view order status and account-specific order details.
           </p>
           <a href="/login" className="hpe-btn-primary mt-8 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
             Login <ArrowRight size={14} />
@@ -97,15 +97,15 @@ export function OrdersPage({ orderId }: OrdersPageProps) {
     <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <PageHeader
-          eyebrow="Shopify Orders"
+          eyebrow="Orders"
           title="All orders"
-          body="Every order shown here is loaded from your authenticated Shopify customer account."
+          body="Every order shown here is loaded securely from your customer account."
           backHref="/account"
           backLabel="Back to account"
         />
 
         {loading ? (
-          <LoadingPanel label="Loading Shopify orders..." />
+          <LoadingPanel label="Loading orders..." />
         ) : error ? (
           <ErrorPanel message={error} />
         ) : orders.length ? (
@@ -137,7 +137,7 @@ function OrderStatusView({
     return (
       <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
         <div className="relative z-10 mx-auto max-w-6xl px-6">
-          <PageHeader eyebrow="Order Status" title="Loading order" body="Pulling the latest status from Shopify." backHref="/account/orders" backLabel="All orders" />
+          <PageHeader eyebrow="Order Status" title="Loading order" body="Pulling the latest order status." backHref="/account/orders" backLabel="All orders" />
           <LoadingPanel label="Loading order status..." />
         </div>
       </section>
@@ -148,8 +148,8 @@ function OrderStatusView({
     return (
       <section className="relative min-h-screen overflow-hidden pb-24 pt-32">
         <div className="relative z-10 mx-auto max-w-6xl px-6">
-          <PageHeader eyebrow="Order Status" title="Order not found" body="Shopify did not return this order for the signed-in customer." backHref="/account/orders" backLabel="All orders" />
-          <ErrorPanel message={error || 'This order is not available for the current Shopify customer account.'} />
+          <PageHeader eyebrow="Order Status" title="Order not found" body="This order is not available for the signed-in customer." backHref="/account/orders" backLabel="All orders" />
+          <ErrorPanel message={error || 'This order is not available for the current customer account.'} />
         </div>
       </section>
     );
@@ -165,7 +165,7 @@ function OrderStatusView({
         <PageHeader
           eyebrow="Order Status"
           title={order.name}
-          body={`Latest Shopify order details for ${customerName}.`}
+          body={`Latest order details for ${customerName}.`}
           backHref="/account/orders"
           backLabel="All orders"
         />
@@ -233,7 +233,7 @@ function OrderStatusView({
                 <div className="mt-4 space-y-4">
                   {fulfillments.map((fulfillment, index) => (
                     <div key={`${fulfillment.trackingCompany || 'fulfillment'}-${index}`} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                      <p className="text-sm font-medium text-white">{fulfillment.trackingCompany || 'Shopify fulfillment'}</p>
+                      <p className="text-sm font-medium text-white">{fulfillment.trackingCompany || 'Order fulfillment'}</p>
                       {fulfillment.trackingInfo.length ? (
                         <div className="mt-3 space-y-2">
                           {fulfillment.trackingInfo.map((tracking) => (
@@ -250,19 +250,19 @@ function OrderStatusView({
                           ))}
                         </div>
                       ) : (
-                        <p className="mt-2 text-sm text-white/45">Tracking has not been added in Shopify yet.</p>
+                        <p className="mt-2 text-sm text-white/45">Tracking has not been added yet.</p>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="mt-4 text-sm leading-relaxed text-white/50">
-                  No successful fulfillment or tracking number has been added in Shopify yet.
+                  No successful fulfillment or tracking number has been added yet.
                 </p>
               )}
               {shopifyStatusUrl && (
                 <a href={shopifyStatusUrl} target="_blank" rel="noreferrer" className="hpe-btn-primary mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-                  Open Shopify status <ExternalLink size={14} />
+                  Open order status <ExternalLink size={14} />
                 </a>
               )}
             </div>
@@ -351,7 +351,7 @@ function AddressCard({ title, address }: { title: string; address?: ShopifyMaili
           {address.phone && <><br />{address.phone}</>}
         </address>
       ) : (
-        <p className="mt-4 text-sm text-white/45">No {title.toLowerCase()} returned by Shopify.</p>
+        <p className="mt-4 text-sm text-white/45">No {title.toLowerCase()} available for this order.</p>
       )}
     </div>
   );
@@ -396,9 +396,9 @@ function EmptyPanel() {
   return (
     <div className="hpe-glass mt-10 rounded-2xl p-10 text-center">
       <ListOrdered className="mx-auto text-cyan-300" size={30} />
-      <h2 className="mt-5 text-2xl font-medium text-white">No Shopify orders yet</h2>
+      <h2 className="mt-5 text-2xl font-medium text-white">No orders yet</h2>
       <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/50">
-        Orders will appear here after checkout is completed through Shopify.
+        Orders will appear here after checkout is completed.
       </p>
       <a href="/products" className="hpe-btn-primary mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
         Shop DDW <ArrowRight size={14} />

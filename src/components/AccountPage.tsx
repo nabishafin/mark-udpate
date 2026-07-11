@@ -72,19 +72,19 @@ export function AccountPage({ mode }: Props) {
           transition={{ duration: 0.65 }}
           className="pt-4"
         >
-          <div className="hpe-hud-label">Shopify Customer Account</div>
+          <div className="hpe-hud-label">Customer Account</div>
           <h1 className="mt-4 text-4xl font-medium tracking-tight text-white sm:text-6xl">
             Secure account access.
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/62 sm:text-lg">
             Register, sign in, recover your password, and contact the store team
-            through the same Shopify customer backend used for orders.
+            through one secure Mdrn-Life DDW account.
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {[
-              ['Customer creation', 'Creates a Shopify customer record.'],
-              ['Secure login', 'Uses Shopify customer access tokens.'],
-              ['Password recovery', 'Sends the Shopify reset flow by email.'],
+              ['Customer creation', 'Creates your customer profile.'],
+              ['Secure login', 'Protects your account session.'],
+              ['Password recovery', 'Sends a secure reset email.'],
               ['Admin support', 'Routes messages to store support.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -130,7 +130,7 @@ function LoginForm({ onSession }: { onSession: (session: CustomerSession) => voi
     try {
       const session = await loginCustomer({ email, password });
       onSession(session);
-      setStatus('Signed in through Shopify. Opening your account...');
+      setStatus('Signed in. Opening your account...');
       navigate('/account');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not sign in.');
@@ -141,12 +141,12 @@ function LoginForm({ onSession }: { onSession: (session: CustomerSession) => voi
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <FormHeader icon={Lock} title="Login" body="Access your Shopify customer account." />
+      <FormHeader icon={Lock} title="Login" body="Access your Mdrn-Life DDW account." />
       <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
       <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" required revealable />
       <Feedback error={error} status={status} />
       <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-        {submitting ? 'Signing in...' : 'Login with Shopify'} <ArrowRight size={14} />
+        {submitting ? 'Signing in...' : 'Login'} <ArrowRight size={14} />
       </button>
       <div className="flex flex-wrap gap-3 text-sm text-white/55">
         <a href="/forgot-password" className="text-cyan-200/75 hover:text-cyan-100">Forgot password?</a>
@@ -177,7 +177,7 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
       await registerCustomer({ firstName, lastName, email, password, phone, acceptsMarketing });
       const session = await loginCustomer({ email, password });
       onSession(session);
-      setStatus('Account created in Shopify. Opening your account...');
+      setStatus('Account created. Opening your account...');
       navigate('/account');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create account.');
@@ -188,7 +188,7 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <FormHeader icon={UserPlus} title="Register" body="Create a Shopify customer account." />
+      <FormHeader icon={UserPlus} title="Register" body="Create your Mdrn-Life DDW account." />
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField label="First name" value={firstName} onChange={setFirstName} autoComplete="given-name" required />
         <TextField label="Last name" value={lastName} onChange={setLastName} autoComplete="family-name" required />
@@ -207,7 +207,7 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
       </label>
       <Feedback error={error} status={status} />
       <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-        {submitting ? 'Creating account...' : 'Register with Shopify'} <ArrowRight size={14} />
+        {submitting ? 'Creating account...' : 'Create account'} <ArrowRight size={14} />
       </button>
       <div className="text-sm text-white/55">
         Already registered? <a href="/login" className="text-cyan-200/75 hover:text-cyan-100">Login</a>
@@ -240,7 +240,7 @@ function RecoverForm() {
     try {
       await recoverCustomerPassword(email);
       setCooldown(50);
-      setStatus('If that email belongs to a Shopify customer account, Shopify will send a password reset link.');
+      setStatus('Check your email for a link to reset your password.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start password recovery.');
     } finally {
@@ -250,7 +250,7 @@ function RecoverForm() {
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <FormHeader icon={Mail} title="Forgot password" body="Send a Shopify password reset email." />
+      <FormHeader icon={Mail} title="Forgot password" body="Send a secure password reset email." />
       <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
       <Feedback error={error} status={status} />
       <button type="submit" disabled={submitting || cooldown > 0} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
@@ -309,7 +309,7 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
       setConfirmPassword('');
       setStatus('Password changed successfully. Your account is now signed in.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not reset password with this Shopify reset link.');
+      setError(err instanceof Error ? err.message : 'Could not reset password with this reset link.');
     } finally {
       setSubmitting(false);
     }
@@ -393,7 +393,7 @@ function CustomerDashboard({
           <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/58">
             <p><span className="text-white/35">Email:</span> {customer?.email ?? 'Connected customer'}</p>
             {customer?.phone && <p><span className="text-white/35">Phone:</span> {customer.phone}</p>}
-            {customer?.numberOfOrders && <p><span className="text-white/35">Shopify orders:</span> {customer.numberOfOrders}</p>}
+            {customer?.numberOfOrders && <p><span className="text-white/35">Orders:</span> {customer.numberOfOrders}</p>}
             <p><span className="text-white/35">Session expires:</span> {new Date(session.expiresAt).toLocaleDateString()}</p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -407,7 +407,7 @@ function CustomerDashboard({
 
           <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-sm font-medium uppercase tracking-widest text-white/45">Recent Shopify orders</h2>
+              <h2 className="text-sm font-medium uppercase tracking-widest text-white/45">Recent orders</h2>
               <a href="/account/orders" className="inline-flex items-center gap-2 text-sm text-cyan-200/75 hover:text-cyan-100">
                 Check all orders <ListOrdered size={14} />
               </a>
@@ -442,7 +442,7 @@ function CustomerDashboard({
                 ))}
               </ul>
             ) : (
-              <p className="mt-4 text-sm text-white/45">No Shopify orders found for this account yet.</p>
+              <p className="mt-4 text-sm text-white/45">No orders found for this account yet.</p>
             )}
           </div>
         </motion.div>
@@ -482,7 +482,7 @@ function ProfileForm({ session, onSessionChange }: { session: CustomerSession; o
         acceptsMarketing,
       }, session.expiresAt);
       onSessionChange(updated);
-      setStatus('Your Shopify account information was updated.');
+      setStatus('Your account information was updated.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update your account information.');
     } finally {
@@ -492,7 +492,7 @@ function ProfileForm({ session, onSessionChange }: { session: CustomerSession; o
 
   return (
     <form onSubmit={submit} className="hpe-glass grid gap-4 rounded-2xl p-6 sm:p-8">
-      <FormHeader icon={UserPlus} title="Account information" body="Update your Shopify customer profile." />
+      <FormHeader icon={UserPlus} title="Account information" body="Update your customer profile." />
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField label="First name" value={firstName} onChange={setFirstName} autoComplete="given-name" required />
         <TextField label="Last name" value={lastName} onChange={setLastName} autoComplete="family-name" required />
@@ -539,7 +539,7 @@ function PasswordForm({ session, onSessionChange }: { session: CustomerSession; 
       onSessionChange(updated);
       setPassword('');
       setConfirmPassword('');
-      setStatus('Password changed in Shopify. Your session was refreshed.');
+      setStatus('Password changed. Your session was refreshed.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not change password.');
     } finally {
@@ -549,7 +549,7 @@ function PasswordForm({ session, onSessionChange }: { session: CustomerSession; 
 
   return (
     <form onSubmit={submit} className="hpe-glass grid gap-4 rounded-2xl p-6 sm:p-8">
-      <FormHeader icon={KeyRound} title="Change password" body="Update your Shopify customer password." />
+      <FormHeader icon={KeyRound} title="Change password" body="Update your account password." />
       <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
       <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
       <Feedback error={error} status={status} />

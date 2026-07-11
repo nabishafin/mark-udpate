@@ -299,7 +299,7 @@ const ORDER_DETAIL_FIELDS = `
 `;
 
 function getCustomerErrors(errors: CustomerUserError[] = []) {
-  return errors.map((error) => error.message).filter(Boolean).join(' ') || 'Shopify customer account request failed.';
+  return errors.map((error) => error.message).filter(Boolean).join(' ') || 'Customer account request failed.';
 }
 
 function getAllowedResetHosts() {
@@ -333,7 +333,7 @@ export function normalizeCustomerResetUrl(value: string) {
   const allowedHost = getAllowedResetHosts().has(hostname) || isLocalHost(hostname);
   const allowedProtocol = url.protocol === 'https:' || (url.protocol === 'http:' && isLocalHost(hostname));
   if (!allowedHost || !allowedProtocol || !url.pathname.includes('/account/reset/')) {
-    throw new Error('Password reset link is not recognized for this Shopify store.');
+    throw new Error('Password reset link is not recognized for this store.');
   }
 
   url.hash = '';
@@ -403,7 +403,7 @@ export async function registerCustomer(input: RegisterInput): Promise<ShopifyCus
   if (errors.length) throw new Error(getCustomerErrors(errors));
 
   const customer = payload?.data?.customerCreate?.customer;
-  if (!customer) throw new Error('Shopify did not return the new customer account.');
+  if (!customer) throw new Error('Could not create the new customer account.');
   return customer;
 }
 
@@ -422,7 +422,7 @@ export async function loginCustomer(input: LoginInput): Promise<CustomerSession>
   if (errors.length) throw new Error(getCustomerErrors(errors));
 
   const token = payload?.data?.customerAccessTokenCreate?.customerAccessToken;
-  if (!token?.accessToken) throw new Error('Shopify did not return a customer access token.');
+  if (!token?.accessToken) throw new Error('Could not start a customer session.');
 
   const customer = await getCustomer(token.accessToken);
   const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer };
@@ -498,7 +498,7 @@ export async function updateCustomerProfile(accessToken: string, input: Customer
   if (errors.length) throw new Error(getCustomerErrors(errors));
 
   const customer = payload?.data?.customerUpdate?.customer;
-  if (!customer) throw new Error('Shopify did not return the updated customer account.');
+  if (!customer) throw new Error('Could not update the customer account.');
 
   const token = payload?.data?.customerUpdate?.customerAccessToken;
   const session = {
@@ -530,7 +530,7 @@ export async function updateCustomerPassword(accessToken: string, password: stri
 
   const token = payload?.data?.customerUpdate?.customerAccessToken;
   const customer = payload?.data?.customerUpdate?.customer;
-  if (!token?.accessToken || !customer) throw new Error('Shopify did not return a refreshed customer session.');
+  if (!token?.accessToken || !customer) throw new Error('Could not refresh the customer session.');
 
   const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer };
   saveCustomerSession(session);
@@ -558,7 +558,7 @@ export async function resetCustomerPasswordByUrl(resetUrl: string, password: str
 
   const token = payload?.data?.customerResetByUrl?.customerAccessToken;
   const customer = payload?.data?.customerResetByUrl?.customer;
-  if (!token?.accessToken || !customer) throw new Error('Shopify could not reset the password with this reset link.');
+  if (!token?.accessToken || !customer) throw new Error('Could not reset the password with this reset link.');
 
   const fullCustomer = await getCustomer(token.accessToken);
   const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer: fullCustomer ?? customer };

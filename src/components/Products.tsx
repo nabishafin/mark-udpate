@@ -183,7 +183,7 @@ function ProductCard({
         {loadingImage ? (
           <div
             role="status"
-            aria-label="Loading Shopify product image"
+            aria-label="Loading product image"
             className="aspect-[16/11] w-full animate-pulse bg-[linear-gradient(110deg,rgba(255,255,255,0.035),rgba(63,184,255,0.10),rgba(255,255,255,0.035))] bg-[length:220%_100%]"
           />
         ) : (

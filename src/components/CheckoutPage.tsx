@@ -439,7 +439,7 @@ export function CheckoutPage() {
                       <div className="flex items-start gap-3">
                         <Lock size={14} className="mt-0.5 shrink-0 text-cyan-300/60" />
                         <div>
-                          <p className="text-xs font-medium text-white/80">Payment processed securely by Shopify</p>
+                          <p className="text-xs font-medium text-white/80">Payment processed securely</p>
                           <p className="mt-1 text-xs leading-relaxed text-white/45">
                             All major credit cards, Shop Pay, PayPal, and Apple Pay accepted. Your card details are never stored on our servers.
                           </p>
@@ -537,7 +537,7 @@ export function CheckoutPage() {
 
             <div className="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-white/30">
               <ShieldCheck size={11} />
-              <span>SSL secured · Powered by Shopify</span>
+              <span>SSL secured</span>
             </div>
           </motion.aside>
 
