@@ -7,7 +7,9 @@ import { trackCommerceEvent } from '../lib/tracking';
 
 export function Products() {
   const [cartCount, setCartCount] = useState(() => getCartCount());
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [products, setProducts] = useState<Product[] | null>(null);
+  const loadingProducts = products === null;
+  const visibleProducts = products ?? PRODUCTS;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -19,6 +21,12 @@ export function Products() {
   }, []);
 
   useEffect(() => {
+    return onCartChange(() => setCartCount(getCartCount()));
+  }, []);
+
+  useEffect(() => {
+    if (!products) return;
+
     products.forEach((product) => {
       trackCommerceEvent('product_viewed', {
         productId: product.id,
@@ -28,8 +36,6 @@ export function Products() {
         checkoutReady: Boolean(product.variantId),
       });
     });
-
-    return onCartChange(() => setCartCount(getCartCount()));
   }, [products]);
 
   return (
@@ -76,11 +82,12 @@ export function Products() {
         </motion.div>
 
         <div className="mt-14 grid gap-5 md:grid-cols-2">
-          {products.map((product, i) => (
+          {visibleProducts.map((product, i) => (
             <ProductCard
               key={product.id}
               product={product}
               delay={i * 0.1}
+              loadingImage={loadingProducts}
               onCartCountChange={() => setCartCount(getCartCount())}
             />
           ))}
@@ -99,10 +106,12 @@ export function Products() {
 function ProductCard({
   product,
   delay,
+  loadingImage,
   onCartCountChange,
 }: {
   product: Product;
   delay: number;
+  loadingImage: boolean;
   onCartCountChange: () => void;
 }) {
   const [adding, setAdding] = useState(false);
@@ -171,13 +180,21 @@ function ProductCard({
       />
 
       <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
-        <img
-          src={product.image.src}
-          alt={product.image.alt}
-          loading="lazy"
-          decoding="async"
-          className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
-        />
+        {loadingImage ? (
+          <div
+            role="status"
+            aria-label="Loading Shopify product image"
+            className="aspect-[16/11] w-full animate-pulse bg-[linear-gradient(110deg,rgba(255,255,255,0.035),rgba(63,184,255,0.10),rgba(255,255,255,0.035))] bg-[length:220%_100%]"
+          />
+        ) : (
+          <img
+            src={product.image.src}
+            alt={product.image.alt}
+            loading="lazy"
+            decoding="async"
+            className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
+          />
+        )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050608]/55 via-transparent to-transparent" />
       </div>
 

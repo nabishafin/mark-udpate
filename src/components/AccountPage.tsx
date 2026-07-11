@@ -10,6 +10,7 @@ import {
   getCustomerOrders,
   getStoredCustomerSession,
   loginCustomer,
+  normalizeCustomerResetUrl,
   onCustomerSessionChange,
   recoverCustomerPassword,
   registerCustomer,
@@ -106,7 +107,7 @@ export function AccountPage({ mode }: Props) {
             : mode === 'recover'
               ? <RecoverForm />
               : mode === 'reset'
-                ? <ResetPasswordForm />
+                ? <ResetPasswordForm onSession={setSession} />
                 : <LoginForm onSession={setSession} />}
         </motion.div>
       </div>
@@ -257,17 +258,26 @@ function RecoverForm() {
       </button>
       <div className="flex flex-wrap gap-3 text-sm text-white/55">
         <a href="/login" className="text-cyan-200/75 hover:text-cyan-100">Back to login</a>
-        <a href="/reset-password" className="text-cyan-200/75 hover:text-cyan-100">I have a reset link</a>
       </div>
     </form>
   );
 }
 
-function ResetPasswordForm() {
-  const resetUrlFromEmail = /\/account\/reset\//.test(window.location.pathname);
+function getResetUrlFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  const resetUrlParam = params.get('reset_url') || params.get('resetUrl') || params.get('url');
+  if (resetUrlParam) return normalizeCustomerResetUrl(resetUrlParam);
+  if (/\/account\/reset\//.test(window.location.pathname)) return normalizeCustomerResetUrl(window.location.href);
+  return '';
+}
+
+function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession) => void }) {
   const [resetUrl, setResetUrl] = useState(() => {
-    const currentUrl = window.location.href;
-    return resetUrlFromEmail ? currentUrl : '';
+    try {
+      return getResetUrlFromLocation();
+    } catch {
+      return '';
+    }
   });
   const [email, setEmail] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -281,9 +291,9 @@ function ResetPasswordForm() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!resetUrlFromEmail) return;
+    if (!resetUrl) return;
     window.history.replaceState({}, '', '/reset-password');
-  }, [resetUrlFromEmail]);
+  }, [resetUrl]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return undefined;
@@ -323,11 +333,12 @@ function ResetPasswordForm() {
 
     setSubmitting(true);
     try {
-      await resetCustomerPasswordByUrl(resetUrl, password);
+      const session = await resetCustomerPasswordByUrl(resetUrl, password);
+      onSession(session);
       setResetUrl('');
       setPassword('');
       setConfirmPassword('');
-      setStatus('Password changed successfully. You can now login with your email and new password.');
+      setStatus('Password changed successfully. Your account is now signed in.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not reset password with this Shopify reset link.');
     } finally {
@@ -337,39 +348,30 @@ function ResetPasswordForm() {
 
   return (
     <div className="grid gap-4">
-      <FormHeader icon={KeyRound} title="Reset password" body="Use the Shopify reset link from your email." />
-      <form onSubmit={submit} className="grid gap-4">
-        {!resetUrlFromEmail && (
-          <label className="grid gap-2 text-sm text-white/70">
-            Shopify reset link
-            <textarea
-              required
-              value={resetUrl}
-              onChange={(event) => setResetUrl(event.target.value)}
-              rows={3}
-              className="resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/60"
-              placeholder="Paste the full Shopify password reset link from your email."
-            />
-          </label>
-        )}
-        {resetUrlFromEmail && (
+      <FormHeader icon={KeyRound} title="Reset password" body="Set a new password from the secure link sent to your email." />
+      {resetUrl ? (
+        <form onSubmit={submit} className="grid gap-4">
           <div className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] p-3 text-sm leading-relaxed text-cyan-100">
-            Shopify reset link received. The reset token was removed from the address bar for security.
+            Secure reset link verified. The token was removed from the address bar.
           </div>
-        )}
-        <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
-        <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
-        <Feedback error={error} status={status} />
-        {status ? (
-          <a href="/login" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-            Go to login <ArrowRight size={14} />
-          </a>
-        ) : (
-          <button type="submit" disabled={submitting || !resetUrl} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-            {submitting ? 'Saving...' : 'Set new password'} <ArrowRight size={14} />
-          </button>
-        )}
-      </form>
+          <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
+          <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
+          <Feedback error={error} status={status} />
+          {status ? (
+            <a href="/account" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+              Open account <ArrowRight size={14} />
+            </a>
+          ) : (
+            <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+              {submitting ? 'Saving...' : 'Set new password'} <ArrowRight size={14} />
+            </button>
+          )}
+        </form>
+      ) : (
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-white/58">
+          Open the reset link from your email to continue. For security, this page does not accept pasted reset links.
+        </div>
+      )}
       <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
         <p className="text-sm font-medium text-white">Need a new Shopify reset link?</p>
         <form onSubmit={resend} className="mt-3 grid gap-3">

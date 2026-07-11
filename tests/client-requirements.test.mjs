@@ -403,6 +403,9 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.match(products, /Adding/);
   assert.match(products, /ShoppingCart/);
   assert.match(products, /\/products\/cart/);
+  assert.match(products, /useState<Product\[\] \| null>\(null\)/);
+  assert.match(products, /loadingImage=\{loadingProducts\}/);
+  assert.match(products, /Loading Shopify product image/);
   assert.doesNotMatch(products, />\s*Buy Now\s*</);
   assert.doesNotMatch(products, />\s*Subscribe\s*</);
   assert.doesNotMatch(products, />\s*View\s*</);
@@ -420,6 +423,29 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   for (const phrase of ['Meta Pixel', 'Google Analytics 4', 'TikTok Pixel', 'Klaviyo']) {
     assert.match(tracking, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
+});
+
+test('customer password reset uses secure email links without paste-a-link UX', () => {
+  const account = file('src/components/AccountPage.tsx');
+  const customer = file('src/lib/customer.ts');
+  const doc = file('docs/shopify-integration-handoff.md');
+
+  assert.match(account, /reset_url/);
+  assert.match(account, /normalizeCustomerResetUrl/);
+  assert.match(account, /window\.history\.replaceState\(\{\}, '', '\/reset-password'\)/);
+  assert.match(account, /Open the reset link from your email to continue/);
+  assert.doesNotMatch(account, /Paste the full Shopify password reset link/);
+  assert.doesNotMatch(account, /I have a reset link/);
+
+  assert.match(customer, /customerResetByUrl/);
+  assert.match(customer, /normalizeCustomerResetUrl/);
+  assert.match(customer, /url\.pathname\.includes\('\/account\/reset\/'\)/);
+  assert.match(customer, /orise-6796\.myshopify\.com/);
+  assert.doesNotMatch(customer, /hostname\.endsWith\('\.myshopify\.com'\)/);
+  assert.match(customer, /saveCustomerSession\(session\)/);
+
+  assert.match(doc, /reset_url=\{\{ customer\.reset_password_url \}\}/);
+  assert.match(doc, /customerResetByUrl/);
 });
 
 test('support widget provides WhatsApp and email support without Shopify Admin tracking', () => {

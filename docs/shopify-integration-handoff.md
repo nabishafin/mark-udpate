@@ -19,6 +19,17 @@ Current cart path:
 - Checkout handoff creates or redirects to Shopify checkout using the configured variant ID and selling plan data.
 - The floating support widget now uses WhatsApp and SMTP email support only. It does not require a Shopify Admin API token.
 
+Customer password reset:
+
+- The React reset page accepts Shopify reset URLs from `/reset-password?reset_url=...`, validates that the URL belongs to this Shopify store, removes the token from the address bar, and sends it to Shopify through `customerResetByUrl` only when the customer submits a new password.
+- Update the Shopify Customer account password reset email template so the reset button points to:
+
+```html
+https://mdrnlifeddw.com/reset-password?reset_url={{ customer.reset_password_url }}
+```
+
+- After this template change, customers click the email button and see only `New password` and `Confirm new password` on the site. They should not paste reset links manually.
+
 Production setup notes:
 
 - Configure every server-only value in Vercel Project Settings, not in client-side `VITE_` variables.

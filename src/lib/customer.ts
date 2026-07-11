@@ -1,4 +1,4 @@
-import { shopifyStorefrontFetch } from './shopify';
+import { getStoreDomain, shopifyStorefrontFetch } from './shopify';
 
 const CUSTOMER_SESSION_KEY = 'mdrn_life_shopify_customer_session';
 const AUTH_EVENT = 'mdrn-life-auth-change';
@@ -302,6 +302,44 @@ function getCustomerErrors(errors: CustomerUserError[] = []) {
   return errors.map((error) => error.message).filter(Boolean).join(' ') || 'Shopify customer account request failed.';
 }
 
+function getAllowedResetHosts() {
+  const storeDomain = getStoreDomain().toLowerCase();
+  const hosts = new Set([
+    storeDomain,
+    storeDomain.startsWith('www.') ? storeDomain.slice(4) : `www.${storeDomain}`,
+    'mdrnlifeddw.com',
+    'www.mdrnlifeddw.com',
+    'orise-6796.myshopify.com',
+  ]);
+  return hosts;
+}
+
+function isLocalHost(hostname: string) {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+}
+
+export function normalizeCustomerResetUrl(value: string) {
+  const resetUrl = value.trim();
+  if (!resetUrl) throw new Error('Password reset link is missing.');
+
+  let url: URL;
+  try {
+    url = new URL(resetUrl);
+  } catch {
+    throw new Error('Password reset link is not valid.');
+  }
+
+  const hostname = url.hostname.toLowerCase();
+  const allowedHost = getAllowedResetHosts().has(hostname) || isLocalHost(hostname);
+  const allowedProtocol = url.protocol === 'https:' || (url.protocol === 'http:' && isLocalHost(hostname));
+  if (!allowedHost || !allowedProtocol || !url.pathname.includes('/account/reset/')) {
+    throw new Error('Password reset link is not recognized for this Shopify store.');
+  }
+
+  url.hash = '';
+  return url.toString();
+}
+
 function emitAuthChange() {
   window.dispatchEvent(new CustomEvent(AUTH_EVENT));
 }
@@ -499,7 +537,8 @@ export async function updateCustomerPassword(accessToken: string, password: stri
   return session;
 }
 
-export async function resetCustomerPasswordByUrl(resetUrl: string, password: string): Promise<void> {
+export async function resetCustomerPasswordByUrl(resetUrl: string, password: string): Promise<CustomerSession> {
+  const safeResetUrl = normalizeCustomerResetUrl(resetUrl);
   const payload = await shopifyStorefrontFetch<CustomerResetByUrlPayload>({
     query: `mutation CustomerResetByUrl($resetUrl: URL!, $password: String!) {
       customerResetByUrl(resetUrl: $resetUrl, password: $password) {
@@ -509,7 +548,7 @@ export async function resetCustomerPasswordByUrl(resetUrl: string, password: str
       }
     }`,
     variables: {
-      resetUrl,
+      resetUrl: safeResetUrl,
       password,
     },
   });
@@ -517,8 +556,14 @@ export async function resetCustomerPasswordByUrl(resetUrl: string, password: str
   const errors = payload?.data?.customerResetByUrl?.customerUserErrors ?? [];
   if (errors.length) throw new Error(getCustomerErrors(errors));
 
+  const token = payload?.data?.customerResetByUrl?.customerAccessToken;
   const customer = payload?.data?.customerResetByUrl?.customer;
-  if (!customer) throw new Error('Shopify could not reset the password with this reset link.');
+  if (!token?.accessToken || !customer) throw new Error('Shopify could not reset the password with this reset link.');
+
+  const fullCustomer = await getCustomer(token.accessToken);
+  const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer: fullCustomer ?? customer };
+  saveCustomerSession(session);
+  return session;
 }
 
 export async function recoverCustomerPassword(email: string): Promise<void> {
