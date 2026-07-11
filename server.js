@@ -10,6 +10,7 @@ import marketingSignupHandler from './api/marketing-signup.js';
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const distDir = resolve(__dirname, 'dist');
 const SHOPIFY_CHECKOUT_ORIGIN = 'https://orise-6796.myshopify.com';
+const routeManifest = loadRouteManifest();
 
 function loadEnvFile(filename) {
   const filePath = resolve(__dirname, filename);
@@ -70,10 +71,8 @@ const appRoutePatterns = [
   /^\/research$/,
   /^\/blogs$/,
   /^\/blogs\/news$/,
-  /^\/blogs\/news\/.+$/,
   /^\/contact$/,
   /^\/learn$/,
-  /^\/learn\/.+$/,
   /^\/founder$/,
   /^\/pages\/refund$/,
   /^\/policies\/.+$/,
@@ -149,7 +148,7 @@ function staticPath(pathname) {
 }
 
 function isAppRoute(pathname) {
-  return appRoutePatterns.some((pattern) => pattern.test(pathname));
+  return appRoutePatterns.some((pattern) => pattern.test(pathname)) || routeManifest.has(pathname);
 }
 
 function normalizeAppPath(pathname) {
@@ -158,6 +157,27 @@ function normalizeAppPath(pathname) {
 
 function isShopifyPath(pathname) {
   return shopifyPathPatterns.some((pattern) => pattern.test(pathname));
+}
+
+function loadRouteManifest() {
+  for (const filePath of [
+    resolve(distDir, 'route-manifest.json'),
+    resolve(__dirname, 'public/route-manifest.json'),
+  ]) {
+    if (!existsSync(filePath)) continue;
+
+    try {
+      const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+      return new Set([
+        ...(Array.isArray(parsed.blogRoutes) ? parsed.blogRoutes : []),
+        ...(Array.isArray(parsed.learnRoutes) ? parsed.learnRoutes : []),
+      ]);
+    } catch {
+      return new Set();
+    }
+  }
+
+  return new Set();
 }
 
 const server = createServer(async (request, response) => {

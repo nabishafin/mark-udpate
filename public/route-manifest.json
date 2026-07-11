@@ -1,0 +1,58 @@
+{
+  "staticRoutes": [
+    "/",
+    "/science",
+    "/science/lab-testing",
+    "/benefits",
+    "/athletes-recovery",
+    "/healthy-aging",
+    "/research",
+    "/blogs/news",
+    "/products",
+    "/founder",
+    "/learn",
+    "/contact"
+  ],
+  "blogRoutes": [
+    "/blogs/news/deuterium-depleted-water-immune-support",
+    "/blogs/news/can-deuterium-depleted-water-improve-recovery",
+    "/blogs/news/deuterium-depleted-water-anti-aging",
+    "/blogs/news/deuterium-depleted-water-for-brain-fog",
+    "/blogs/news/does-deuterium-depleted-water-support-metabolism",
+    "/blogs/news/deuterium-depleted-water-for-mitochondria"
+  ],
+  "learnRoutes": [
+    "/learn/deuterium-mitochondria",
+    "/learn/hydration-recovery",
+    "/learn/hydration-brain-function",
+    "/learn/hydration-gut-health",
+    "/learn/hydration-healthy-aging",
+    "/learn/cellular-energy-performance"
+  ],
+  "indexableRoutes": [
+    "/",
+    "/science",
+    "/science/lab-testing",
+    "/benefits",
+    "/athletes-recovery",
+    "/healthy-aging",
+    "/research",
+    "/blogs/news",
+    "/products",
+    "/founder",
+    "/learn",
+    "/contact",
+    "/blogs/news/deuterium-depleted-water-immune-support",
+    "/blogs/news/can-deuterium-depleted-water-improve-recovery",
+    "/blogs/news/deuterium-depleted-water-anti-aging",
+    "/blogs/news/deuterium-depleted-water-for-brain-fog",
+    "/blogs/news/does-deuterium-depleted-water-support-metabolism",
+    "/blogs/news/deuterium-depleted-water-for-mitochondria",
+    "/learn/deuterium-mitochondria",
+    "/learn/hydration-recovery",
+    "/learn/hydration-brain-function",
+    "/learn/hydration-gut-health",
+    "/learn/hydration-healthy-aging",
+    "/learn/cellular-energy-performance"
+  ]
+}

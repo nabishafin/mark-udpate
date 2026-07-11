@@ -46,11 +46,11 @@ export function Products() {
             <div className="hpe-hud-label mb-3" style={{ color: '#F0D27A' }}>
               Shop
             </div>
-            <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.05]">
-              <span className="hpe-text-chrome">One verified concentration.</span>
+            <h1 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.05]">
+              <span className="hpe-text-chrome">Buy 5 ppm Deuterium Depleted Water</span>
               <br />
               <span className="text-white/80">Two packaging options.</span>
-            </h2>
+            </h1>
             <p className="mt-5 text-white/60 text-base sm:text-lg leading-relaxed">
               Mdrn-Life DDW is offered at 5 ppm in Glass and PET Plastic bottles.
               Every product mention points back to the same{' '}

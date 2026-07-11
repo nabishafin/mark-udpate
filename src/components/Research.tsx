@@ -79,7 +79,7 @@ export function Research() {
           <div>
             <div className="hpe-hud-label mb-3">Research</div>
             <h1 className="text-4xl sm:text-6xl font-medium tracking-tight leading-[1.03] text-white">
-              The science behind deuterium.
+              DDW Research and Studies on Mitochondrial Function
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
               Every glass of water contains hydrogen. A small portion of that

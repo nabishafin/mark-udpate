@@ -33,8 +33,8 @@ test('project metadata and copy contain no generator references', () => {
 test('homepage head implements the client supplied SEO metadata and schema', () => {
   const html = file('index.html');
 
-  assert.match(html, /Mdrn-Life DDW — 5 ppm Deuterium-Depleted Water/i);
-  assert.match(html, /world's most depleted deuterium water at 5 ppm/i);
+  assert.match(html, /5 ppm Deuterium Depleted Water \| Mdrn-Life DDW/i);
+  assert.match(html, /The lowest PPM DDW available\. IRMS-verified, USA-made, independently tested/i);
   assert.match(html, /https:\/\/mdrnlifeddw\.com\//i);
   assert.match(html, /application\/ld\+json/i);
   assert.match(html, /Mdrn-Life DDW/i);
@@ -51,8 +51,8 @@ test('app exposes the lab testing credibility page content from the client SEO b
   assert.match(appText, /USGS Reston Stable Isotope Lab/i);
   assert.match(appText, /Isotope Ratio Mass Spectrometry/i);
   assert.match(appText, /independently verified/i);
-  assert.match(seo, /Independently Lab-Tested DDW \| Mdrn-Life DDW/);
-  assert.match(seo, /deuterium depleted water brands/);
+  assert.match(seo, /DDW Lab Testing & IRMS Verification \| Mdrn-Life/);
+  assert.match(seo, /IRMS verified DDW/);
   assert.match(seo, /FAQPage/);
   assert.match(seo, /Article/);
   assert.match(seo, /BreadcrumbList/);
@@ -85,11 +85,11 @@ test('app exposes the lab testing credibility page content from the client SEO b
     'Downloadable lab reports are available on this page.',
     'Ships to the US, Canada, and Mexico with a 30-day guarantee.',
     'reverse osmosis, electrolysis, hydrogen infusion, and ionization',
-    'Most DDW brands are produced in Eastern Europe or China at 25–125 ppm',
+    'Most DDW brands are produced in Eastern Europe or China at 25-125 ppm',
   ]) {
     assert.match(seo, new RegExp(schemaPhrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
-  assert.match(seo, /Buy Deuterium-Depleted Water — 5 ppm Verified/);
+  assert.match(seo, /Buy 5 ppm Deuterium Depleted Water/);
 });
 
 test('site is routed as a multipage experience instead of one long homepage', () => {
@@ -147,10 +147,11 @@ test('site is routed as a multipage experience instead of one long homepage', ()
 test('hero presents the body experience without the removed lower CTA buttons', () => {
   const hero = file('src/components/Hero.tsx');
 
-  assert.match(hero, /Every Cell Needs Energy\./);
+  assert.match(hero, /5 ppm Deuterium Depleted Water\./);
   assert.match(hero, /Every System Needs/);
   assert.match(hero, /Hydration\./);
   assert.match(hero, /Explore how advanced Deuterium Depleted Water Hydration supports the brain, joints, gut/);
+  assert.match(hero, /Explore Cellular Hydration and Mitochondrial Function/);
   assert.doesNotMatch(hero, /Mdrn-Life DDW - 5 ppm/);
   assert.doesNotMatch(hero, /href="\/explore-the-body"[^>]*>\s*Explore the Body/i);
   assert.doesNotMatch(hero, /Discover DDW Science/);
@@ -745,6 +746,68 @@ test('blog archive is routed, theme-native, and ready for Shopify Storefront art
   assert.match(blogData, /shopifyStorefrontFetch/);
   assert.match(file('src/lib/shopify.ts'), /X-Shopify-Storefront-Access-Token/);
   assert.match(blogData, /blog\(handle: "news"\)/);
+});
+
+test('technical SEO covers approved metadata, dynamic articles, generated sitemap, and noindex routes', () => {
+  const seo = file('src/lib/seo.ts');
+  const sitemap = file('public/sitemap.xml');
+  const robots = file('public/robots.txt');
+  const manifest = file('public/route-manifest.json');
+  const server = file('server.js');
+  const nginx = file('deploy/nginx/mdrnlifeddw.com.conf');
+  const htaccess = file('public/.htaccess');
+
+  for (const phrase of [
+    '5 ppm Deuterium Depleted Water | Mdrn-Life DDW',
+    'The Science Behind DDW | Mdrn-Life DDW',
+    'DDW Lab Testing & IRMS Verification | Mdrn-Life',
+    'Deuterium Depleted Water Benefits | Mdrn-Life DDW',
+    'DDW for Athletes & Recovery | Mdrn-Life DDW',
+    'Deuterium Depleted Water for Healthy Aging | Mdrn-Life',
+    'DDW Research & Studies | Mdrn-Life DDW',
+    'DDW Blog - Deuterium Depleted Water Insights | Mdrn-Life',
+    'Buy 5 ppm Deuterium Depleted Water | Mdrn-Life DDW',
+    'Our Story - Why We Built Mdrn-Life DDW',
+    'Learn About Deuterium Depleted Water | Mdrn-Life',
+    'Contact Mdrn-Life DDW | Questions & Support',
+    'Terms of Service | Mdrn-Life DDW',
+    'Shipping Policy | Mdrn-Life DDW',
+    'Refund Policy | Mdrn-Life DDW',
+    'Privacy Policy | Mdrn-Life DDW',
+    'Subscription Policy | Mdrn-Life DDW',
+  ]) {
+    assert.match(seo, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+
+  assert.match(seo, /function learnArticleSeo/);
+  assert.match(seo, /function blogArticleSeo/);
+  assert.match(seo, /BlogPosting/);
+  assert.match(seo, /noIndex: true/);
+  assert.match(seo, /normalizePathname/);
+  assert.match(seo, /canonical: url/);
+  assert.match(seo, /return SEO_CONFIGS\.notFound/);
+
+  for (const url of [
+    'https://mdrnlifeddw.com/founder',
+    'https://mdrnlifeddw.com/learn',
+    'https://mdrnlifeddw.com/learn/deuterium-mitochondria',
+    'https://mdrnlifeddw.com/learn/cellular-energy-performance',
+    'https://mdrnlifeddw.com/blogs/news/deuterium-depleted-water-for-mitochondria',
+    'https://mdrnlifeddw.com/blogs/news/can-deuterium-depleted-water-improve-recovery',
+  ]) {
+    assert.match(sitemap, new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+
+  assert.doesNotMatch(sitemap, /products\/cart|checkout|login|account|policies/);
+  assert.match(robots, /Sitemap: https:\/\/mdrnlifeddw\.com\/sitemap\.xml/);
+  assert.match(robots, /Disallow: \/checkout/);
+  assert.match(manifest, /"blogRoutes"/);
+  assert.match(manifest, /"learnRoutes"/);
+  assert.match(server, /routeManifest/);
+  assert.doesNotMatch(server, /\/\^\\\/blogs\\\/news\\\/\.\+\$\//);
+  assert.doesNotMatch(server, /\/\^\\\/learn\\\/\.\+\$\//);
+  assert.match(nginx, /Generated dynamic content routes need Node/);
+  assert.match(htaccess, /BEGIN GENERATED SEO ROUTES/);
 });
 
 test('footer policy routes render the copied Shopify policy content', () => {

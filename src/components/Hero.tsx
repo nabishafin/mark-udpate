@@ -20,7 +20,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           }`}
         >
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.05]">
-            <span className="hpe-text-chrome">Every Cell Needs Energy.</span>
+            <span className="hpe-text-chrome">5 ppm Deuterium Depleted Water.</span>
             <br />
             <span className="text-white/70">Every System Needs</span>{' '}
             <span style={{ color: '#3FB8FF', textShadow: '0 0 24px rgba(63,184,255,0.5)' }}>
@@ -34,7 +34,25 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           </p>
         </div>
 
-        <div className="relative w-full flex items-center justify-center mt-8 min-h-[58vh] sm:min-h-[64vh] lg:min-h-0">
+        <section
+          className="relative w-full flex items-center justify-center mt-8 min-h-[58vh] sm:min-h-[64vh] lg:min-h-0"
+          aria-labelledby="body-video-title"
+          aria-describedby="body-video-description"
+        >
+          <div
+            className={`pointer-events-none absolute top-0 z-20 max-w-xl px-4 text-center transition-all duration-700 ${
+              activeId ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
+            <h2 id="body-video-title" className="text-base font-medium text-white sm:text-lg">
+              Explore Cellular Hydration and Mitochondrial Function
+            </h2>
+            <p id="body-video-description" className="mt-2 text-xs leading-relaxed text-white/50 sm:text-sm">
+              The interactive body highlights systems connected to hydration, energy, recovery,
+              circulation, and cellular balance.
+            </p>
+          </div>
+
           <div
             className={`hidden lg:flex absolute left-12 top-1/2 -translate-y-1/2 flex-col gap-6 transition-all duration-700 ${
               activeId ? 'opacity-0 -translate-x-10' : 'opacity-100 translate-x-0'
@@ -62,7 +80,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
             <SpecBlock label="FORMATS" value="2" unit="bottle types" />
             <SpecBlock label="ORIGIN" value="US" unit="made" />
           </div>
-        </div>
+        </section>
 
         <div className="absolute bottom-5 inset-x-0 z-10 hidden sm:flex justify-center px-6 pointer-events-none">
           <div className="hpe-glass rounded-full px-5 py-2.5 flex items-center gap-3 sm:gap-5 pointer-events-auto">

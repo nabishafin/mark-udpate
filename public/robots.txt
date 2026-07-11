@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /cart
+Disallow: /products/cart
+Disallow: /checkout
+Disallow: /account
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
 
 Sitemap: https://mdrnlifeddw.com/sitemap.xml

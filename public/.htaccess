@@ -27,7 +27,22 @@ RewriteRule ^api/marketing-signup/?$ /api/marketing-signup.php [L,QSA]
 # Known React/Vite routes. Unknown paths return a real 404 instead of the home page.
 RewriteRule ^$ /index.html [L,QSA]
 RewriteRule ^(science|science/lab-testing|benefits|athletes-recovery|healthy-aging|shop|products|cart|products/cart|checkout|login|register|forgot-password|reset-password|account|account/orders|research|blogs|blogs/news|contact|learn|founder|pages/refund)/?$ /index.html [L,QSA]
-RewriteRule ^(blogs/news/.+|account/orders/.+|account/reset/.+|policies/.+|learn/.+)/?$ /index.html [L,QSA]
+RewriteRule ^(account/orders/.+|account/reset/.+|policies/.+)/?$ /index.html [L,QSA]
+
+# BEGIN GENERATED SEO ROUTES
+RewriteRule ^blogs/news/deuterium-depleted-water-immune-support/?$ /index.html [L,QSA]
+RewriteRule ^blogs/news/can-deuterium-depleted-water-improve-recovery/?$ /index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-anti-aging/?$ /index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-for-brain-fog/?$ /index.html [L,QSA]
+RewriteRule ^blogs/news/does-deuterium-depleted-water-support-metabolism/?$ /index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-for-mitochondria/?$ /index.html [L,QSA]
+RewriteRule ^learn/deuterium-mitochondria/?$ /index.html [L,QSA]
+RewriteRule ^learn/hydration-recovery/?$ /index.html [L,QSA]
+RewriteRule ^learn/hydration-brain-function/?$ /index.html [L,QSA]
+RewriteRule ^learn/hydration-gut-health/?$ /index.html [L,QSA]
+RewriteRule ^learn/hydration-healthy-aging/?$ /index.html [L,QSA]
+RewriteRule ^learn/cellular-energy-performance/?$ /index.html [L,QSA]
+# END GENERATED SEO ROUTES
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

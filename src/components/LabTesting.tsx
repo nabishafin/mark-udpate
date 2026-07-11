@@ -91,11 +91,11 @@ export function LabTesting() {
           <div className="hpe-hud-label mb-3" style={{ color: '#5EE6B5' }}>
             Lab Testing
           </div>
-          <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.05]">
-            <span className="hpe-text-chrome">Why independent lab testing makes Mdrn-Life DDW</span>
+          <h1 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.05]">
+            <span className="hpe-text-chrome">IRMS-Verified 5 ppm Deuterium Depleted Water</span>
             <br />
-            <span className="text-white/80">the world's most verified deuterium-depleted water.</span>
-          </h2>
+            <span className="text-white/80">with independent lab testing from two trusted labs.</span>
+          </h1>
           <p className="mt-5 max-w-3xl text-white/65 text-base sm:text-lg leading-relaxed">
             The lab testing page follows the client SEO outline directly: market
             skepticism, what deuterium testing measures, the independent labs,

@@ -89,7 +89,7 @@ export function AthletesRecovery() {
           <div>
             <div className="hpe-hud-label mb-3">Athletes & Recovery</div>
             <h1 className="text-4xl sm:text-6xl font-medium tracking-tight leading-[1.03] text-white">
-              Advanced hydration for performance-focused living.
+              DDW for Athletes and Recovery
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
               Hydration belongs inside the performance routine: before training,

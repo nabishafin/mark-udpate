@@ -46,10 +46,10 @@ export function FounderPage() {
         >
           <div className="hpe-hud-label mb-3">Our Story</div>
           <h1 className="text-4xl font-medium tracking-tight text-white sm:text-6xl leading-[1.03]">
-            <span className="hpe-text-chrome">The science behind</span>
+            <span className="hpe-text-chrome">Why we built</span>
             <br />
             <span style={{ color: '#3FB8FF', textShadow: '0 0 24px rgba(63,184,255,0.5)' }}>
-              the standard.
+              Mdrn-Life DDW.
             </span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">

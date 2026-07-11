@@ -124,6 +124,27 @@ export function BlogArticlePage({ handle }: Props) {
           )}
         </motion.div>
 
+        <motion.nav
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.28 }}
+          className="mt-10 rounded-2xl border border-white/10 bg-white/[0.025] p-5"
+          aria-label="Related DDW resources"
+        >
+          <div className="hpe-hud-label mb-3">Continue Learning</div>
+          <div className="flex flex-wrap gap-3 text-sm">
+            <a href="/science/lab-testing" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              independent IRMS lab testing
+            </a>
+            <a href="/benefits" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              benefits of 5 ppm DDW
+            </a>
+            <a href="/products" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              shop 5 ppm deuterium depleted water
+            </a>
+          </div>
+        </motion.nav>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

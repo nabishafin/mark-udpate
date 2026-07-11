@@ -115,6 +115,8 @@ export function InteractiveBody({ onSelect, active }: Props) {
           loop
           muted
           playsInline
+          preload="metadata"
+          aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
           style={{
             mixBlendMode: 'screen',
@@ -185,12 +187,13 @@ export function InteractiveBody({ onSelect, active }: Props) {
               key={organ.id}
               type="button"
               aria-label={`Inspect ${organ.name}`}
+              aria-pressed={isActive}
               onMouseEnter={() => setHovered(organ.id)}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(organ.id)}
               onBlur={() => setHovered(null)}
               onClick={() => onSelect(organ)}
-              className="absolute -translate-x-1/2 -translate-y-1/2 group focus:outline-none z-10"
+              className="absolute -translate-x-1/2 -translate-y-1/2 group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] z-10"
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,

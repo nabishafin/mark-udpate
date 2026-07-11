@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Brain, FlaskConical, Heart, Leaf, Microscope, Zap } from 'lucide-react';
+import { NotFoundPage } from './NotFoundPage';
 
 const ARTICLES = [
   {
@@ -196,7 +197,7 @@ type Props = { slug?: string };
 export function LearnPage({ slug }: Props) {
   if (slug) {
     const article = ARTICLES.find((a) => a.slug === slug);
-    if (!article) return <LearnIndex />;
+    if (!article) return <NotFoundPage />;
     return <ArticlePage article={article} />;
   }
   return <LearnIndex />;
@@ -214,11 +215,26 @@ function LearnIndex() {
         >
           <div className="hpe-hud-label">Learn</div>
           <h1 className="mt-4 text-4xl font-medium tracking-tight text-white sm:text-6xl">
-            The science behind DDW, explained.
+            Learn About Deuterium Depleted Water
           </h1>
           <p className="mt-5 text-base leading-relaxed text-white/62 sm:text-lg">
             Educational articles on deuterium, cellular hydration, mitochondrial science,
             and the research behind Mdrn-Life DDW.
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-white/56 sm:text-base">
+            Start with{' '}
+            <a href="/science" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              how deuterium depleted water works
+            </a>
+            , compare{' '}
+            <a href="/science/lab-testing" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              independent IRMS lab testing
+            </a>
+            , or explore{' '}
+            <a href="/benefits" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              benefits of 5 ppm DDW
+            </a>
+            .
           </p>
         </motion.div>
 
@@ -281,6 +297,21 @@ function ArticlePage({ article }: { article: Article }) {
           </h1>
           <p className="mt-5 text-base leading-relaxed text-white/70 sm:text-lg">
             {article.intro}
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-white/55 sm:text-base">
+            Continue with{' '}
+            <a href="/science" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              the science behind DDW
+            </a>
+            , review{' '}
+            <a href="/science/lab-testing" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              independent IRMS lab testing
+            </a>
+            , or{' '}
+            <a href="/products" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              shop 5 ppm deuterium depleted water
+            </a>
+            .
           </p>
         </motion.div>
 

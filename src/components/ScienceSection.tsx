@@ -41,7 +41,7 @@ export function ScienceSection() {
           <div>
             <div className="hpe-hud-label mb-3">The Science</div>
             <h1 className="text-4xl sm:text-6xl font-medium text-white tracking-tight leading-[1.03]">
-              Deuterium-depleted water, explained through motion.
+              How Deuterium Depleted Water Supports Mitochondrial Function
             </h1>
             <p className="mt-5 max-w-2xl text-white/62 text-base sm:text-lg leading-relaxed">
               DDW is framed around deuterium ppm, cellular hydration, mitochondria,
@@ -89,7 +89,7 @@ export function ScienceSection() {
         <div className="mt-8 hpe-glass rounded-2xl p-6 sm:p-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="hpe-hud-label mb-2">Independent Verification</div>
-            <h2 className="text-2xl font-medium text-white">See the lab testing page.</h2>
+            <h2 className="text-2xl font-medium text-white">IRMS verified DDW, documented batch by batch.</h2>
             <p className="mt-2 text-sm leading-relaxed text-white/60 max-w-2xl">
               Hydroisotop GmbH, USGS Reston Stable Isotope Lab, IRMS, and
               batch-specific 5 ppm verification are documented on the dedicated

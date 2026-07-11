@@ -86,7 +86,7 @@ export function Benefits() {
               Benefits
             </div>
             <h1 className="text-4xl sm:text-6xl font-medium tracking-tight leading-[1.03] text-white">
-              Why people choose Mdrn-Life DDW.
+              Benefits of 5 ppm Deuterium Depleted Water
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
               Hydration is one of the few things your body depends on every
@@ -119,7 +119,7 @@ export function Benefits() {
               Daily Dependence
             </div>
             <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-white">
-              Hydration becomes the baseline habit.
+              Deuterium depleted water benefits begin with a daily hydration habit.
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-white/60">
               Live Better. Longer. Because when you pay attention to the details

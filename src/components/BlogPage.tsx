@@ -36,6 +36,21 @@ export function BlogPage() {
             Evidence-aware guides on deuterium depletion, mitochondrial energy,
             recovery, metabolism, and longevity-focused living.
           </p>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/54 sm:text-base">
+            New to the category? Explore{' '}
+            <a href="/science" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              the science behind DDW
+            </a>
+            , compare{' '}
+            <a href="/athletes-recovery" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              DDW for athlete recovery
+            </a>
+            , or see{' '}
+            <a href="/healthy-aging" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+              deuterium depleted water for healthy aging
+            </a>
+            .
+          </p>
         </motion.header>
 
         {loading && (
