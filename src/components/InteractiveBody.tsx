@@ -197,8 +197,8 @@ export function InteractiveBody({ onSelect, active }: Props) {
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
-                width: 22,
-                height: 22,
+                width: 28,
+                height: 28,
                 touchAction: 'manipulation'
               }}>
               
