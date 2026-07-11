@@ -36,7 +36,7 @@ export function ScienceSection() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-          className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center"
+          className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-start"
         >
           <div>
             <div className="hpe-hud-label mb-3">The Science</div>
