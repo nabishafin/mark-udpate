@@ -92,20 +92,22 @@ export function AthletesRecovery() {
           transition={{ duration: 0.7 }}
           className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-start"
         >
-          <div>
-            <div className="hpe-hud-label mb-3">Athletes & Recovery</div>
-            <h1 className="text-4xl sm:text-6xl font-medium tracking-tight leading-[1.03] text-white">
-              Advanced hydration for performance-focused living.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
-              Hydration belongs inside the performance routine: before training,
-              during demanding days, and through the recovery window.
-            </p>
-            <a href="/products" className="mt-8 hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
-              Shop Performance Hydration
-              <ArrowRight size={14} />
-            </a>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+          <div className="lg:flex lg:min-h-[520px] lg:flex-col lg:justify-between">
+            <div>
+              <div className="hpe-hud-label mb-3">Athletes & Recovery</div>
+              <h1 className="text-4xl sm:text-6xl font-medium tracking-tight leading-[1.03] text-white">
+                Advanced hydration for performance-focused living.
+              </h1>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/62 sm:text-lg">
+                Hydration belongs inside the performance routine: before training,
+                during demanding days, and through the recovery window.
+              </p>
+              <a href="/products" className="mt-8 hpe-btn-primary rounded-xl px-5 py-3 text-sm font-medium tracking-wide inline-flex items-center gap-2">
+                Shop Performance Hydration
+                <ArrowRight size={14} />
+              </a>
+            </div>
+            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:mt-0 lg:grid-cols-1 xl:grid-cols-3">
               {HERO_RECOVERY_POINTS.map(([label, value]) => (
                 <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
                   <div className="hpe-hud-label" style={{ fontSize: 8 }}>{label}</div>

@@ -44,25 +44,27 @@ export function ScienceSection() {
           transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
           className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-start"
         >
-          <div>
-            <div className="hpe-hud-label mb-3">The Science</div>
-            <h1 className="text-4xl sm:text-6xl font-medium text-white tracking-tight leading-[1.03]">
-              Deuterium-depleted water, explained through motion.
-            </h1>
-            <p className="mt-5 max-w-2xl text-white/62 text-base sm:text-lg leading-relaxed">
-              DDW is framed around deuterium ppm, cellular hydration, mitochondria,
-              oxidative stress, lab testing, recovery, and healthy aging.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="/science/lab-testing" className="hpe-btn-primary inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium tracking-wide">
-                View Lab Testing
-                <ArrowRight size={14} />
-              </a>
-              <a href="/research" className="hpe-btn-ghost inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-                Review Research
-              </a>
+          <div className="lg:flex lg:min-h-[430px] lg:flex-col lg:justify-between">
+            <div>
+              <div className="hpe-hud-label mb-3">The Science</div>
+              <h1 className="text-4xl sm:text-6xl font-medium text-white tracking-tight leading-[1.03]">
+                Deuterium-depleted water, explained through motion.
+              </h1>
+              <p className="mt-5 max-w-2xl text-white/62 text-base sm:text-lg leading-relaxed">
+                DDW is framed around deuterium ppm, cellular hydration, mitochondria,
+                oxidative stress, lab testing, recovery, and healthy aging.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="/science/lab-testing" className="hpe-btn-primary inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium tracking-wide">
+                  View Lab Testing
+                  <ArrowRight size={14} />
+                </a>
+                <a href="/research" className="hpe-btn-ghost inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+                  Review Research
+                </a>
+              </div>
             </div>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:mt-0 lg:grid-cols-1 xl:grid-cols-3">
               {SCIENCE_HERO_POINTS.map(([label, value]) => (
                 <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
                   <div className="hpe-hud-label" style={{ fontSize: 8 }}>{label}</div>
