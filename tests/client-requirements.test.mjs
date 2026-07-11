@@ -299,6 +299,7 @@ test('athletes and healthy aging pages use the latest client-provided copy', () 
   const app = file('src/App.tsx');
 
   for (const phrase of [
+    'Advanced hydration for performance-focused living.',
     'Your body is built to move. To push. To adapt. To recover.',
     'Every sprint, lift, ride, run, match, and training session asks something from your body.',
     'That is why serious athletes do not treat hydration as an afterthought.',
@@ -327,6 +328,17 @@ test('athletes and healthy aging pages use the latest client-provided copy', () 
   assert.match(athletes, /Recovery Simulation/);
   assert.match(healthy, /LongevitySimulation/);
   assert.match(healthy, /Longevity Simulation/);
+});
+
+test('science and athlete pages keep approved hero copy and clean visible characters', () => {
+  const science = file('src/components/ScienceSection.tsx');
+  const athletes = file('src/components/AthletesRecovery.tsx');
+
+  assert.match(science, /Deuterium-depleted water, explained through motion\./);
+  assert.match(athletes, /Advanced hydration for performance-focused living\./);
+  assert.match(science, /value: '145-155 ppm'/);
+  assert.match(science, /&gt;/);
+  assert.doesNotMatch(`${science}\n${athletes}`, /â|�|145–155 ppm|›/);
 });
 
 test('visible section labels do not use rejected numeric prefixes', () => {

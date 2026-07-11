@@ -41,7 +41,7 @@ export function ScienceSection() {
           <div>
             <div className="hpe-hud-label mb-3">The Science</div>
             <h1 className="text-4xl sm:text-6xl font-medium text-white tracking-tight leading-[1.03]">
-              How Deuterium Depleted Water Supports Mitochondrial Function
+              Deuterium-depleted water, explained through motion.
             </h1>
             <p className="mt-5 max-w-2xl text-white/62 text-base sm:text-lg leading-relaxed">
               DDW is framed around deuterium ppm, cellular hydration, mitochondria,
@@ -111,7 +111,7 @@ function DDWJourney() {
     {
       icon: Waves,
       label: 'Natural Water',
-      value: '145–155 ppm',
+      value: '145-155 ppm',
       body: 'Deuterium occurs naturally in drinking water at this baseline concentration.',
       color: 'text-amber-200',
     },
@@ -165,7 +165,7 @@ function DDWJourney() {
             className="relative rounded-2xl border border-white/10 bg-white/[0.035] p-4"
           >
             {index < steps.length - 1 && (
-              <span className="absolute -right-1.5 top-1/2 hidden -translate-y-1/2 text-white/20 sm:block text-xs">›</span>
+              <span className="absolute -right-1.5 top-1/2 hidden -translate-y-1/2 text-white/20 sm:block text-xs">&gt;</span>
             )}
             <div className="mb-3 flex items-center gap-2">
               <step.icon size={14} className={step.color} />
