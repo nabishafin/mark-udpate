@@ -10,16 +10,16 @@ type Props = {
 
 export function Hero({ onSelectOrgan, activeId }: Props) {
   return (
-    <section id="top" className="relative min-h-screen w-full overflow-hidden pt-28 pb-12 hpe-hero-premium">
+    <section id="top" className="relative min-h-screen w-full overflow-hidden pt-24 pb-8 sm:pt-28 sm:pb-12 hpe-hero-premium">
       <div className="absolute inset-0 hpe-hero-liquid" />
 
       <div className="relative z-10 w-full px-6 flex flex-col items-center min-h-[calc(100vh-7rem)] justify-center">
         <div
           className={`transition-all duration-700 ease-in-out w-full flex flex-col items-center text-center max-w-3xl z-20 ${
-            activeId ? 'opacity-0 h-0 overflow-hidden scale-95' : 'opacity-100 h-auto scale-100 mb-6 sm:mb-8 lg:mb-10'
+            activeId ? 'opacity-0 h-0 overflow-hidden scale-95' : 'opacity-100 h-auto scale-100 mb-2 sm:mb-8 lg:mb-10'
           }`}
         >
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.05]">
+          <h1 className="text-[24px] sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.06]">
             <span className="hpe-text-chrome">5 ppm Deuterium Depleted Water.</span>
             <br />
             <span className="text-white/70">Every System Needs</span>{' '}
@@ -28,7 +28,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
             </span>
           </h1>
 
-          <p className="mt-3 text-white/65 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
+          <p className="mt-2 max-w-xs text-xs leading-relaxed text-white/62 sm:mt-3 sm:max-w-lg sm:text-base">
             Explore how advanced Deuterium Depleted Water Hydration supports the brain, joints, gut,
             energy production, recovery, and healthy aging.
           </p>
@@ -38,14 +38,14 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
           </h2>
           <p
             id="body-video-description"
-            className="mt-4 max-w-lg text-xs leading-relaxed text-white/48 sm:text-[13px]"
+            className="mt-3 max-w-xs text-[11px] leading-relaxed text-white/48 sm:mt-4 sm:max-w-lg sm:text-[13px]"
           >
             Explore hydration, mitochondrial function, recovery, and cellular balance.
           </p>
         </div>
 
         <section
-          className="relative w-full flex items-start justify-center mt-1 min-h-[42vh] sm:mt-2 sm:min-h-[48vh] lg:mt-4 lg:min-h-[52vh] lg:items-center"
+          className="relative w-full flex items-start justify-center mt-0 min-h-[50vh] sm:mt-2 sm:min-h-[48vh] lg:mt-4 lg:min-h-[52vh] lg:items-center"
           aria-labelledby="body-video-title"
           aria-describedby="body-video-description"
         >

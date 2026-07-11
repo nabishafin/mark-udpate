@@ -217,7 +217,7 @@ body {
 .hpe-breathe { animation: hpePulseSlow 6s ease-in-out infinite; }
 .hpe-body-stage {
   flex: 0 0 auto;
-  width: clamp(560px, 150vw, 680px);
+  width: clamp(680px, 185vw, 760px);
 }
 .hpe-body-clean-stage::before {
   content: '';

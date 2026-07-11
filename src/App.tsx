@@ -103,7 +103,7 @@ export function App() {
       />
       <FloatingShopCTA pathname={pathname} />
       <Suspense fallback={null}>
-        <ShopifyInbox />
+        <ShopifyInbox hidden={Boolean(activeOrgan)} />
         <EmailPopup />
       </Suspense>
     </div>

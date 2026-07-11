@@ -39,7 +39,11 @@ function whatsappUrl() {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
-export function ShopifyInbox() {
+type Props = {
+  hidden?: boolean;
+};
+
+export function ShopifyInbox({ hidden = false }: Props) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [view, setView] = useState<ChatView>('home');
   const [supportEmail, setSupportEmail] = useState('');
@@ -54,6 +58,12 @@ export function ShopifyInbox() {
     document.documentElement.classList.toggle('shopify-inbox-custom-active', panelOpen);
     return () => document.documentElement.classList.remove('shopify-inbox-custom-active');
   }, [panelOpen]);
+
+  useEffect(() => {
+    if (hidden) setPanelOpen(false);
+  }, [hidden]);
+
+  if (hidden) return null;
 
   const openPanel = () => {
     setError('');
