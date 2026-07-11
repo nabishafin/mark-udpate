@@ -279,11 +279,6 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
       return '';
     }
   });
-  const [email, setEmail] = useState('');
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const [resending, setResending] = useState(false);
-  const [resendStatus, setResendStatus] = useState('');
-  const [resendError, setResendError] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('');
@@ -294,32 +289,6 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
     if (!resetUrl) return;
     window.history.replaceState({}, '', '/reset-password');
   }, [resetUrl]);
-
-  useEffect(() => {
-    if (resendCooldown <= 0) return undefined;
-    const timer = window.setInterval(() => {
-      setResendCooldown((current) => Math.max(0, current - 1));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [resendCooldown]);
-
-  const resend = async (event: FormEvent) => {
-    event.preventDefault();
-    if (resendCooldown > 0) return;
-    setResending(true);
-    setResendStatus('');
-    setResendError('');
-
-    try {
-      await recoverCustomerPassword(email);
-      setResendCooldown(50);
-      setResendStatus('If that email belongs to a Shopify customer account, Shopify will send a new reset link.');
-    } catch (err) {
-      setResendError(err instanceof Error ? err.message : 'Could not send a new Shopify reset link.');
-    } finally {
-      setResending(false);
-    }
-  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -351,9 +320,6 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
       <FormHeader icon={KeyRound} title="Reset password" body="Set a new password from the secure link sent to your email." />
       {resetUrl ? (
         <form onSubmit={submit} className="grid gap-4">
-          <div className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] p-3 text-sm leading-relaxed text-cyan-100">
-            Secure reset link verified. The token was removed from the address bar.
-          </div>
           <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
           <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
           <Feedback error={error} status={status} />
@@ -366,22 +332,20 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
               {submitting ? 'Saving...' : 'Set new password'} <ArrowRight size={14} />
             </button>
           )}
+          {!status && (
+            <a href="/forgot-password" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+              Back to forgot password
+            </a>
+          )}
         </form>
       ) : (
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-white/58">
           Open the reset link from your email to continue. For security, this page does not accept pasted reset links.
+          <a href="/forgot-password" className="mt-4 hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+            Back to forgot password
+          </a>
         </div>
       )}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-        <p className="text-sm font-medium text-white">Need a new Shopify reset link?</p>
-        <form onSubmit={resend} className="mt-3 grid gap-3">
-          <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
-          <button type="submit" disabled={resending || resendCooldown > 0} className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-            {resending ? 'Sending...' : resendCooldown > 0 ? `Send again in ${resendCooldown}s` : 'Send new reset link'} <ArrowRight size={14} />
-          </button>
-        </form>
-        <Feedback error={resendError} status={resendStatus} />
-      </div>
     </div>
   );
 }

@@ -433,9 +433,12 @@ test('customer password reset uses secure email links without paste-a-link UX', 
   assert.match(account, /reset_url/);
   assert.match(account, /normalizeCustomerResetUrl/);
   assert.match(account, /window\.history\.replaceState\(\{\}, '', '\/reset-password'\)/);
+  assert.match(account, /Back to forgot password/);
   assert.match(account, /Open the reset link from your email to continue/);
   assert.doesNotMatch(account, /Paste the full Shopify password reset link/);
   assert.doesNotMatch(account, /I have a reset link/);
+  assert.doesNotMatch(account, /Secure reset link verified/);
+  assert.doesNotMatch(account, /Need a new Shopify reset link/);
 
   assert.match(customer, /customerResetByUrl/);
   assert.match(customer, /normalizeCustomerResetUrl/);
