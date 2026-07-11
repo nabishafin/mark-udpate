@@ -24,6 +24,12 @@ const RECOVERY_FLOW = [
   },
 ];
 
+const HERO_RECOVERY_POINTS = [
+  ['Before', 'Pre-training hydration'],
+  ['During', 'Demand-day routine'],
+  ['After', 'Recovery window'],
+];
+
 const ATHLETE_STORY = [
   {
     icon: Dumbbell,
@@ -99,6 +105,14 @@ export function AthletesRecovery() {
               Shop Performance Hydration
               <ArrowRight size={14} />
             </a>
+            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {HERO_RECOVERY_POINTS.map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                  <div className="hpe-hud-label" style={{ fontSize: 8 }}>{label}</div>
+                  <div className="mt-2 text-sm font-medium leading-snug text-white">{value}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <TrainingSimulation />

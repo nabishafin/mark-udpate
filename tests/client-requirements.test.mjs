@@ -338,6 +338,12 @@ test('science and athlete pages keep approved hero copy and clean visible charac
   assert.match(athletes, /Advanced hydration for performance-focused living\./);
   assert.match(science, /lg:grid-cols-\[0\.92fr_1\.08fr\] lg:items-start/);
   assert.match(athletes, /lg:grid-cols-\[0\.92fr_1\.08fr\] lg:items-start/);
+  assert.match(science, /SCIENCE_HERO_POINTS/);
+  assert.match(science, /View Lab Testing/);
+  assert.match(science, /Review Research/);
+  assert.match(athletes, /HERO_RECOVERY_POINTS/);
+  assert.match(athletes, /Pre-training hydration/);
+  assert.match(athletes, /Recovery window/);
   assert.match(science, /value: '145-155 ppm'/);
   assert.match(science, /&gt;/);
   assert.doesNotMatch(`${science}\n${athletes}`, /â|�|145–155 ppm|›/);

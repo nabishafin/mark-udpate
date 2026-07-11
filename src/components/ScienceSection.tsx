@@ -28,6 +28,12 @@ const PILLARS = [
   },
 ];
 
+const SCIENCE_HERO_POINTS = [
+  ['Ordinary water', '145-155 ppm'],
+  ['Mdrn-Life DDW', '5 ppm'],
+  ['Verified by', 'IRMS'],
+];
+
 export function ScienceSection() {
   return (
     <section id="science" className="hpe-section relative overflow-hidden">
@@ -47,6 +53,23 @@ export function ScienceSection() {
               DDW is framed around deuterium ppm, cellular hydration, mitochondria,
               oxidative stress, lab testing, recovery, and healthy aging.
             </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href="/science/lab-testing" className="hpe-btn-primary inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium tracking-wide">
+                View Lab Testing
+                <ArrowRight size={14} />
+              </a>
+              <a href="/research" className="hpe-btn-ghost inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+                Review Research
+              </a>
+            </div>
+            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {SCIENCE_HERO_POINTS.map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                  <div className="hpe-hud-label" style={{ fontSize: 8 }}>{label}</div>
+                  <div className="mt-2 font-mono text-lg text-white">{value}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <ScienceSimulation />
