@@ -19,6 +19,7 @@ if (!rate_limit('contact', 5)) {
 $body = read_json_body();
 $name = clean_value($body['name'] ?? '', 160);
 $email = strtolower(clean_value($body['email'] ?? '', 254));
+$phone = clean_value($body['phone'] ?? '', 80);
 $subject = clean_value($body['subject'] ?? '', 180);
 $message = clean_multiline($body['message'] ?? '', 4000);
 $errors = [];
@@ -45,11 +46,12 @@ $plain = implode("\n", [
   'Source: Contact form',
   'Name: ' . $name,
   'Email: ' . $email,
+  $phone !== '' ? 'Phone: ' . $phone : '',
   'Subject: ' . $subject,
   '',
   $message,
 ]);
-$html = support_email_html('Contact form', $name, $email, '', 'Contact form', $subject, $message);
+$html = support_email_html('Contact form', $name, $email, $phone, 'Contact form', $subject, $message);
 
 send_smtp_email('SUPPORT_EMAIL_TO', $email, 'Website contact: ' . $subject, $plain, $html);
 api_json(200, [

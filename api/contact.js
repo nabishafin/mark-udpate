@@ -125,6 +125,7 @@ function validationError(field, message) {
 function validateContact(body) {
   const name = clean(body.name, 160);
   const email = clean(body.email, 254).toLowerCase();
+  const phone = clean(body.phone, 80);
   const subject = clean(body.subject, 180);
   const message = cleanMultiline(body.message, MAX_MESSAGE_LENGTH);
   const errors = [];
@@ -141,6 +142,7 @@ function validateContact(body) {
     contact: {
       name,
       email,
+      phone,
       subject: subject || 'Website contact message',
       message,
     },
@@ -232,10 +234,11 @@ function buildEmail(contact, config, messageId) {
     'Source: Contact form',
     `Name: ${contact.name}`,
     `Email: ${contact.email}`,
+    contact.phone ? `Phone: ${contact.phone}` : '',
     `Subject: ${contact.subject}`,
     '',
     contact.message,
-  ].join('\n');
+  ].filter(Boolean).join('\n');
   const html = `<!doctype html>
 <html>
   <body style="margin:0;padding:0;background:#eef6f8;font-family:Arial,sans-serif;color:#101828;">
@@ -255,6 +258,7 @@ function buildEmail(contact, config, messageId) {
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                   ${detailRow('Name', contact.name)}
                   ${detailRow('Email', contact.email)}
+                  ${contact.phone ? detailRow('Phone', contact.phone) : ''}
                   ${detailRow('Subject', contact.subject)}
                 </table>
               </td>
