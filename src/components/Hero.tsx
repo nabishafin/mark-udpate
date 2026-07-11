@@ -16,7 +16,7 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
       <div className="relative z-10 w-full px-6 flex flex-col items-center min-h-[calc(100vh-7rem)] justify-center">
         <div
           className={`transition-all duration-700 ease-in-out w-full flex flex-col items-center text-center max-w-3xl z-20 ${
-            activeId ? 'opacity-0 h-0 overflow-hidden scale-95' : 'opacity-100 h-auto scale-100 mb-12'
+            activeId ? 'opacity-0 h-0 overflow-hidden scale-95' : 'opacity-100 h-auto scale-100 mb-6 sm:mb-8 lg:mb-10'
           }`}
         >
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.05]">
@@ -32,27 +32,23 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
             Explore how advanced Deuterium Depleted Water Hydration supports the brain, joints, gut,
             energy production, recovery, and healthy aging.
           </p>
+
+          <h2 id="body-video-title" className="sr-only">
+            Interactive cellular hydration model
+          </h2>
+          <p
+            id="body-video-description"
+            className="mt-4 max-w-lg text-xs leading-relaxed text-white/48 sm:text-[13px]"
+          >
+            Explore hydration, mitochondrial function, recovery, and cellular balance.
+          </p>
         </div>
 
         <section
-          className="relative w-full flex items-center justify-center mt-8 min-h-[58vh] sm:min-h-[64vh] lg:min-h-0"
+          className="relative w-full flex items-start justify-center mt-1 min-h-[42vh] sm:mt-2 sm:min-h-[48vh] lg:mt-4 lg:min-h-[52vh] lg:items-center"
           aria-labelledby="body-video-title"
           aria-describedby="body-video-description"
         >
-          <div
-            className={`pointer-events-none absolute top-0 z-20 max-w-xl px-4 text-center transition-all duration-700 ${
-              activeId ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            <h2 id="body-video-title" className="text-base font-medium text-white sm:text-lg">
-              Explore Cellular Hydration and Mitochondrial Function
-            </h2>
-            <p id="body-video-description" className="mt-2 text-xs leading-relaxed text-white/50 sm:text-sm">
-              The interactive body highlights systems connected to hydration, energy, recovery,
-              circulation, and cellular balance.
-            </p>
-          </div>
-
           <div
             className={`hidden lg:flex absolute left-12 top-1/2 -translate-y-1/2 flex-col gap-6 transition-all duration-700 ${
               activeId ? 'opacity-0 -translate-x-10' : 'opacity-100 translate-x-0'
@@ -64,10 +60,10 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
 
           <div
             className={`relative w-full max-w-none flex-1 flex items-center justify-center transition-all duration-700 ease-in-out ${
-              activeId ? '-translate-x-[28vw] scale-110 sm:-translate-x-[24vw] sm:scale-105 lg:-translate-x-[15vw] lg:scale-100' : 'translate-x-0 scale-110 sm:scale-110 lg:scale-125'
+              activeId ? '-translate-x-[28vw] scale-105 sm:-translate-x-[24vw] sm:scale-100 lg:-translate-x-[15vw] lg:scale-100' : 'translate-x-0 scale-100 sm:scale-105 lg:scale-110 xl:scale-[1.14]'
             }`}
             id="body"
-            style={{ minHeight: '58vh' }}
+            style={{ minHeight: 'inherit' }}
           >
             <InteractiveBody onSelect={onSelectOrgan} active={activeId} />
           </div>

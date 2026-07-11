@@ -217,7 +217,7 @@ body {
 .hpe-breathe { animation: hpePulseSlow 6s ease-in-out infinite; }
 .hpe-body-stage {
   flex: 0 0 auto;
-  width: clamp(760px, 230vw, 860px);
+  width: clamp(420px, 112vw, 760px);
 }
 .hpe-body-clean-stage::before {
   content: '';
@@ -246,12 +246,17 @@ body {
 }
 @media (min-width: 640px) {
   .hpe-body-stage {
-    width: min(180vw, 900px);
+    width: min(104vw, 820px);
   }
 }
 @media (min-width: 1024px) {
   .hpe-body-stage {
-    width: 100%;
+    width: min(72vw, 920px);
+  }
+}
+@media (min-width: 1440px) {
+  .hpe-body-stage {
+    width: min(62vw, 980px);
   }
 }
 @keyframes hpeFloatY {
