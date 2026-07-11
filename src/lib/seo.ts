@@ -354,6 +354,42 @@ export const SEO_CONFIGS = {
       "Reach the Mdrn-Life DDW team via WhatsApp or email. Questions about our 5 ppm DDW, lab results, orders, or wholesale? We're here.",
     path: '/contact',
   }),
+  login: buildSeo({
+    title: 'Login | Mdrn-Life DDW Account',
+    description: 'Sign in to your Mdrn-Life DDW customer account.',
+    path: '/login',
+    noIndex: true,
+  }),
+  register: buildSeo({
+    title: 'Create Account | Mdrn-Life DDW',
+    description: 'Create a Mdrn-Life DDW customer account.',
+    path: '/register',
+    noIndex: true,
+  }),
+  forgotPassword: buildSeo({
+    title: 'Forgot Password | Mdrn-Life DDW',
+    description: 'Request a secure password reset email for your Mdrn-Life DDW account.',
+    path: '/forgot-password',
+    noIndex: true,
+  }),
+  resetPassword: buildSeo({
+    title: 'Reset Password | Mdrn-Life DDW',
+    description: 'Set a new password for your Mdrn-Life DDW customer account.',
+    path: '/reset-password',
+    noIndex: true,
+  }),
+  account: buildSeo({
+    title: 'My Account | Mdrn-Life DDW',
+    description: 'Manage your Mdrn-Life DDW customer account and order history.',
+    path: '/account',
+    noIndex: true,
+  }),
+  accountOrders: buildSeo({
+    title: 'Order Status | Mdrn-Life DDW Account',
+    description: 'View Mdrn-Life DDW order status and order history.',
+    path: '/account/orders',
+    noIndex: true,
+  }),
   body: buildSeo({
     title: 'Explore Cellular Hydration and Mitochondrial Function | Mdrn-Life DDW',
     description:
@@ -479,6 +515,14 @@ export function resolveSeo(pathname: string, hash: string): SeoConfig {
   if (path === '/explore-the-body') return SEO_CONFIGS.body;
   if (path === '/research') return SEO_CONFIGS.research;
   if (path === '/contact') return SEO_CONFIGS.contact;
+  if (path === '/login') return SEO_CONFIGS.login;
+  if (path === '/register') return SEO_CONFIGS.register;
+  if (path === '/forgot-password') return SEO_CONFIGS.forgotPassword;
+  if (path === '/reset-password') return SEO_CONFIGS.resetPassword;
+  if (path === '/account') return SEO_CONFIGS.account;
+  if (path === '/account/orders') return SEO_CONFIGS.accountOrders;
+  if (path.startsWith('/account/orders/') && path.length > '/account/orders/'.length) return SEO_CONFIGS.accountOrders;
+  if (path.startsWith('/account/reset/') && path.length > '/account/reset/'.length) return SEO_CONFIGS.resetPassword;
   if (path === '/blogs' || path === '/blogs/news') return SEO_CONFIGS.blog;
   if (path.startsWith('/blogs/news/') && path.length > '/blogs/news/'.length) {
     return blogArticleSeo(path.slice('/blogs/news/'.length));

@@ -429,6 +429,7 @@ test('customer password reset uses secure email links without paste-a-link UX', 
   const account = file('src/components/AccountPage.tsx');
   const customer = file('src/lib/customer.ts');
   const doc = file('docs/shopify-integration-handoff.md');
+  const seo = file('src/lib/seo.ts');
 
   assert.match(account, /reset_url/);
   assert.match(account, /normalizeCustomerResetUrl/);
@@ -449,6 +450,14 @@ test('customer password reset uses secure email links without paste-a-link UX', 
 
   assert.match(doc, /reset_url=\{\{ customer\.reset_password_url \}\}/);
   assert.match(doc, /customerResetByUrl/);
+
+  for (const route of ['/login', '/register', '/forgot-password', '/reset-password', '/account']) {
+    assert.match(seo, new RegExp(`path === '${route.replace(/\//g, '\\/')}'`));
+  }
+  assert.match(seo, /Login \| Mdrn-Life DDW Account/);
+  assert.match(seo, /Forgot Password \| Mdrn-Life DDW/);
+  assert.match(seo, /Reset Password \| Mdrn-Life DDW/);
+  assert.match(seo, /noIndex:\s*true/);
 });
 
 test('support widget provides WhatsApp and email support without Shopify Admin tracking', () => {
