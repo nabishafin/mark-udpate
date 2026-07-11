@@ -42,6 +42,7 @@ export function SeoHead() {
     setMeta('name', 'twitter:title', config.twitterTitle);
     setMeta('name', 'twitter:description', config.twitterDescription);
     setMeta('name', 'twitter:image', config.image ?? '');
+    setMeta('name', 'robots', config.noIndex ? 'noindex, nofollow' : 'index, follow');
     setJsonLd(config.schema ?? []);
   }, [locationState.hash, locationState.pathname]);
 

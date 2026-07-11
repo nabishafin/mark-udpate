@@ -1,30 +1,32 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
-import { ScienceSection } from './components/ScienceSection';
-import { LabTesting } from './components/LabTesting';
-import { Benefits } from './components/Benefits';
-import { AthletesRecovery } from './components/AthletesRecovery';
-import { HealthyAging } from './components/HealthyAging';
-import { Products } from './components/Products';
-import { CartPage } from './components/CartPage';
-import { Research } from './components/Research';
 import { CTAFooter } from './components/CTAFooter';
-import { ContactPage } from './components/ContactPage';
 import { OrganPanel } from './components/OrganPanel';
 import { SeoHead } from './components/SeoHead';
-import { BlogPage } from './components/BlogPage';
-import { BlogArticlePage } from './components/BlogArticlePage';
-import { PolicyPage } from './components/PolicyPage';
-import { FounderPage } from './components/FounderPage';
-import { LearnPage } from './components/LearnPage';
 import { FloatingShopCTA } from './components/FloatingShopCTA';
-import { ShopifyInbox } from './components/ShopifyInbox';
-import { EmailPopup } from './components/EmailPopup';
-import { CheckoutPage } from './components/CheckoutPage';
-import { AccountPage } from './components/AccountPage';
-import { OrdersPage } from './components/OrderPages';
-import { Organ } from './components/organData';
+import { NotFoundPage } from './components/NotFoundPage';
+import type { Organ } from './components/organData';
+
+const ScienceSection = lazy(() => import('./components/ScienceSection').then(({ ScienceSection }) => ({ default: ScienceSection })));
+const LabTesting = lazy(() => import('./components/LabTesting').then(({ LabTesting }) => ({ default: LabTesting })));
+const Benefits = lazy(() => import('./components/Benefits').then(({ Benefits }) => ({ default: Benefits })));
+const AthletesRecovery = lazy(() => import('./components/AthletesRecovery').then(({ AthletesRecovery }) => ({ default: AthletesRecovery })));
+const HealthyAging = lazy(() => import('./components/HealthyAging').then(({ HealthyAging }) => ({ default: HealthyAging })));
+const Products = lazy(() => import('./components/Products').then(({ Products }) => ({ default: Products })));
+const CartPage = lazy(() => import('./components/CartPage').then(({ CartPage }) => ({ default: CartPage })));
+const Research = lazy(() => import('./components/Research').then(({ Research }) => ({ default: Research })));
+const ContactPage = lazy(() => import('./components/ContactPage').then(({ ContactPage }) => ({ default: ContactPage })));
+const BlogPage = lazy(() => import('./components/BlogPage').then(({ BlogPage }) => ({ default: BlogPage })));
+const BlogArticlePage = lazy(() => import('./components/BlogArticlePage').then(({ BlogArticlePage }) => ({ default: BlogArticlePage })));
+const PolicyPage = lazy(() => import('./components/PolicyPage').then(({ PolicyPage }) => ({ default: PolicyPage })));
+const FounderPage = lazy(() => import('./components/FounderPage').then(({ FounderPage }) => ({ default: FounderPage })));
+const LearnPage = lazy(() => import('./components/LearnPage').then(({ LearnPage }) => ({ default: LearnPage })));
+const CheckoutPage = lazy(() => import('./components/CheckoutPage').then(({ CheckoutPage }) => ({ default: CheckoutPage })));
+const AccountPage = lazy(() => import('./components/AccountPage').then(({ AccountPage }) => ({ default: AccountPage })));
+const OrdersPage = lazy(() => import('./components/OrderPages').then(({ OrdersPage }) => ({ default: OrdersPage })));
+const ShopifyInbox = lazy(() => import('./components/ShopifyInbox').then(({ ShopifyInbox }) => ({ default: ShopifyInbox })));
+const EmailPopup = lazy(() => import('./components/EmailPopup').then(({ EmailPopup }) => ({ default: EmailPopup })));
 
 function normalizePath(pathname: string) {
   if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1);
@@ -88,7 +90,9 @@ export function App() {
       <Nav pathname={pathname} />
 
       <main>
-        {page}
+        <Suspense fallback={<PageFallback />}>
+          {page}
+        </Suspense>
         <CTAFooter />
       </main>
 
@@ -98,9 +102,19 @@ export function App() {
         onNavigate={handleSelectOrgan}
       />
       <FloatingShopCTA pathname={pathname} />
-      <ShopifyInbox />
-      <EmailPopup />
+      <Suspense fallback={null}>
+        <ShopifyInbox />
+        <EmailPopup />
+      </Suspense>
     </div>
+  );
+}
+
+function PageFallback() {
+  return (
+    <section className="flex min-h-screen items-center justify-center px-6 pt-28">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-cyan-300" />
+    </section>
   );
 }
 
@@ -174,7 +188,7 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       // SPA never renders for them in production. No client-side redirect here — a
       // window.location redirect to the myshopify domain causes an infinite refresh
       // loop (Shopify bounces back to the canonical domain -> SPA -> redirect -> ...).
-      return <HomePage onSelectOrgan={onSelectOrgan} activeId={activeId} />;
+      return <NotFoundPage />;
   }
 }
 

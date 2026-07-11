@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, CalendarDays, Droplets, Leaf, Moon, ShieldCheck, Sparkles, SunMedium } from 'lucide-react';
 

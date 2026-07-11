@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Lock, ShieldCheck } from 'lucide-react';
 import { formatMoney, getCartItems, hydrateCartItemsWithProducts } from '../lib/cart';
@@ -241,7 +241,7 @@ export function CheckoutPage() {
               const active = s === step;
               const labels: Record<Step, string> = { information: 'Information', shipping: 'Shipping', review: 'Payment' };
               return (
-                <React.Fragment key={s}>
+                <Fragment key={s}>
                   <li className={`flex items-center gap-2 transition ${active ? 'text-cyan-300' : done ? 'text-cyan-300/50' : 'text-white/25'}`}>
                     <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-mono transition ${
                       done ? 'border-cyan-300/30 bg-cyan-300/10' :
@@ -255,7 +255,7 @@ export function CheckoutPage() {
                   {i < visibleSteps.length - 1 && (
                     <li className="mx-3 h-px flex-1 bg-white/10" />
                   )}
-                </React.Fragment>
+                </Fragment>
               );
             })}
           </ol>
@@ -627,7 +627,7 @@ function ReviewRow({
 }: {
   label: string;
   onEdit: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">

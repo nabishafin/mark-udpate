@@ -130,6 +130,15 @@ type ShopifyArticleNode = {
   author?: { name: string };
 };
 
+type ShopifyBlogPayload = {
+  data?: {
+    blog?: {
+      articles?: { nodes?: ShopifyArticleNode[] };
+      articleByHandle?: ShopifyArticleNode | null;
+    } | null;
+  };
+};
+
 function mapNode(article: ShopifyArticleNode): BlogArticle {
   return {
     id: article.id,
@@ -148,7 +157,7 @@ function mapNode(article: ShopifyArticleNode): BlogArticle {
 }
 
 export async function getBlogArticles(signal?: AbortSignal): Promise<BlogArticle[]> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<ShopifyBlogPayload>({
     query: `query BlogArticles($first: Int!) {
       blog(handle: "news") {
         articles(first: $first, sortKey: PUBLISHED_AT, reverse: true) {
@@ -168,7 +177,7 @@ export async function getBlogArticles(signal?: AbortSignal): Promise<BlogArticle
 export async function getBlogArticle(handle: string, signal?: AbortSignal): Promise<BlogArticle | null> {
   const fallback = FALLBACK_ARTICLES.find((a) => a.handle === handle) || null;
 
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<ShopifyBlogPayload>({
     query: `query BlogArticle($handle: String!) {
       blog(handle: "news") {
         articleByHandle(handle: $handle) {

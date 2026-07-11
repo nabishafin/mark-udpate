@@ -174,25 +174,31 @@ export function getProduct(productId: Product['id']) {
   return PRODUCTS.find((product) => product.id === productId);
 }
 
+type ShopifyMoney = { amount: string; currencyCode: string };
+
+type ShopifySellingPlanAllocationNode = {
+  sellingPlan: { id: string; name?: string };
+  priceAdjustments?: { price?: ShopifyMoney }[];
+};
+
+type ShopifyVariantNode = {
+  id: string;
+  title?: string;
+  availableForSale?: boolean;
+  image?: { url: string; altText?: string };
+  price?: ShopifyMoney;
+  sellingPlanAllocations?: {
+    nodes?: ShopifySellingPlanAllocationNode[];
+  };
+};
+
 type ShopifyProductNode = {
   title?: string;
   onlineStoreUrl?: string;
   availableForSale?: boolean;
   featuredImage?: { url: string; altText?: string };
   variants?: {
-    nodes?: {
-      id: string;
-      title?: string;
-      availableForSale?: boolean;
-      image?: { url: string; altText?: string };
-      price?: { amount: string; currencyCode: string };
-      sellingPlanAllocations?: {
-        nodes?: {
-          sellingPlan: { id: string; name?: string };
-          priceAdjustments?: { price?: { amount: string; currencyCode: string } }[];
-        }[];
-      };
-    }[];
+    nodes?: ShopifyVariantNode[];
   };
 };
 
@@ -207,7 +213,7 @@ function gidToNumericId(value?: string) {
   return value?.match(/\/(\d+)$/)?.[1] || value;
 }
 
-function formatShopifyPrice(price?: { amount: string; currencyCode: string }) {
+function formatShopifyPrice(price?: ShopifyMoney) {
   if (!price?.amount) return null;
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -215,7 +221,7 @@ function formatShopifyPrice(price?: { amount: string; currencyCode: string }) {
   }).format(Number(price.amount));
 }
 
-function mergeSubscriptionPlans(product: Product, variant?: NonNullable<ShopifyProductNode['variants']>['nodes'][number]) {
+function mergeSubscriptionPlans(product: Product, variant?: ShopifyVariantNode) {
   const allocations = variant?.sellingPlanAllocations?.nodes || [];
   if (!allocations.length) return product.subscription;
 

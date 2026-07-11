@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Award, Beaker, ChevronDown, FileCheck2, ShieldCheck, X } from 'lucide-react';
 import { LAB_FAQS } from '../lib/seo';
@@ -292,7 +292,7 @@ function OutlineSection({
 }: {
   eyebrow: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <article className="hpe-glass rounded-2xl p-6 sm:p-8">
@@ -312,7 +312,7 @@ function LabCard({
   report,
   onOpenReport,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   body: string;
   report: LabReport;

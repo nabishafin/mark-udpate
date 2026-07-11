@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, CircleDot, X } from 'lucide-react';
 import { Organ, ORGANS } from './organData';
@@ -143,7 +143,7 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
   );
 }
 
-function IconButton({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+function IconButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
   return (
     <button
       onClick={onClick}
@@ -162,7 +162,7 @@ function PanelBlock({
 }: {
   title: string;
   color: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div>

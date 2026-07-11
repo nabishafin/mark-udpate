@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Check, Droplets, FlaskConical, Loader2, Package, Plus, ShieldCheck, ShoppingCart, Sparkles, Star, Timer, Zap } from 'lucide-react';
 import { addCartItem, getCartCount, onCartChange } from '../lib/cart';

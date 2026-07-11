@@ -13,6 +13,20 @@ export type ShopifyCheckoutItem = {
   purchaseOption?: 'subscription' | 'one-time';
 };
 
+type ShopifyGraphQlError = {
+  message?: string;
+};
+
+type CartCreateCheckoutPayload = {
+  errors?: ShopifyGraphQlError[];
+  data?: {
+    cartCreate?: {
+      cart?: { checkoutUrl?: string | null } | null;
+      userErrors?: ShopifyGraphQlError[];
+    };
+  };
+};
+
 const DEFAULT_STORE_DOMAIN = 'mdrnlifeddw.com';
 const DEFAULT_CHECKOUT_DOMAIN = 'orise-6796.myshopify.com';
 const DEFAULT_STOREFRONT_API_URL = 'https://orise-6796.myshopify.com/api/2026-04/graphql.json';
@@ -21,7 +35,7 @@ const PRODUCT_VARIANT_GID_PREFIX = 'gid://shopify/ProductVariant/';
 const SELLING_PLAN_GID_PREFIX = 'gid://shopify/SellingPlan/';
 const PUBLIC_SITE_DOMAINS = new Set(['mdrnlifeddw.com', 'www.mdrnlifeddw.com']);
 
-function getStoreDomain() {
+export function getStoreDomain() {
   const domain = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || DEFAULT_STORE_DOMAIN;
   return domain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
 }
@@ -60,7 +74,7 @@ function getStorefrontToken() {
   return import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || DEFAULT_STOREFRONT_TOKEN;
 }
 
-export async function shopifyStorefrontFetch<T = any>(body: object, signal?: AbortSignal): Promise<T> {
+export async function shopifyStorefrontFetch<T = unknown>(body: object, signal?: AbortSignal): Promise<T> {
   const endpoint = getStorefrontApiUrl();
   const token = getStorefrontToken();
   if (!endpoint || !token) {
@@ -128,7 +142,7 @@ export async function createShopifyCartCheckoutUrl(items: ShopifyCheckoutItem[])
 
   if (!lines.length) throw new Error('Cart has no checkout-ready items.');
 
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CartCreateCheckoutPayload>({
     query: `mutation CartCreate($input: CartInput!) {
         cartCreate(input: $input) {
           cart {

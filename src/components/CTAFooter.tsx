@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Instagram, Music2, Youtube } from 'lucide-react';
 

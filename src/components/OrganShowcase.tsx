@@ -1,4 +1,3 @@
-import React, { ComponentType } from 'react';
 import { motion } from 'framer-motion';
 import {
   Activity,
@@ -8,6 +7,7 @@ import {
   Eye,
   Footprints,
   Heart,
+  type LucideIcon,
   Shield,
   Smile,
   Wind,
@@ -18,7 +18,7 @@ type Props = {
   onSelectOrgan: (organ: Organ) => void;
 };
 
-const ICONS: Record<string, ComponentType<{ size?: number; className?: string }>> = {
+const ICONS: Record<string, LucideIcon> = {
   brain: Brain,
   eyes: Eye,
   mouth: Smile,

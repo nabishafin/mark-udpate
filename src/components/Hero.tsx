@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { InteractiveBody } from './InteractiveBody';
 import { Organ } from './organData';
@@ -73,13 +73,13 @@ export function Hero({ onSelectOrgan, activeId }: Props) {
               'Florida Manufactured',
               'Glass & PET',
             ].map((item, i) => (
-              <React.Fragment key={item}>
+              <Fragment key={item}>
                 {i > 0 && <span className="text-white/18 font-mono text-xs">·</span>}
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck size={10} className="text-cyan-400/70 shrink-0" />
                   <span className="hpe-hud-label" style={{ fontSize: 9 }}>{item}</span>
                 </span>
-              </React.Fragment>
+              </Fragment>
             ))}
           </div>
         </div>

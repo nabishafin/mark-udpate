@@ -50,6 +50,37 @@ export type CheckoutBuyerIdentity = {
 const VARIANT_GID = 'gid://shopify/ProductVariant/';
 const PLAN_GID = 'gid://shopify/SellingPlan/';
 
+type ShopifyUserError = {
+  message?: string;
+};
+
+type CartCreatePayload = {
+  data?: {
+    cartCreate?: {
+      cart?: RawCart | null;
+      userErrors?: ShopifyUserError[];
+    };
+  };
+};
+
+type CartBuyerIdentityUpdatePayload = {
+  data?: {
+    cartBuyerIdentityUpdate?: {
+      cart?: RawCart | null;
+      userErrors?: ShopifyUserError[];
+    };
+  };
+};
+
+type CartDeliveryOptionsUpdatePayload = {
+  data?: {
+    cartSelectedDeliveryOptionsUpdate?: {
+      cart?: RawCart | null;
+      userErrors?: ShopifyUserError[];
+    };
+  };
+};
+
 function toVariantGid(id: string) {
   return id.startsWith('gid://') ? id : `${VARIANT_GID}${id}`;
 }
@@ -109,7 +140,7 @@ export async function createCheckoutCart(
 
   if (!lines.length) throw new Error('No items to checkout.');
 
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CartCreatePayload>({
     query: `mutation CartCreate($input: CartInput!) {
       cartCreate(input: $input) {
         cart { ${CART_FIELDS} }
@@ -127,7 +158,7 @@ export async function createCheckoutCart(
   });
 
   const errors = payload?.data?.cartCreate?.userErrors ?? [];
-  if (errors.length) throw new Error(errors.map((e: any) => e.message).join(' ') || 'Cart creation failed.');
+  if (errors.length) throw new Error(errors.map((e: ShopifyUserError) => e.message).join(' ') || 'Cart creation failed.');
 
   const cart = payload?.data?.cartCreate?.cart;
   if (!cart) throw new Error('Failed to create checkout session.');
@@ -140,7 +171,7 @@ export async function updateCartBuyerIdentity(
   address: CheckoutAddress,
   customerAccessToken?: string,
 ): Promise<CheckoutCart> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CartBuyerIdentityUpdatePayload>({
     query: `mutation CartBuyerIdentityUpdate($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
       cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
         cart { ${CART_FIELDS} }
@@ -173,7 +204,7 @@ export async function updateCartBuyerIdentity(
   });
 
   const errors = payload?.data?.cartBuyerIdentityUpdate?.userErrors ?? [];
-  if (errors.length) throw new Error(errors.map((e: any) => e.message).join(' ') || 'Failed to save your information.');
+  if (errors.length) throw new Error(errors.map((e: ShopifyUserError) => e.message).join(' ') || 'Failed to save your information.');
 
   const cart = payload?.data?.cartBuyerIdentityUpdate?.cart;
   if (!cart) throw new Error('Failed to update checkout session.');
@@ -185,7 +216,7 @@ export async function selectCartDeliveryOption(
   deliveryGroupId: string,
   deliveryOptionHandle: string,
 ): Promise<CheckoutCart> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CartDeliveryOptionsUpdatePayload>({
     query: `mutation CartSelectedDeliveryOptionsUpdate($cartId: ID!, $selectedDeliveryOptions: [CartSelectedDeliveryOptionInput!]!) {
       cartSelectedDeliveryOptionsUpdate(cartId: $cartId, selectedDeliveryOptions: $selectedDeliveryOptions) {
         cart { ${CART_FIELDS} }
@@ -199,7 +230,7 @@ export async function selectCartDeliveryOption(
   });
 
   const errors = payload?.data?.cartSelectedDeliveryOptionsUpdate?.userErrors ?? [];
-  if (errors.length) throw new Error(errors.map((e: any) => e.message).join(' ') || 'Failed to select shipping method.');
+  if (errors.length) throw new Error(errors.map((e: ShopifyUserError) => e.message).join(' ') || 'Failed to select shipping method.');
 
   const cart = payload?.data?.cartSelectedDeliveryOptionsUpdate?.cart;
   if (!cart) throw new Error('Failed to update shipping selection.');

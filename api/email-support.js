@@ -75,20 +75,35 @@ function getClientIp(request) {
   return request.socket?.remoteAddress || 'unknown';
 }
 
-function isSameOrigin(request) {
+function allowedOrigins() {
+  return new Set([
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    ...(process.env.SUPPORT_ALLOWED_ORIGINS || '')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean),
+  ]);
+}
+
+function applyCors(request, response) {
   const origin = request.headers.origin;
   if (!origin) return true;
 
   try {
     const originUrl = new URL(origin);
     const host = request.headers['x-forwarded-host'] || request.headers.host;
-    const allowed = (process.env.SUPPORT_ALLOWED_ORIGINS || '')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
+    const isAllowed = allowedOrigins().has(originUrl.origin) || originUrl.host === host;
 
-    if (allowed.includes(originUrl.origin)) return true;
-    return originUrl.host === host;
+    if (isAllowed) {
+      response.setHeader('Access-Control-Allow-Origin', originUrl.origin);
+      response.setHeader('Vary', 'Origin');
+      response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    }
+    return isAllowed;
   } catch {
     return false;
   }
@@ -294,14 +309,22 @@ async function sendMail(mail) {
 }
 
 export default async function handler(request, response) {
-  if (request.method !== 'POST') {
-    response.setHeader('Allow', 'POST');
-    json(response, 405, { error: 'Method not allowed.' });
+  const isAllowedOrigin = applyCors(request, response);
+
+  if (request.method === 'OPTIONS') {
+    response.statusCode = isAllowedOrigin ? 204 : 403;
+    response.end();
     return;
   }
 
-  if (!isSameOrigin(request)) {
+  if (!isAllowedOrigin) {
     json(response, 403, { error: 'Support request origin is not allowed.' });
+    return;
+  }
+
+  if (request.method !== 'POST') {
+    response.setHeader('Allow', 'POST');
+    json(response, 405, { error: 'Method not allowed.' });
     return;
   }
 

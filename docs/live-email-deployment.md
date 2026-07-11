@@ -9,7 +9,7 @@ Preferred Hostinger Node setup:
 3. Set the build command to `npm run build`.
 4. Set the app port from Hostinger through `PORT`.
 5. Configure these server environment variables:
-   - `VITE_API_URL=http://2.25.199.73:3000` for the direct VPS API target
+   - `VITE_API_URL=` blank for same-origin HTTPS API requests
    - `SMTP_HOST=smtp.gmail.com`
    - `SMTP_PORT=465`
    - `SMTP_USER=support@orisefinance.com`
@@ -19,6 +19,7 @@ Preferred Hostinger Node setup:
    - `MARKETING_SIGNUP_TO=support@orisefinance.com`
    - `SUPPORT_ALLOWED_ORIGINS=https://mdrnlifeddw.com,https://www.mdrnlifeddw.com`
 6. Route/proxy the domain to the Node app so `/api/contact`, `/api/email-support`, and `/api/marketing-signup` reach `server.js`.
+7. Do not build production assets with `VITE_API_URL=http://...`; browsers block mixed active content from the HTTPS website.
 
 Do not commit the real SMTP app password. Keep it in Hostinger/Vercel/server environment variables.
 

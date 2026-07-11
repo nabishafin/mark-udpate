@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Atom, Cpu, FlaskConical, Gauge, Package, ShieldCheck, Waves } from 'lucide-react';
 

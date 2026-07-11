@@ -118,6 +118,77 @@ type CustomerUserError = {
   code?: string;
 };
 
+type CustomerAccessToken = {
+  accessToken: string;
+  expiresAt: string;
+};
+
+type CustomerCreatePayload = {
+  data?: {
+    customerCreate?: {
+      customer?: ShopifyCustomer | null;
+      customerUserErrors?: CustomerUserError[];
+    };
+  };
+};
+
+type CustomerAccessTokenCreatePayload = {
+  data?: {
+    customerAccessTokenCreate?: {
+      customerAccessToken?: CustomerAccessToken | null;
+      customerUserErrors?: CustomerUserError[];
+    };
+  };
+};
+
+type CustomerPayload = {
+  data?: {
+    customer?: ShopifyCustomer | null;
+  };
+};
+
+type CustomerOrdersPayload = {
+  data?: {
+    customer?: {
+      orders?: { nodes?: ShopifyCustomerOrder[] };
+    } | null;
+  };
+};
+
+type OrderDetailPayload = {
+  data?: {
+    node?: ShopifyCustomerOrder | null;
+  };
+};
+
+type CustomerUpdatePayload = {
+  data?: {
+    customerUpdate?: {
+      customer?: ShopifyCustomer | null;
+      customerAccessToken?: CustomerAccessToken | null;
+      customerUserErrors?: CustomerUserError[];
+    };
+  };
+};
+
+type CustomerResetByUrlPayload = {
+  data?: {
+    customerResetByUrl?: {
+      customer?: Pick<ShopifyCustomer, 'id' | 'email'> | null;
+      customerAccessToken?: CustomerAccessToken | null;
+      customerUserErrors?: CustomerUserError[];
+    };
+  };
+};
+
+type CustomerRecoverPayload = {
+  data?: {
+    customerRecover?: {
+      customerUserErrors?: CustomerUserError[];
+    };
+  };
+};
+
 const CUSTOMER_FIELDS = `
   id
   firstName
@@ -271,7 +342,7 @@ export function clearCustomerSession() {
 }
 
 export async function registerCustomer(input: RegisterInput): Promise<ShopifyCustomer> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerCreatePayload>({
     query: `mutation CustomerCreate($input: CustomerCreateInput!) {
       customerCreate(input: $input) {
         customer { id firstName lastName email phone acceptsMarketing createdAt }
@@ -299,7 +370,7 @@ export async function registerCustomer(input: RegisterInput): Promise<ShopifyCus
 }
 
 export async function loginCustomer(input: LoginInput): Promise<CustomerSession> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerAccessTokenCreatePayload>({
     query: `mutation CustomerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
       customerAccessTokenCreate(input: $input) {
         customerAccessToken { accessToken expiresAt }
@@ -322,7 +393,7 @@ export async function loginCustomer(input: LoginInput): Promise<CustomerSession>
 }
 
 export async function getCustomer(accessToken: string): Promise<ShopifyCustomer | null> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerPayload>({
     query: `query Customer($customerAccessToken: String!) {
       customer(customerAccessToken: $customerAccessToken) {
         ${CUSTOMER_FIELDS}
@@ -335,7 +406,7 @@ export async function getCustomer(accessToken: string): Promise<ShopifyCustomer 
 }
 
 export async function getCustomerOrders(accessToken: string, first = 50): Promise<ShopifyCustomerOrder[]> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerOrdersPayload>({
     query: `query CustomerOrders($customerAccessToken: String!, $first: Int!) {
       customer(customerAccessToken: $customerAccessToken) {
         orders(first: $first, sortKey: PROCESSED_AT, reverse: true) {
@@ -356,7 +427,7 @@ export async function getCustomerOrder(accessToken: string, orderId: string): Pr
   const orderBelongsToCustomer = orders.some((order) => order.id === orderId);
   if (!orderBelongsToCustomer) return null;
 
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<OrderDetailPayload>({
     query: `query OrderDetail($id: ID!) {
       node(id: $id) {
         ... on Order {
@@ -371,7 +442,7 @@ export async function getCustomerOrder(accessToken: string, orderId: string): Pr
 }
 
 export async function updateCustomerProfile(accessToken: string, input: CustomerProfileInput, expiresAt: string): Promise<CustomerSession> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerUpdatePayload>({
     query: `mutation CustomerProfileUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
       customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
         customer { ${CUSTOMER_FIELDS} }
@@ -402,7 +473,7 @@ export async function updateCustomerProfile(accessToken: string, input: Customer
 }
 
 export async function updateCustomerPassword(accessToken: string, password: string): Promise<CustomerSession> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerUpdatePayload>({
     query: `mutation CustomerPasswordUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
       customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
         customer { ${CUSTOMER_FIELDS} }
@@ -429,7 +500,7 @@ export async function updateCustomerPassword(accessToken: string, password: stri
 }
 
 export async function resetCustomerPasswordByUrl(resetUrl: string, password: string): Promise<void> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerResetByUrlPayload>({
     query: `mutation CustomerResetByUrl($resetUrl: URL!, $password: String!) {
       customerResetByUrl(resetUrl: $resetUrl, password: $password) {
         customer { id email }
@@ -451,7 +522,7 @@ export async function resetCustomerPasswordByUrl(resetUrl: string, password: str
 }
 
 export async function recoverCustomerPassword(email: string): Promise<void> {
-  const payload = await shopifyStorefrontFetch({
+  const payload = await shopifyStorefrontFetch<CustomerRecoverPayload>({
     query: `mutation CustomerRecover($email: String!) {
       customerRecover(email: $email) {
         customerUserErrors { field message code }

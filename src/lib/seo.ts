@@ -11,6 +11,7 @@ export type SeoConfig = {
   twitterDescription: string;
   image?: string;
   schema?: Record<string, unknown>[];
+  noIndex?: boolean;
 };
 
 const siteUrl = 'https://mdrnlifeddw.com';
@@ -247,6 +248,19 @@ export const SEO_CONFIGS = {
     twitterDescription: 'Customer terms, shipping, refunds, privacy, and subscription information.',
     image: socialImage,
   },
+  notFound: {
+    title: 'Page Not Found | Mdrn-Life DDW',
+    description: 'The requested Mdrn-Life DDW page could not be found.',
+    canonical: `${siteUrl}/`,
+    ogTitle: 'Page Not Found | Mdrn-Life DDW',
+    ogDescription: 'The requested Mdrn-Life DDW page could not be found.',
+    ogUrl: `${siteUrl}/`,
+    ogType: 'website',
+    twitterTitle: 'Page Not Found | Mdrn-Life DDW',
+    twitterDescription: 'The requested Mdrn-Life DDW page could not be found.',
+    image: socialImage,
+    noIndex: true,
+  },
 } satisfies Record<string, SeoConfig>;
 
 export function resolveSeo(pathname: string, hash: string): SeoConfig {
@@ -264,5 +278,6 @@ export function resolveSeo(pathname: string, hash: string): SeoConfig {
     const url = `${siteUrl}${pathname}`;
     return { ...SEO_CONFIGS.policy, canonical: url, ogUrl: url };
   }
-  return SEO_CONFIGS.home;
+  if (pathname === '/') return SEO_CONFIGS.home;
+  return SEO_CONFIGS.notFound;
 }

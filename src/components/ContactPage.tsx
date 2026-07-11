@@ -1,4 +1,23 @@
-import React, { useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
+
+type ContactValues = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+type ContactErrors = Record<keyof ContactValues, string>;
+
+type AlertState = {
+  type: 'success' | 'error';
+  message: string;
+} | null;
+
+type ServerValidationError = {
+  field?: string;
+  message?: string;
+};
 
 const initialValues = {
   name: '',
@@ -7,7 +26,7 @@ const initialValues = {
   message: '',
 };
 
-const initialErrors = {
+const initialErrors: ContactErrors = {
   name: '',
   email: '',
   subject: '',
@@ -19,11 +38,11 @@ function contactEndpoint() {
   return `${baseUrl}/api/contact`;
 }
 
-function isValidEmail(value) {
+function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function validate(values) {
+function validate(values: ContactValues) {
   const errors = { ...initialErrors };
 
   if (!values.name.trim()) {
@@ -45,35 +64,35 @@ function validate(values) {
   return errors;
 }
 
-function hasErrors(errors) {
+function hasErrors(errors: ContactErrors) {
   return Object.values(errors).some(Boolean);
 }
 
 export function ContactPage() {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState(initialErrors);
-  const [alert, setAlert] = useState(null);
+  const [alert, setAlert] = useState<AlertState>(null);
   const [loading, setLoading] = useState(false);
 
-  const updateField = (event) => {
+  const updateField = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setValues((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: '' }));
   };
 
-  const applyServerValidation = (serverErrors = []) => {
+  const applyServerValidation = (serverErrors: ServerValidationError[] = []) => {
     const nextErrors = { ...initialErrors };
 
     for (const item of serverErrors) {
       if (item?.field && Object.prototype.hasOwnProperty.call(nextErrors, item.field)) {
-        nextErrors[item.field] = item.message || 'This field is invalid.';
+        nextErrors[item.field as keyof ContactErrors] = item.message || 'This field is invalid.';
       }
     }
 
     setErrors(nextErrors);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setAlert(null);
 

@@ -1,8 +1,17 @@
 import { defineConfig, loadEnv } from 'vite'
+import type { Plugin, ProxyOptions, ViteDevServer } from 'vite'
+import type { ClientRequest, IncomingMessage, ServerResponse } from 'node:http'
 import react from '@vitejs/plugin-react'
 import contactHandler from './api/contact.js'
 import emailSupportHandler from './api/email-support.js'
 import marketingSignupHandler from './api/marketing-signup.js'
+
+type ApiHandler = (request: IncomingMessage, response: ServerResponse) => Promise<void> | void
+type NextFunction = (error?: unknown) => void
+
+const contactApiHandler = contactHandler as ApiHandler
+const emailSupportApiHandler = emailSupportHandler as ApiHandler
+const marketingSignupApiHandler = marketingSignupHandler as ApiHandler
 
 // Shopify store origin that actually hosts checkout.
 const SHOPIFY_ORIGIN = 'https://orise-6796.myshopify.com'
@@ -14,7 +23,7 @@ const STORE_DOMAIN = 'mdrnlifeddw.com'
 // Mirrors what nginx (prod) / vercel.json must do. Any redirects or cookies
 // Shopify sets for its own domain are rewritten back to the current host so the
 // browser stays put.
-function shopifyCheckoutProxy() {
+function shopifyCheckoutProxy(): ProxyOptions {
   return {
     target: SHOPIFY_ORIGIN,
     // IMPORTANT: do NOT use changeOrigin (it forces Host = myshopify domain, which
@@ -29,12 +38,12 @@ function shopifyCheckoutProxy() {
     },
     // Drop the cookie Domain attribute so Shopify's checkout cookies stick to localhost.
     cookieDomainRewrite: '',
-    configure: (proxy: any) => {
+    configure: (proxy) => {
       // Force the Host on every proxied request (covers redirects/sub-requests too).
-      proxy.on('proxyReq', (proxyReq: any) => {
+      proxy.on('proxyReq', (proxyReq: ClientRequest) => {
         proxyReq.setHeader('host', STORE_DOMAIN)
       })
-      proxy.on('proxyRes', (proxyRes: any) => {
+      proxy.on('proxyRes', (proxyRes: IncomingMessage) => {
         const loc = proxyRes.headers['location']
         if (typeof loc === 'string') {
           // Make Shopify's redirects relative so the browser stays on the current origin.
@@ -50,27 +59,27 @@ function shopifyCheckoutProxy() {
   }
 }
 
-function localShopifyChatApi() {
+function localShopifyChatApi(): Plugin {
   return {
     name: 'local-shopify-support-api',
-    configureServer(server: any) {
-      server.middlewares.use('/api/email-support', async (req: any, res: any, next: any) => {
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use('/api/email-support', async (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
         try {
-          await emailSupportHandler(req, res)
+          await emailSupportApiHandler(req, res)
         } catch (error) {
           next(error)
         }
       })
-      server.middlewares.use('/api/contact', async (req: any, res: any, next: any) => {
+      server.middlewares.use('/api/contact', async (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
         try {
-          await contactHandler(req, res)
+          await contactApiHandler(req, res)
         } catch (error) {
           next(error)
         }
       })
-      server.middlewares.use('/api/marketing-signup', async (req: any, res: any, next: any) => {
+      server.middlewares.use('/api/marketing-signup', async (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
         try {
-          await marketingSignupHandler(req, res)
+          await marketingSignupApiHandler(req, res)
         } catch (error) {
           next(error)
         }

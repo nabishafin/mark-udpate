@@ -9,11 +9,12 @@ RewriteEngine On
 
 # Shopify Storefront checkout URLs may use the primary domain. On Hostinger,
 # those paths must go back to Shopify before the React app fallback runs.
+RewriteRule ^products/?$ /index.html [L,QSA]
 RewriteRule ^account/reset/(.*)$ /index.html [L,QSA]
 RewriteRule ^cart/c/(.*)$ https://orise-6796.myshopify.com/cart/c/$1 [R=302,L,QSA]
 RewriteRule ^cart/([0-9].*)$ https://orise-6796.myshopify.com/cart/$1 [R=302,L,QSA]
 RewriteRule ^checkouts/(.*)$ https://orise-6796.myshopify.com/checkouts/$1 [R=302,L,QSA]
-RewriteRule ^checkout/(.*)$ https://orise-6796.myshopify.com/checkout/$1 [R=302,L,QSA]
+RewriteRule ^checkout/(.+)$ https://orise-6796.myshopify.com/checkout/$1 [R=302,L,QSA]
 RewriteRule ^wallets/checkouts/(.*)$ https://orise-6796.myshopify.com/wallets/checkouts/$1 [R=302,L,QSA]
 RewriteRule ^orders/(.*)$ https://orise-6796.myshopify.com/orders/$1 [R=302,L,QSA]
 RewriteRule ^([0-9]+)/orders/(.*)$ https://orise-6796.myshopify.com/$1/orders/$2 [R=302,L,QSA]
@@ -23,7 +24,11 @@ RewriteRule ^api/contact/?$ /api/contact.php [L,QSA]
 RewriteRule ^api/email-support/?$ /api/email-support.php [L,QSA]
 RewriteRule ^api/marketing-signup/?$ /api/marketing-signup.php [L,QSA]
 
-# React/Vite single-page app fallback.
+# Known React/Vite routes. Unknown paths return a real 404 instead of the home page.
+RewriteRule ^$ /index.html [L,QSA]
+RewriteRule ^(science|science/lab-testing|benefits|athletes-recovery|healthy-aging|shop|products|cart|products/cart|checkout|login|register|forgot-password|reset-password|account|account/orders|research|blogs|blogs/news|contact|learn|founder|pages/refund)/?$ /index.html [L,QSA]
+RewriteRule ^(blogs/news/.+|account/orders/.+|account/reset/.+|policies/.+|learn/.+)/?$ /index.html [L,QSA]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
+RewriteRule . - [R=404,L]

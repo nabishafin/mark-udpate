@@ -123,7 +123,7 @@ test('site is routed as a multipage experience instead of one long homepage', ()
   assert.doesNotMatch(nav, /label:\s*'Lab Testing'/);
   assert.match(science, /href="\/science\/lab-testing"[\s\S]*View Lab Testing/);
   assert.match(app, /case '\/products\/cart':\s*return <CartPage \/>/);
-  assert.match(app, /<main>\s*\{page\}\s*<CTAFooter \/>\s*<\/main>/);
+  assert.match(app, /<main>\s*<Suspense fallback=\{<PageFallback \/>}>\s*\{page\}\s*<\/Suspense>\s*<CTAFooter \/>\s*<\/main>/);
   assert.doesNotMatch(app, /pathname !== '\/contact'/);
   assert.doesNotMatch(app, /<main>\s*<Hero[\s\S]*<ScienceSection \/>[\s\S]*<LabTesting \/>[\s\S]*<Benefits \/>/);
   assert.match(file('src/index.tsx'), /redirectShopifyCheckoutPath/);
@@ -135,7 +135,9 @@ test('site is routed as a multipage experience instead of one long homepage', ()
   assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/checkouts\/\$1/);
   assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/wallets\/checkouts\/\$1/);
   assert.match(file('public/.htaccess'), /orise-6796\.myshopify\.com\/orders\/\$1/);
-  assert.match(file('public/.htaccess'), /RewriteRule \. \/index\.html \[L\]/);
+  assert.match(file('public/.htaccess'), /Known React\/Vite routes/);
+  assert.match(file('public/.htaccess'), /RewriteRule \^\(science\|science\/lab-testing/);
+  assert.match(file('public/.htaccess'), /RewriteRule \. - \[R=404,L\]/);
   assert.match(vercel, /"source":\s*"\/cart\/c\/:path\*"/);
   assert.match(vercel, /orise-6796\.myshopify\.com\/cart\/c\/:path\*/);
   assert.match(vercel, /"source":\s*"\/\(\.\*\)"/);
@@ -237,7 +239,7 @@ test('mobile body interaction uses a split view instead of blocking the hotspots
 test('navigation follows the client supplied IA and keeps shop/contact paths explicit', () => {
   const nav = file('src/components/Nav.tsx');
   const footer = file('src/components/CTAFooter.tsx');
-  const contact = file('src/components/ContactPage.jsx');
+  const contact = file('src/components/ContactPage.tsx');
   const contactApi = file('api/contact.js');
   const app = file('src/App.tsx');
 
@@ -524,7 +526,7 @@ test('cart page supports local cart quantity controls, removal, and Shopify chec
   const products = file('src/lib/products.ts');
   const shopify = file('src/lib/shopify.ts');
 
-  assert.match(app, /import \{ CartPage \} from '\.\/components\/CartPage'/);
+  assert.match(app, /import\('\.\/components\/CartPage'\)/);
   assert.match(cart, /Your Cart/);
   assert.match(cart, /Continue shopping/);
   assert.match(cart, /Estimated total/);
@@ -701,7 +703,7 @@ test('page sections blend into the site background without divider grids or foot
     file('src/components/OrganShowcase.tsx'),
     file('src/components/Products.tsx'),
     file('src/components/Research.tsx'),
-    file('src/components/ContactPage.jsx'),
+    file('src/components/ContactPage.tsx'),
     file('src/components/CTAFooter.tsx'),
   ].join('\n');
 
@@ -719,7 +721,7 @@ test('page sections do not use independent glow or particle background layers', 
     file('src/components/OrganShowcase.tsx'),
     file('src/components/Products.tsx'),
     file('src/components/Research.tsx'),
-    file('src/components/ContactPage.jsx'),
+    file('src/components/ContactPage.tsx'),
     file('src/components/CTAFooter.tsx'),
   ].join('\n');
 

@@ -2,10 +2,9 @@
 
 The contact page posts JSON to `/api/contact`. The frontend builds the URL from `VITE_API_URL`:
 
-- Current direct VPS API target: `VITE_API_URL=http://2.25.199.73:3000`.
-- Production on the same domain: keep `VITE_API_URL=` blank so the browser posts to `/api/contact`.
+- Production on the same domain: keep `VITE_API_URL=` blank so the browser posts to HTTPS same-origin endpoints such as `/api/contact`.
 - Local frontend with a separate Node backend: set `VITE_API_URL=http://localhost:3000`.
-- Production with an external backend domain: set `VITE_API_URL=https://mdrnlifeddw.com`.
+- Production with an external backend domain: set `VITE_API_URL` to an HTTPS origin only. Never point the HTTPS site at a plain `http://` API.
 
 The built-in Node/PHP backend sends mail through SMTP. If the client later replaces SMTP with an email API provider such as Resend, SendGrid, Mailgun, or Postmark, keep the same `/api/contact` response contract so the frontend does not need to change.
 

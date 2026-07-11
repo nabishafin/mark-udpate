@@ -1,4 +1,3 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import './index.css';
@@ -8,7 +7,7 @@ const SHOPIFY_CHECKOUT_PATHS = [
   /^\/cart\/c\//,
   /^\/cart\/\d/,
   /^\/checkouts\//,
-  /^\/checkout\//,
+  /^\/checkout\/.+/,
   /^\/wallets\/checkouts\//,
   /^\/orders\//,
   /^\/\d+\/orders\//,

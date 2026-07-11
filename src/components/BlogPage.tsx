@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, BookOpen, Loader2 } from 'lucide-react';
 import { BlogArticle, FALLBACK_ARTICLES, getBlogArticles } from '../lib/blog';
