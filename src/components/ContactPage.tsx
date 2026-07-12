@@ -1,6 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Beaker, Briefcase, Mail, MapPin, Phone, Send, ShieldCheck, Users } from 'lucide-react';
+import { apiBaseUrl } from '../lib/api';
 
 type ContactValues = {
   name: string;
@@ -83,8 +84,7 @@ const INQUIRY_TYPES = [
 ];
 
 function contactEndpoint() {
-  const baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
-  return `${baseUrl}/api/contact`;
+  return `${apiBaseUrl()}/api/contact`;
 }
 
 function isValidEmail(value: string) {

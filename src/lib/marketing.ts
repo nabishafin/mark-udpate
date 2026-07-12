@@ -1,3 +1,5 @@
+import { apiBaseUrl } from './api';
+
 export type SubscribeInput = {
   email: string;
   firstName?: string;
@@ -13,10 +15,7 @@ export type SubscribeResult = {
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// Base URL of the support/API server (e.g. http://2.25.199.73:3000). Falls back
-// to same-origin when unset.
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+const API_BASE = apiBaseUrl();
 
 export function isValidEmail(email: string) {
   return EMAIL_PATTERN.test(email.trim());
@@ -33,18 +32,41 @@ export async function subscribeEmailToMarketing(input: SubscribeInput): Promise<
     throw new Error('Please enter a valid email address.');
   }
 
-  const response = await fetch(`${API_BASE}/api/marketing-signup`, {
+  if (input.website) {
+    return { status: 'subscribed' };
+  }
+
+  let response = await fetch(`${API_BASE}/api/marketing-signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email,
       acceptsMarketing: input.acceptsMarketing ?? true,
-      website: input.website || '',
+      website: '',
       page: input.page || window.location.href,
       sessionId: input.sessionId || '',
     }),
   });
-  const payload = await response.json().catch(() => ({}));
+  let payload = await response.json().catch(() => ({}));
+
+  if (response.status === 404 && String(payload?.message || payload?.error || '').toLowerCase().includes('route not found')) {
+    response = await fetch(`${API_BASE}/api/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Website lead',
+        email,
+        phone: '',
+        subject: 'New wellness opportunity signup',
+        message: [
+          'Source: Unlock a world of opportunities popup',
+          input.page || window.location.href,
+          input.sessionId ? `Session: ${input.sessionId}` : '',
+        ].filter(Boolean).join('\n'),
+      }),
+    });
+    payload = await response.json().catch(() => ({}));
+  }
 
   if (!response.ok) {
     throw new Error(payload?.error || 'Could not save your email. Please try again.');

@@ -1,9 +1,7 @@
-production-ready-audit-2026-07-12
-
-Source commit:
-844dac09eeb5f1437b7be1106d0ec4ec0266f44c
+hostinger-api-fallback-fix-2026-07-12
 
 This build contains:
+- Frontend fallback for Hostinger deployments where `/api/email-support` or `/api/marketing-signup` are missing but `/api/contact` is live.
 - Final SEO, routing, cart, checkout, account, contact/API, and responsive layout fixes.
 - Hostinger Apache .htaccess and nginx handoff rules for SPA routes, APIs, and Shopify checkout continuations.
 - Generated sitemap.xml and route-manifest.json for 24 indexable URLs.

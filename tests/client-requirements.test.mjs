@@ -280,7 +280,7 @@ test('navigation follows the client supplied IA and keeps shop/contact paths exp
   assert.doesNotMatch(contact, /Hydroisotop GmbH, USGS Reston, and verification questions/);
   assert.doesNotMatch(footer, /Current Store/);
   assert.match(contact, /<motion\.form[\s\S]*name="name"[\s\S]*name="email"[\s\S]*name="phone"[\s\S]*name="subject"[\s\S]*name="message"/);
-  assert.match(contact, /VITE_API_URL/);
+  assert.match(contact, /apiBaseUrl/);
   assert.match(contact, /\/api\/contact/);
   assert.match(contact, /headers:\s*\{ 'Content-Type': 'application\/json' \}/);
   assert.match(contact, /Sending\.\.\./);
@@ -505,6 +505,7 @@ test('support widget provides WhatsApp and email support without Shopify Admin t
   const emailApi = file('api/email-support.js');
   const phpEmailApi = file('public/api/email-support.php');
   const phpSmtp = file('public/api/_smtp.php');
+  const apiBase = file('src/lib/api.ts');
   const vite = file('vite.config.ts');
   const envExample = file('.env.example');
   const htaccess = file('public/.htaccess');
@@ -519,9 +520,15 @@ test('support widget provides WhatsApp and email support without Shopify Admin t
   assert.match(inbox, /Issue type/);
   assert.match(inbox, /Describe the issue/);
   assert.match(inbox, /\/api\/email-support/);
+  assert.match(inbox, /\/api\/contact/);
+  assert.match(inbox, /isMissingApiRoute/);
+  assert.match(inbox, /Support widget request/);
   assert.match(inbox, /support@orisefinance\.com/);
   assert.match(inbox, /Support team/);
   assert.match(inbox, /WhatsApp and email/);
+  assert.match(inbox, /apiBaseUrl/);
+  assert.match(apiBase, /import\.meta\.env\.PROD/);
+  assert.match(apiBase, /return ''/);
   assert.doesNotMatch(inbox, /Chat with us/);
   assert.doesNotMatch(inbox, /Before we get started/);
   assert.doesNotMatch(inbox, /Track my order/);
@@ -583,6 +590,9 @@ test('opportunity email popup submits leads through the secure SMTP backend', ()
   assert.match(popup, /Saving\.\.\./);
   assert.doesNotMatch(popup, /ðŸš€|Savingâ€¦/);
   assert.match(marketing, /\/api\/marketing-signup/);
+  assert.match(marketing, /\/api\/contact/);
+  assert.match(marketing, /route not found/);
+  assert.match(marketing, /Website lead/);
   assert.match(marketing, /acceptsMarketing/);
   assert.doesNotMatch(marketing, /customerCreate/);
   assert.doesNotMatch(marketing, /shopifyStorefrontFetch/);

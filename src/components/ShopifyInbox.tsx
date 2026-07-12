@@ -10,16 +10,16 @@ import {
   Send,
   X,
 } from 'lucide-react';
+import { apiBaseUrl } from '../lib/api';
 
 const SESSION_KEY = 'mdrnLifeSupportSessionId';
 const WHATSAPP_NUMBER = '19544105042';
 const SUPPORT_EMAIL = 'support@orisefinance.com';
 
-// Base URL of the support/API server (e.g. http://2.25.199.73:3000). Falls back
-// to same-origin when unset. Requests must hit this host, not the site origin.
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+const API_BASE = apiBaseUrl();
 
 type ChatView = 'home' | 'email' | 'emailSent';
+type ApiPayload = Record<string, unknown>;
 
 function getSessionId() {
   const existing = window.localStorage.getItem(SESSION_KEY);
@@ -37,6 +37,20 @@ function whatsappUrl() {
   ].filter(Boolean).join('\n');
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
+
+async function postJson(path: string, body: ApiPayload) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const payload = await response.json().catch(() => ({}));
+  return { response, payload };
+}
+
+function isMissingApiRoute(response: Response, payload: ApiPayload) {
+  return response.status === 404 && String(payload?.message || payload?.error || '').toLowerCase().includes('route not found');
 }
 
 type Props = {
@@ -82,20 +96,40 @@ export function ShopifyInbox({ hidden = false }: Props) {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE}/api/email-support`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      if (website) {
+        setView('emailSent');
+        return;
+      }
+
+      const page = window.location.href;
+      const sessionId = getSessionId();
+      const supportPayload = {
+        email: supportEmail,
+        subject: supportSubject,
+        issue: supportIssue,
+        message: supportMessage,
+        website,
+        page,
+        sessionId,
+      };
+
+      let { response, payload } = await postJson('/api/email-support', supportPayload);
+
+      if (isMissingApiRoute(response, payload)) {
+        ({ response, payload } = await postJson('/api/contact', {
+          name: 'Support widget request',
           email: supportEmail,
-          subject: supportSubject,
-          issue: supportIssue,
-          message: supportMessage,
-          website,
-          page: window.location.href,
-          sessionId: getSessionId(),
-        }),
-      });
-      const payload = await response.json().catch(() => ({}));
+          phone: '',
+          subject: supportSubject || 'Website support request',
+          message: [
+            supportIssue ? `Issue type: ${supportIssue}` : '',
+            supportMessage,
+            '',
+            `Page: ${page}`,
+          ].filter(Boolean).join('\n'),
+        }));
+      }
+
       if (!response.ok) throw new Error(payload?.error || 'Support request could not be sent.');
 
       setSupportSubject('');
