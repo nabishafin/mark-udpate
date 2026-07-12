@@ -53,6 +53,21 @@ function isMissingApiRoute(response: Response, payload: ApiPayload) {
   return response.status === 404 && String(payload?.message || payload?.error || '').toLowerCase().includes('route not found');
 }
 
+function contactSupportPayload(email: string, subject: string, issue: string, message: string, page: string) {
+  return {
+    name: 'Support widget request',
+    email,
+    phone: '',
+    subject: subject || 'Website support request',
+    message: [
+      issue ? `Issue type: ${issue}` : '',
+      message,
+      '',
+      `Page: ${page}`,
+    ].filter(Boolean).join('\n'),
+  };
+}
+
 type Props = {
   hidden?: boolean;
 };
@@ -113,21 +128,12 @@ export function ShopifyInbox({ hidden = false }: Props) {
         sessionId,
       };
 
-      let { response, payload } = await postJson('/api/email-support', supportPayload);
+      let { response, payload } = import.meta.env.PROD
+        ? await postJson('/api/contact', contactSupportPayload(supportEmail, supportSubject, supportIssue, supportMessage, page))
+        : await postJson('/api/email-support', supportPayload);
 
       if (isMissingApiRoute(response, payload)) {
-        ({ response, payload } = await postJson('/api/contact', {
-          name: 'Support widget request',
-          email: supportEmail,
-          phone: '',
-          subject: supportSubject || 'Website support request',
-          message: [
-            supportIssue ? `Issue type: ${supportIssue}` : '',
-            supportMessage,
-            '',
-            `Page: ${page}`,
-          ].filter(Boolean).join('\n'),
-        }));
+        ({ response, payload } = await postJson('/api/contact', contactSupportPayload(supportEmail, supportSubject, supportIssue, supportMessage, page)));
       }
 
       if (!response.ok) throw new Error(payload?.error || 'Support request could not be sent.');

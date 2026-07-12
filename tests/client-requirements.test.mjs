@@ -521,6 +521,7 @@ test('support widget provides WhatsApp and email support without Shopify Admin t
   assert.match(inbox, /Describe the issue/);
   assert.match(inbox, /\/api\/email-support/);
   assert.match(inbox, /\/api\/contact/);
+  assert.match(inbox, /import\.meta\.env\.PROD/);
   assert.match(inbox, /isMissingApiRoute/);
   assert.match(inbox, /Support widget request/);
   assert.match(inbox, /support@orisefinance\.com/);
@@ -591,6 +592,7 @@ test('opportunity email popup submits leads through the secure SMTP backend', ()
   assert.doesNotMatch(popup, /ðŸš€|Savingâ€¦/);
   assert.match(marketing, /\/api\/marketing-signup/);
   assert.match(marketing, /\/api\/contact/);
+  assert.match(marketing, /import\.meta\.env\.PROD/);
   assert.match(marketing, /route not found/);
   assert.match(marketing, /Website lead/);
   assert.match(marketing, /acceptsMarketing/);

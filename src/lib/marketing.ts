@@ -17,6 +17,20 @@ export type SubscribeResult = {
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const API_BASE = apiBaseUrl();
 
+function contactLeadPayload(email: string, page: string, sessionId = '') {
+  return {
+    name: 'Website lead',
+    email,
+    phone: '',
+    subject: 'New wellness opportunity signup',
+    message: [
+      'Source: Unlock a world of opportunities popup',
+      page,
+      sessionId ? `Session: ${sessionId}` : '',
+    ].filter(Boolean).join('\n'),
+  };
+}
+
 export function isValidEmail(email: string) {
   return EMAIL_PATTERN.test(email.trim());
 }
@@ -36,16 +50,20 @@ export async function subscribeEmailToMarketing(input: SubscribeInput): Promise<
     return { status: 'subscribed' };
   }
 
-  let response = await fetch(`${API_BASE}/api/marketing-signup`, {
+  const page = input.page || window.location.href;
+  const sessionId = input.sessionId || '';
+  let response = await fetch(`${API_BASE}${import.meta.env.PROD ? '/api/contact' : '/api/marketing-signup'}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email,
-      acceptsMarketing: input.acceptsMarketing ?? true,
-      website: '',
-      page: input.page || window.location.href,
-      sessionId: input.sessionId || '',
-    }),
+    body: JSON.stringify(import.meta.env.PROD
+      ? contactLeadPayload(email, page, sessionId)
+      : {
+          email,
+          acceptsMarketing: input.acceptsMarketing ?? true,
+          website: '',
+          page,
+          sessionId,
+        }),
   });
   let payload = await response.json().catch(() => ({}));
 
@@ -58,11 +76,7 @@ export async function subscribeEmailToMarketing(input: SubscribeInput): Promise<
         email,
         phone: '',
         subject: 'New wellness opportunity signup',
-        message: [
-          'Source: Unlock a world of opportunities popup',
-          input.page || window.location.href,
-          input.sessionId ? `Session: ${input.sessionId}` : '',
-        ].filter(Boolean).join('\n'),
+        message: contactLeadPayload(email, page, sessionId).message,
       }),
     });
     payload = await response.json().catch(() => ({}));
