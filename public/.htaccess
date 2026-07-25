@@ -23,6 +23,7 @@ RewriteRule ^collections/all/?$ /products [R=301,L]
 RewriteRule ^products/(mdrn-life-ddw|mdrn-life-ddw-pet-plastic)/?$ /products [R=301,L]
 RewriteRule ^products/?$ /products/index.html [L,QSA]
 RewriteRule ^account/reset/(.*)$ /index.html [L,QSA]
+RewriteRule ^account/activate/(.*)$ /index.html [L,QSA]
 RewriteRule ^cart/c/(.*)$ https://orise-6796.myshopify.com/cart/c/$1 [R=302,L,QSA]
 RewriteRule ^cart/([0-9].*)$ https://orise-6796.myshopify.com/cart/$1 [R=302,L,QSA]
 RewriteRule ^checkouts/(.*)$ https://orise-6796.myshopify.com/checkouts/$1 [R=302,L,QSA]
@@ -39,8 +40,8 @@ RewriteRule ^api/marketing-signup/?$ /api/marketing-signup.php [L,QSA]
 # Known React/Vite routes. Unknown paths return a real 404 instead of the home page.
 RewriteRule ^$ /index.html [L,QSA]
 RewriteRule ^(science|science/lab-testing|benefits|athletes-recovery|healthy-aging|research|blogs/news|products|contact|learn|founder)/?$ /$1/index.html [L,QSA]
-RewriteRule ^(shop|cart|products/cart|checkout|login|register|forgot-password|reset-password|account|account/orders|blogs|pages/refund)/?$ /index.html [L,QSA]
-RewriteRule ^(account/orders/.+|account/reset/.+|policies/.+)/?$ /index.html [L,QSA]
+RewriteRule ^(shop|cart|products/cart|checkout|login|register|forgot-password|reset-password|account|account/activate|account/orders|blogs|pages/refund)/?$ /index.html [L,QSA]
+RewriteRule ^(account/orders/.+|account/reset/.+|account/activate/.+|policies/.+)/?$ /index.html [L,QSA]
 
 # BEGIN GENERATED SEO ROUTES
 RewriteRule ^blogs/news/deuterium-depleted-water-immune-support/?$ /blogs/news/deuterium-depleted-water-immune-support/index.html [L,QSA]

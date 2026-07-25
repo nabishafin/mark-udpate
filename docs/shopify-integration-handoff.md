@@ -30,6 +30,12 @@ https://mdrnlifeddw.com/reset-password?reset_url={{ customer.reset_password_url 
 
 - After this template change, customers click the email button and see only `New password` and `Confirm new password` on the site. They should not paste reset links manually.
 
+Customer account activation:
+
+- Shopify's default activation email can continue linking to `https://mdrnlifeddw.com/account/activate/...`. The app accepts that dynamic route, validates the store host and secure path, removes the customer ID and token from the address bar, and submits the link to Shopify through `customerActivateByUrl`.
+- The customer chooses and confirms a password, then the returned customer access token signs them in. Activation links are never accepted through a paste-a-link field.
+- If a link was shared, already used, or expired, request a fresh activation email before testing. Do not reuse an exposed activation token.
+
 Production setup notes:
 
 - Configure every server-only value in Vercel Project Settings, not in client-side `VITE_` variables.

@@ -4,12 +4,14 @@ import { ArrowRight, Eye, EyeOff, KeyRound, ListOrdered, Lock, LogOut, Mail, Shi
 import {
   CustomerSession,
   ShopifyCustomerOrder,
+  activateCustomerAccountByUrl,
   clearCustomerSession,
   getCustomer,
   getCustomerDisplayName,
   getCustomerOrders,
   getStoredCustomerSession,
   loginCustomer,
+  normalizeCustomerActivationUrl,
   normalizeCustomerResetUrl,
   onCustomerSessionChange,
   recoverCustomerPassword,
@@ -20,7 +22,7 @@ import {
   updateCustomerProfile,
 } from '../lib/customer';
 
-type AuthMode = 'login' | 'register' | 'recover' | 'reset' | 'account';
+type AuthMode = 'login' | 'register' | 'recover' | 'reset' | 'activate' | 'account';
 
 type Props = {
   mode: AuthMode;
@@ -108,6 +110,8 @@ export function AccountPage({ mode }: Props) {
               ? <RecoverForm />
               : mode === 'reset'
                 ? <ResetPasswordForm onSession={setSession} />
+                : mode === 'activate'
+                  ? <ActivateAccountForm onSession={setSession} />
                 : <LoginForm onSession={setSession} />}
         </motion.div>
       </div>
@@ -167,6 +171,7 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [createdAwaitingActivation, setCreatedAwaitingActivation] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -175,16 +180,37 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
     setStatus('');
     try {
       await registerCustomer({ firstName, lastName, email, password, phone, acceptsMarketing });
-      const session = await loginCustomer({ email, password });
-      onSession(session);
-      setStatus('Account created. Opening your account...');
-      navigate('/account');
+      try {
+        const session = await loginCustomer({ email, password });
+        onSession(session);
+        setStatus('Account created. Opening your account...');
+        navigate('/account');
+      } catch {
+        setPassword('');
+        setCreatedAwaitingActivation(true);
+        setStatus('Account created. Check your email and activate your account before signing in.');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create account.');
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (createdAwaitingActivation) {
+    return (
+      <div className="grid gap-4">
+        <FormHeader icon={Mail} title="Check your email" body="Your customer account was created successfully." />
+        <Feedback error="" status={status} />
+        <p className="text-sm leading-relaxed text-white/58">
+          Open the newest activation email and use its secure button. Activation links are single-use and can expire.
+        </p>
+        <a href="/login" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+          Back to login
+        </a>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={submit} className="grid gap-4">
@@ -343,6 +369,92 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
           Open the reset link from your email to continue. For security, this page does not accept pasted reset links.
           <a href="/forgot-password" className="mt-4 hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
             Back to forgot password
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function getActivationUrlFromLocation() {
+  if (/^\/account\/activate\/[^/]+\/[^/]+\/?$/.test(window.location.pathname)) {
+    return normalizeCustomerActivationUrl(window.location.href);
+  }
+  return '';
+}
+
+function ActivateAccountForm({ onSession }: { onSession: (session: CustomerSession) => void }) {
+  const [activationUrl, setActivationUrl] = useState(() => {
+    try {
+      return getActivationUrlFromLocation();
+    } catch {
+      return '';
+    }
+  });
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!activationUrl) return;
+    window.history.replaceState({}, '', '/account/activate');
+  }, [activationUrl]);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('');
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const session = await activateCustomerAccountByUrl(activationUrl, password);
+      onSession(session);
+      setActivationUrl('');
+      setPassword('');
+      setConfirmPassword('');
+      setStatus('Account activated successfully. Your account is now signed in.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not activate the account with this link.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="grid gap-4">
+      <FormHeader icon={ShieldCheck} title="Activate account" body="Choose a secure password to finish activating your account." />
+      {activationUrl ? (
+        <form onSubmit={submit} className="grid gap-4">
+          <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={12} revealable />
+          <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={12} revealable />
+          <Feedback error={error} status={status} />
+          {status ? (
+            <a href="/account" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+              Open account <ArrowRight size={14} />
+            </a>
+          ) : (
+            <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+              {submitting ? 'Activating...' : 'Activate account'} <ArrowRight size={14} />
+            </button>
+          )}
+          {!status && (
+            <a href="/login" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+              Back to login
+            </a>
+          )}
+        </form>
+      ) : (
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-white/58">
+          Open the newest activation link from your email to continue. For security, this page does not accept pasted activation links.
+          <a href="/login" className="mt-4 hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+            Back to login
           </a>
         </div>
       )}

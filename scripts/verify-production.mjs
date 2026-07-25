@@ -91,6 +91,17 @@ for (const path of criticalRoutes.filter((route) => route.startsWith('/blogs/new
   }
 }
 
+const activationRoute = await request('/account/activate/1234567890/codex-invalid-token-route-check');
+if (activationRoute?.status !== 200) {
+  failures.push(`/account/activate dynamic route: expected 200, received ${activationRoute?.status ?? 'no response'}`);
+} else {
+  for (const header of requiredHeaders) {
+    if (!activationRoute.headers.get(header)) {
+      failures.push(`/account/activate dynamic route: missing ${header}`);
+    }
+  }
+}
+
 const sitemap = await request('/sitemap.xml');
 if (sitemap?.status !== 200) {
   failures.push(`/sitemap.xml: expected 200, received ${sitemap?.status ?? 'no response'}`);

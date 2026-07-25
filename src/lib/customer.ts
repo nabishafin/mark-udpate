@@ -181,6 +181,16 @@ type CustomerResetByUrlPayload = {
   };
 };
 
+type CustomerActivateByUrlPayload = {
+  data?: {
+    customerActivateByUrl?: {
+      customer?: Pick<ShopifyCustomer, 'id' | 'email'> | null;
+      customerAccessToken?: CustomerAccessToken | null;
+      customerUserErrors?: CustomerUserError[];
+    };
+  };
+};
+
 type CustomerRecoverPayload = {
   data?: {
     customerRecover?: {
@@ -302,7 +312,7 @@ function getCustomerErrors(errors: CustomerUserError[] = []) {
   return errors.map((error) => error.message).filter(Boolean).join(' ') || 'Customer account request failed.';
 }
 
-function getAllowedResetHosts() {
+function getAllowedCustomerHosts() {
   const storeDomain = getStoreDomain().toLowerCase();
   const hosts = new Set([
     storeDomain,
@@ -330,10 +340,33 @@ export function normalizeCustomerResetUrl(value: string) {
   }
 
   const hostname = url.hostname.toLowerCase();
-  const allowedHost = getAllowedResetHosts().has(hostname) || isLocalHost(hostname);
+  const allowedHost = getAllowedCustomerHosts().has(hostname) || isLocalHost(hostname);
   const allowedProtocol = url.protocol === 'https:' || (url.protocol === 'http:' && isLocalHost(hostname));
   if (!allowedHost || !allowedProtocol || !url.pathname.includes('/account/reset/')) {
     throw new Error('Password reset link is not recognized for this store.');
+  }
+
+  url.hash = '';
+  return url.toString();
+}
+
+export function normalizeCustomerActivationUrl(value: string) {
+  const activationUrl = value.trim();
+  if (!activationUrl) throw new Error('Account activation link is missing.');
+
+  let url: URL;
+  try {
+    url = new URL(activationUrl);
+  } catch {
+    throw new Error('Account activation link is not valid.');
+  }
+
+  const hostname = url.hostname.toLowerCase();
+  const allowedHost = getAllowedCustomerHosts().has(hostname) || isLocalHost(hostname);
+  const allowedProtocol = url.protocol === 'https:' || (url.protocol === 'http:' && isLocalHost(hostname));
+  const isActivationPath = /^\/account\/activate\/[^/]+\/[^/]+\/?$/.test(url.pathname);
+  if (!allowedHost || !allowedProtocol || !isActivationPath) {
+    throw new Error('Account activation link is not recognized for this store.');
   }
 
   url.hash = '';
@@ -566,6 +599,37 @@ export async function resetCustomerPasswordByUrl(resetUrl: string, password: str
   const token = payload?.data?.customerResetByUrl?.customerAccessToken;
   const customer = payload?.data?.customerResetByUrl?.customer;
   if (!token?.accessToken || !customer) throw new Error('Could not reset the password with this reset link.');
+
+  const fullCustomer = await getCustomer(token.accessToken);
+  const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer: fullCustomer ?? customer };
+  saveCustomerSession(session);
+  return session;
+}
+
+export async function activateCustomerAccountByUrl(activationUrl: string, password: string): Promise<CustomerSession> {
+  const safeActivationUrl = normalizeCustomerActivationUrl(activationUrl);
+  const payload = await shopifyStorefrontFetch<CustomerActivateByUrlPayload>({
+    query: `mutation CustomerActivateByUrl($activationUrl: URL!, $password: String!) {
+      customerActivateByUrl(activationUrl: $activationUrl, password: $password) {
+        customer { id email }
+        customerAccessToken { accessToken expiresAt }
+        customerUserErrors { field message code }
+      }
+    }`,
+    variables: {
+      activationUrl: safeActivationUrl,
+      password,
+    },
+  });
+
+  const errors = payload?.data?.customerActivateByUrl?.customerUserErrors ?? [];
+  if (errors.length) throw new Error(getCustomerErrors(errors));
+
+  const token = payload?.data?.customerActivateByUrl?.customerAccessToken;
+  const customer = payload?.data?.customerActivateByUrl?.customer;
+  if (!token?.accessToken || !customer) {
+    throw new Error('Could not activate the account with this link. Request a fresh activation email and try again.');
+  }
 
   const fullCustomer = await getCustomer(token.accessToken);
   const session = { accessToken: token.accessToken, expiresAt: token.expiresAt, customer: fullCustomer ?? customer };

@@ -150,6 +150,8 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       return <AccountPage mode="recover" />;
     case '/reset-password':
       return <AccountPage mode="reset" />;
+    case '/account/activate':
+      return <AccountPage mode="activate" />;
     case '/account':
       return <AccountPage mode="account" />;
     case '/account/orders':
@@ -172,6 +174,9 @@ function renderPage(pathname: string, onSelectOrgan: (organ: Organ) => void, act
       }
       if (pathname.startsWith('/account/reset/') && pathname.length > '/account/reset/'.length) {
         return <AccountPage mode="reset" />;
+      }
+      if (pathname.startsWith('/account/activate/') && pathname.length > '/account/activate/'.length) {
+        return <AccountPage mode="activate" />;
       }
       if (pathname.startsWith('/policies/')) {
         return <PolicyPage slug={pathname.replace('/policies/', '')} />;

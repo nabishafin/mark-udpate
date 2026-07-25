@@ -378,6 +378,12 @@ export const SEO_CONFIGS = {
     path: '/reset-password',
     noIndex: true,
   }),
+  activateAccount: buildSeo({
+    title: 'Activate Account | Mdrn-Life DDW',
+    description: 'Securely activate your Mdrn-Life DDW customer account.',
+    path: '/account/activate',
+    noIndex: true,
+  }),
   account: buildSeo({
     title: 'My Account | Mdrn-Life DDW',
     description: 'Manage your Mdrn-Life DDW customer account and order history.',
@@ -519,10 +525,12 @@ export function resolveSeo(pathname: string, hash: string): SeoConfig {
   if (path === '/register') return SEO_CONFIGS.register;
   if (path === '/forgot-password') return SEO_CONFIGS.forgotPassword;
   if (path === '/reset-password') return SEO_CONFIGS.resetPassword;
+  if (path === '/account/activate') return SEO_CONFIGS.activateAccount;
   if (path === '/account') return SEO_CONFIGS.account;
   if (path === '/account/orders') return SEO_CONFIGS.accountOrders;
   if (path.startsWith('/account/orders/') && path.length > '/account/orders/'.length) return SEO_CONFIGS.accountOrders;
   if (path.startsWith('/account/reset/') && path.length > '/account/reset/'.length) return SEO_CONFIGS.resetPassword;
+  if (path.startsWith('/account/activate/') && path.length > '/account/activate/'.length) return SEO_CONFIGS.activateAccount;
   if (path === '/blogs' || path === '/blogs/news') return SEO_CONFIGS.blog;
   if (path.startsWith('/blogs/news/') && path.length > '/blogs/news/'.length) {
     return blogArticleSeo(path.slice('/blogs/news/'.length));

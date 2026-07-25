@@ -502,6 +502,35 @@ test('customer password reset uses secure email links without paste-a-link UX', 
   assert.match(seo, /noIndex:\s*true/);
 });
 
+test('customer activation links route into a secure Shopify activation flow', () => {
+  const account = file('src/components/AccountPage.tsx');
+  const app = file('src/App.tsx');
+  const customer = file('src/lib/customer.ts');
+  const doc = file('docs/shopify-integration-handoff.md');
+  const htaccess = file('public/.htaccess');
+  const nginx = file('deploy/nginx/mdrnlifeddw.com.conf');
+  const server = file('server.js');
+  const verifier = file('scripts/verify-production.mjs');
+
+  assert.match(account, /normalizeCustomerActivationUrl/);
+  assert.match(account, /activateCustomerAccountByUrl/);
+  assert.match(account, /window\.history\.replaceState\(\{\}, '', '\/account\/activate'\)/);
+  assert.match(account, /Open the newest activation link from your email to continue/);
+  assert.doesNotMatch(account, /Paste the full Shopify activation link/);
+
+  assert.match(customer, /customerActivateByUrl/);
+  assert.match(customer, /normalizeCustomerActivationUrl/);
+  assert.match(customer, /\^\\\/account\\\/activate\\\/\[\^\/\]\+\\\/\[\^\/\]\+/);
+  assert.match(customer, /saveCustomerSession\(session\)/);
+
+  assert.match(app, /pathname\.startsWith\('\/account\/activate\/'\)/);
+  assert.match(server, /account\\\/activate\\\/\.\+/);
+  assert.match(nginx, /account\/activate\/\.\+/);
+  assert.match(htaccess, /account\/activate\/\.\+/);
+  assert.match(verifier, /codex-invalid-token-route-check/);
+  assert.match(doc, /customerActivateByUrl/);
+});
+
 test('support widget provides WhatsApp and email support without Shopify Admin tracking', () => {
   const inbox = file('src/components/ShopifyInbox.tsx');
   const emailApi = file('api/email-support.js');
