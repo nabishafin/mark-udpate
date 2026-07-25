@@ -466,7 +466,9 @@ test('first-visit and repeat-load media stay immediate, resilient, and within pe
   assert.match(products, /data-shopify-image=/);
   assert.match(products, /onError=/);
   assert.match(products, /aspect-square w-full bg-white object-cover/);
-  assert.match(popup, /SHOW_DELAY_MS = 60000/);
+  assert.match(popup, /SHOW_DELAY_MS = 8000/);
+  assert.match(popup, /mdrn-life-ddw-email-popup-v2/);
+  assert.match(popup, /Open request information form/);
   assert.match(nginx, /webm\|mp4\|ogg/);
   assert.match(nginx, /sendfile on/);
   assert.match(nginx, /location = \/sw\.js/);

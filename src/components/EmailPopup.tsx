@@ -3,12 +3,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Loader2, X } from 'lucide-react';
 import { subscribeEmailToMarketing } from '../lib/marketing';
 
-const STORAGE_KEY = 'mdrn-life-ddw-email-popup';
+// Version the key so visitors who dismissed the old, overly delayed popup are
+// not silently excluded from the corrected experience.
+const STORAGE_KEY = 'mdrn-life-ddw-email-popup-v2';
 const SESSION_KEY = 'mdrn-life-ddw-marketing-session';
-// Give first-time visitors time to see and use the hero before interrupting
-// them with an optional marketing request.
-const SHOW_DELAY_MS = 60000;
-const DISMISS_FOR_MS = 30 * 24 * 60 * 60 * 1000;
+// Give visitors a brief moment to orient themselves, then show the lead form.
+const SHOW_DELAY_MS = 8000;
+const DISMISS_FOR_MS = 7 * 24 * 60 * 60 * 1000;
 const SUBSCRIBE_FOR_MS = 365 * 24 * 60 * 60 * 1000;
 
 // Don't interrupt active commerce / account flows with the marketing popup.
@@ -72,6 +73,7 @@ function getSessionId() {
 
 export function EmailPopup() {
   const [open, setOpen] = useState(false);
+  const [hasBeenShown, setHasBeenShown] = useState(false);
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -82,7 +84,10 @@ export function EmailPopup() {
     if (alreadyHandled()) return;
     if (SUPPRESSED_PATHS.some((pattern) => pattern.test(window.location.pathname))) return;
 
-    const timer = window.setTimeout(() => setOpen(true), SHOW_DELAY_MS);
+    const timer = window.setTimeout(() => {
+      setHasBeenShown(true);
+      setOpen(true);
+    }, SHOW_DELAY_MS);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -97,6 +102,7 @@ export function EmailPopup() {
 
   const dismiss = () => {
     remember('dismissed', DISMISS_FOR_MS);
+    setHasBeenShown(true);
     setOpen(false);
   };
 
@@ -122,8 +128,9 @@ export function EmailPopup() {
   };
 
   return (
-    <AnimatePresence>
-      {open && (
+    <>
+      <AnimatePresence>
+        {open && (
         <motion.div
           className="fixed inset-0 z-[60] flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
@@ -245,7 +252,19 @@ export function EmailPopup() {
             )}
           </motion.div>
         </motion.div>
+        )}
+      </AnimatePresence>
+
+      {hasBeenShown && !open && !done && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 left-6 z-50 rounded-xl border border-cyan-200/30 bg-[#0b171d]/95 px-4 py-3 text-sm font-medium text-cyan-50 shadow-2xl shadow-black/35 backdrop-blur transition hover:border-cyan-200/60 hover:bg-[#10252e]"
+          aria-label="Open request information form"
+        >
+          Request information
+        </button>
       )}
-    </AnimatePresence>
+    </>
   );
 }
