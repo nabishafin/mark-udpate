@@ -255,12 +255,16 @@ export function InteractiveBody({ onSelect, active }: Props) {
               >
                 <span className="block p-1.5">
                   <span className="block aspect-[16/9] w-full overflow-hidden rounded-lg border border-white/10 bg-white/[0.04]">
-                    <img
-                      src={organ.image?.src ?? '/brand/logo.png'}
-                      alt={organ.image?.alt ?? `${organ.name} preview`}
-                      className="h-full w-full object-cover"
-                      style={{ objectPosition: organ.image?.position ?? 'center' }}
-                    />
+                    {isHover && (
+                      <img
+                        src={organ.image?.src ?? '/brand/logo.png'}
+                        alt={organ.image?.alt ?? `${organ.name} preview`}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                        style={{ objectPosition: organ.image?.position ?? 'center' }}
+                      />
+                    )}
                   </span>
                   <span className="mt-1 block min-w-0 px-0.5 pb-0.5">
                     <span className="block text-[10px] font-semibold leading-tight text-white sm:text-[11px]">
