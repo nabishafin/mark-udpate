@@ -942,6 +942,9 @@ test('technical SEO covers approved metadata, dynamic articles, generated sitema
   assert.doesNotMatch(nginx, /proxy_pass http:\/\/127\.0\.0\.1:3000/);
   assert.equal((nginx.match(/proxy_pass http:\/\/127\.0\.0\.1:3001/g) || []).length, 2);
   assert.ok((nginx.match(/expires -1;/g) || []).length >= 5);
+  assert.ok((nginx.match(/add_header Content-Security-Policy/g) || []).length >= 3);
+  assert.ok((nginx.match(/add_header Strict-Transport-Security/g) || []).length >= 3);
+  assert.match(file('scripts/verify-production.mjs'), /codex-production-security-check\.js/);
   assert.match(htaccess, /BEGIN GENERATED SEO ROUTES/);
 });
 

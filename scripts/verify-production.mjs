@@ -114,6 +114,17 @@ for (const endpoint of ['/api/contact', '/api/email-support', '/api/marketing-si
 const unknown = await request('/codex-production-404-check');
 if (unknown?.status !== 404) failures.push(`/unknown route: expected 404, received ${unknown?.status ?? 'no response'}`);
 
+const assetShapedUnknown = await request('/codex-production-security-check.js');
+if (assetShapedUnknown?.status !== 404) {
+  failures.push(`/asset-shaped unknown route: expected 404, received ${assetShapedUnknown?.status ?? 'no response'}`);
+} else {
+  for (const header of requiredHeaders) {
+    if (!assetShapedUnknown.headers.get(header)) {
+      failures.push(`/asset-shaped unknown route: missing ${header}`);
+    }
+  }
+}
+
 for (const [source, destination] of Object.entries(legacyRedirects)) {
   const response = await request(source);
   if (![301, 308].includes(response?.status)) {
