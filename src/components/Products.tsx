@@ -196,14 +196,7 @@ function ProductCard({
       />
 
       <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
-        <img
-          src={product.image.src}
-          alt={product.image.alt}
-          loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
-          decoding="async"
-          className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
-        />
+        <ProductImage product={product} priority={priority} />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050608]/55 via-transparent to-transparent" />
       </div>
 
@@ -349,6 +342,55 @@ function ProductCard({
         )}
       </div>
     </motion.article>
+  );
+}
+
+function ProductImage({ product, priority }: { product: Product; priority: boolean }) {
+  const fallbackSource = product.image.fallbackSrc ?? product.image.src;
+  const [displaySource, setDisplaySource] = useState(fallbackSource);
+  const [shopifyImageReady, setShopifyImageReady] = useState(!product.image.fallbackSrc);
+
+  useEffect(() => {
+    const targetSource = product.image.src;
+    const fallback = product.image.fallbackSrc ?? targetSource;
+
+    if (targetSource === fallback) {
+      setDisplaySource(targetSource);
+      setShopifyImageReady(true);
+      return;
+    }
+
+    setDisplaySource(fallback);
+    setShopifyImageReady(false);
+    let cancelled = false;
+    const image = new Image();
+    image.decoding = 'async';
+    image.fetchPriority = priority ? 'high' : 'auto';
+    image.onload = () => {
+      if (cancelled) return;
+      setDisplaySource(targetSource);
+      setShopifyImageReady(true);
+    };
+    image.onerror = () => {
+      if (!cancelled) setShopifyImageReady(false);
+    };
+    image.src = targetSource;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [priority, product.image.fallbackSrc, product.image.src]);
+
+  return (
+    <img
+      src={displaySource}
+      alt={product.image.alt}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : 'auto'}
+      decoding="async"
+      data-shopify-image={shopifyImageReady ? 'ready' : 'loading'}
+      className="aspect-square w-full bg-white object-cover"
+    />
   );
 }
 

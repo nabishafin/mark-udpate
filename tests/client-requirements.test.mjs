@@ -459,7 +459,11 @@ test('first-visit and repeat-load media stay immediate, resilient, and within pe
   assert.match(organPanel, /fetchPriority="high"/);
   assert.match(products, /visibleProducts = products \?\? PRODUCTS/);
   assert.doesNotMatch(products, /loadingImage/);
-  assert.match(productData, /src: product\.image\.src/);
+  assert.match(productData, /src: image\?\.url \|\| product\.image\.src/);
+  assert.match(productData, /preferredContentType: WEBP/);
+  assert.match(products, /const image = new Image\(\)/);
+  assert.match(products, /data-shopify-image=/);
+  assert.match(products, /aspect-square w-full bg-white object-cover/);
   assert.match(popup, /SHOW_DELAY_MS = 60000/);
   assert.match(nginx, /webm\|mp4\|ogg/);
   assert.match(nginx, /sendfile on/);
@@ -508,7 +512,8 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.match(shopify, /cartLines\.join\(','\)/);
   assert.doesNotMatch(shopify, /channel=buy_button/);
   assert.match(shopify, /cartCreate/);
-  assert.match(file('src/lib/products.ts'), /src: product\.image\.src/);
+  assert.match(file('src/lib/products.ts'), /src: image\?\.url \|\| product\.image\.src/);
+  assert.match(file('src/lib/products.ts'), /fallbackSrc: image\?\.url \? product\.image\.src : undefined/);
 
   for (const phrase of ['Meta Pixel', 'Google Analytics 4', 'TikTok Pixel', 'Klaviyo']) {
     assert.match(tracking, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));

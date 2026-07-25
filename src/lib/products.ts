@@ -28,6 +28,7 @@ export type Product = ShopifyProductConfig & {
   image: {
     src: string;
     alt: string;
+    fallbackSrc?: string;
   };
   spec: {
     k: string;
@@ -268,10 +269,9 @@ function mergeShopifyProduct(product: Product, shopifyProduct?: ShopifyProductNo
     priceCents,
     subscription: mergeSubscriptionPlans(product, variant),
     image: {
-      // Keep the small, same-origin product artwork visible immediately.
-      // Shopify remains authoritative for price, inventory, and checkout data.
-      src: product.image.src,
+      src: image?.url || product.image.src,
       alt: imageAlt,
+      fallbackSrc: image?.url ? product.image.src : undefined,
     },
   };
 }
@@ -291,13 +291,19 @@ export async function getLiveProducts(signal?: AbortSignal): Promise<Product[]> 
       title
       onlineStoreUrl
       availableForSale
-      featuredImage { url altText }
+      featuredImage {
+        url(transform: { maxWidth: 900, maxHeight: 900, preferredContentType: WEBP })
+        altText
+      }
       variants(first: 20) {
         nodes {
           id
           title
           availableForSale
-          image { url altText }
+          image {
+            url(transform: { maxWidth: 900, maxHeight: 900, preferredContentType: WEBP })
+            altText
+          }
           price { amount currencyCode }
           sellingPlanAllocations(first: 20) {
             nodes {
