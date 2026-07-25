@@ -87,6 +87,10 @@ pm2 save
 If the deployed service has a different PM2 name or project path, use the
 values shown by `pm2 list` and `pwd` rather than guessing.
 
+The checked-in PM2 configuration binds the application to
+`127.0.0.1:3001`, while nginx proxies `/api/*` to that loopback port. Do not
+open ports `3000`, `3001`, or `4173` to the internet.
+
 The timestamped `/var/www` release and atomic `current` symlink avoid partial
 static deployments and avoid nginx permission failures caused by serving files
 from `/root`.

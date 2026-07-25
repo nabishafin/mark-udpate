@@ -44,6 +44,10 @@ install `deploy/nginx/mdrnlifeddw.com.conf`, run `sudo nginx -t`, reload nginx,
 restart PM2, and then run `npm.cmd run verify:production` from a trusted
 machine. Do not configure nginx to serve files directly from `/root`.
 
+The current VPS runs the hardened application on loopback port `3001`; nginx
+proxies `/api/*` to that port. Ports `3000`, `3001`, and `4173` must not be
+publicly allowed through UFW because nginx is the only public entry point.
+
 Do not send passwords or private keys in chat. Use a temporary collaborator
 account or the platform's secret/credential flow.
 

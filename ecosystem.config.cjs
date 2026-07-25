@@ -10,7 +10,9 @@ module.exports = {
       listen_timeout: 10000,
       env: {
         NODE_ENV: 'production',
-        PORT: '3000',
+        // Port 3000 is occupied by the legacy backend on the current VPS.
+        // Keep this service loopback-only and route nginx to port 3001.
+        PORT: '3001',
         HOST: '127.0.0.1',
       },
     },
