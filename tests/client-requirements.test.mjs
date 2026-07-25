@@ -470,6 +470,8 @@ test('customer password reset uses secure email links without paste-a-link UX', 
   assert.match(account, /reset_url/);
   assert.match(account, /normalizeCustomerResetUrl/);
   assert.match(account, /window\.history\.replaceState\(\{\}, '', '\/reset-password'\)/);
+  assert.match(account, /\{status \? \(\s*<AccountActionSuccess status=\{status\} \/>\s*\) : resetUrl \? \(/);
+  assert.match(account, /Password changed successfully\. Your account is now signed in\./);
   assert.match(account, /Back to forgot password/);
   assert.match(account, /Open the reset link from your email to continue/);
   assert.match(account, /Check your email for a link to reset your password/);
@@ -515,6 +517,8 @@ test('customer activation links route into a secure Shopify activation flow', ()
   assert.match(account, /normalizeCustomerActivationUrl/);
   assert.match(account, /activateCustomerAccountByUrl/);
   assert.match(account, /window\.history\.replaceState\(\{\}, '', '\/account\/activate'\)/);
+  assert.match(account, /\{status \? \(\s*<AccountActionSuccess status=\{status\} \/>\s*\) : activationUrl \? \(/);
+  assert.match(account, /Account activated successfully\. Your account is now signed in\./);
   assert.match(account, /Open the newest activation link from your email to continue/);
   assert.doesNotMatch(account, /Paste the full Shopify activation link/);
 

@@ -344,25 +344,19 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
   return (
     <div className="grid gap-4">
       <FormHeader icon={KeyRound} title="Reset password" body="Set a new password from the secure link sent to your email." />
-      {resetUrl ? (
+      {status ? (
+        <AccountActionSuccess status={status} />
+      ) : resetUrl ? (
         <form onSubmit={submit} className="grid gap-4">
           <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={12} revealable />
           <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={12} revealable />
-          <Feedback error={error} status={status} />
-          {status ? (
-            <a href="/account" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-              Open account <ArrowRight size={14} />
-            </a>
-          ) : (
-            <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-              {submitting ? 'Saving...' : 'Set new password'} <ArrowRight size={14} />
-            </button>
-          )}
-          {!status && (
-            <a href="/forgot-password" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-              Back to forgot password
-            </a>
-          )}
+          <Feedback error={error} status="" />
+          <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+            {submitting ? 'Saving...' : 'Set new password'} <ArrowRight size={14} />
+          </button>
+          <a href="/forgot-password" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+            Back to forgot password
+          </a>
         </form>
       ) : (
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-white/58">
@@ -430,25 +424,19 @@ function ActivateAccountForm({ onSession }: { onSession: (session: CustomerSessi
   return (
     <div className="grid gap-4">
       <FormHeader icon={ShieldCheck} title="Activate account" body="Choose a secure password to finish activating your account." />
-      {activationUrl ? (
+      {status ? (
+        <AccountActionSuccess status={status} />
+      ) : activationUrl ? (
         <form onSubmit={submit} className="grid gap-4">
           <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={12} revealable />
           <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={12} revealable />
-          <Feedback error={error} status={status} />
-          {status ? (
-            <a href="/account" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-              Open account <ArrowRight size={14} />
-            </a>
-          ) : (
-            <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
-              {submitting ? 'Activating...' : 'Activate account'} <ArrowRight size={14} />
-            </button>
-          )}
-          {!status && (
-            <a href="/login" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
-              Back to login
-            </a>
-          )}
+          <Feedback error={error} status="" />
+          <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
+            {submitting ? 'Activating...' : 'Activate account'} <ArrowRight size={14} />
+          </button>
+          <a href="/login" className="hpe-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+            Back to login
+          </a>
         </form>
       ) : (
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-white/58">
@@ -458,6 +446,17 @@ function ActivateAccountForm({ onSession }: { onSession: (session: CustomerSessi
           </a>
         </div>
       )}
+    </div>
+  );
+}
+
+function AccountActionSuccess({ status }: { status: string }) {
+  return (
+    <div className="grid gap-4">
+      <Feedback error="" status={status} />
+      <a href="/account" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
+        Open account <ArrowRight size={14} />
+      </a>
     </div>
   );
 }
