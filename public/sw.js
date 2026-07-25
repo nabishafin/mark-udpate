@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdrnlifeddw-public-v2';
+const CACHE_NAME = 'mdrnlifeddw-public-v3';
 const PUBLIC_SHELL = ['/', '/human-poster.webp?v=20260725b'];
 const PRIVATE_PATHS = [
   /^\/api(?:\/|$)/,
