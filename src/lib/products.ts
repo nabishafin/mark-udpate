@@ -59,8 +59,12 @@ export const PRODUCTS: Product[] = [
     volume: '12 pack',
     optionLabel: '16 oz. Glass: 12 Pack Glass Bottle 16oz.',
     image: {
-      src: '/products/mdrn-life-ddw-glass.webp',
-      alt: 'Mdrn-Life deuterium-depleted water glass bottle product artwork',
+      // Render Shopify's real storefront image from the first paint. The
+      // Storefront API refresh below can still replace this if Shopify changes
+      // the product image later.
+      src: 'https://cdn.shopify.com/s/files/1/0582/2319/8242/files/wholesale-mdrn-life-ddw-glass-6-pack-125244_900x900.png.webp?v=1740500338',
+      fallbackSrc: '/products/mdrn-life-ddw-glass.webp',
+      alt: 'Mdrn-Life deuterium-depleted water glass bottle product image',
     },
     productUrl: 'https://mdrnlifeddw.com/products/mdrn-life-ddw',
     variantId: import.meta.env.VITE_SHOPIFY_GLASS_VARIANT_ID || '41077216739362',
@@ -120,8 +124,11 @@ export const PRODUCTS: Product[] = [
     volume: '12 pack',
     optionLabel: '16 oz. PET: 12 Pack PET plastic Bottle 16oz.',
     image: {
-      src: '/products/mdrn-life-ddw-pet.webp',
-      alt: 'Mdrn-Life deuterium-depleted water PET bottle product artwork',
+      // Keep the initial visual consistent with Shopify, even before the API
+      // response is available on a visitor's connection.
+      src: 'https://cdn.shopify.com/s/files/1/0582/2319/8242/files/mdrn-life-ddw-pet-plastic-394077_900x900.png.webp?v=1740452932',
+      fallbackSrc: '/products/mdrn-life-ddw-pet.webp',
+      alt: 'Mdrn-Life deuterium-depleted water PET bottle product image',
     },
     productUrl: 'https://mdrnlifeddw.com/products/mdrn-life-ddw-pet-plastic?variant=41122368749602',
     variantId: import.meta.env.VITE_SHOPIFY_PET_VARIANT_ID || '41122368749602',
@@ -271,7 +278,7 @@ function mergeShopifyProduct(product: Product, shopifyProduct?: ShopifyProductNo
     image: {
       src: image?.url || product.image.src,
       alt: imageAlt,
-      fallbackSrc: image?.url ? product.image.src : undefined,
+      fallbackSrc: product.image.fallbackSrc,
     },
   };
 }

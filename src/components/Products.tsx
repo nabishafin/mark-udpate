@@ -346,40 +346,14 @@ function ProductCard({
 }
 
 function ProductImage({ product, priority }: { product: Product; priority: boolean }) {
-  const fallbackSource = product.image.fallbackSrc ?? product.image.src;
-  const [displaySource, setDisplaySource] = useState(fallbackSource);
-  const [shopifyImageReady, setShopifyImageReady] = useState(!product.image.fallbackSrc);
+  const [usingFallback, setUsingFallback] = useState(false);
+  const displaySource = usingFallback && product.image.fallbackSrc
+    ? product.image.fallbackSrc
+    : product.image.src;
 
   useEffect(() => {
-    const targetSource = product.image.src;
-    const fallback = product.image.fallbackSrc ?? targetSource;
-
-    if (targetSource === fallback) {
-      setDisplaySource(targetSource);
-      setShopifyImageReady(true);
-      return;
-    }
-
-    setDisplaySource(fallback);
-    setShopifyImageReady(false);
-    let cancelled = false;
-    const image = new Image();
-    image.decoding = 'async';
-    image.fetchPriority = priority ? 'high' : 'auto';
-    image.onload = () => {
-      if (cancelled) return;
-      setDisplaySource(targetSource);
-      setShopifyImageReady(true);
-    };
-    image.onerror = () => {
-      if (!cancelled) setShopifyImageReady(false);
-    };
-    image.src = targetSource;
-
-    return () => {
-      cancelled = true;
-    };
-  }, [priority, product.image.fallbackSrc, product.image.src]);
+    setUsingFallback(false);
+  }, [product.image.src]);
 
   return (
     <img
@@ -388,7 +362,10 @@ function ProductImage({ product, priority }: { product: Product; priority: boole
       loading={priority ? 'eager' : 'lazy'}
       fetchPriority={priority ? 'high' : 'auto'}
       decoding="async"
-      data-shopify-image={shopifyImageReady ? 'ready' : 'loading'}
+      data-shopify-image={usingFallback ? 'fallback' : 'ready'}
+      onError={() => {
+        if (product.image.fallbackSrc && !usingFallback) setUsingFallback(true);
+      }}
       className="aspect-square w-full bg-white object-cover"
     />
   );

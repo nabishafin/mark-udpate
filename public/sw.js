@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdrnlifeddw-public-v3';
+const CACHE_NAME = 'mdrnlifeddw-public-v4';
 const PUBLIC_SHELL = ['/', '/human-poster.webp?v=20260725b'];
 const PRIVATE_PATHS = [
   /^\/api(?:\/|$)/,
@@ -52,13 +52,17 @@ self.addEventListener('fetch', (event) => {
     const cacheKey = url.pathname;
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
-        const cached = await cache.match(cacheKey);
-        const update = updatePublicPage(request, cache, cacheKey);
-        if (cached) {
-          event.waitUntil(update.catch(() => undefined));
-          return cached;
+        // Public documents must be network-first. A cache-first navigation can
+        // pin visitors to an old HTML shell and therefore an old JS bundle or
+        // product image after a release. The cached page remains an offline
+        // fallback only.
+        try {
+          return await updatePublicPage(request, cache, cacheKey);
+        } catch {
+          const cached = await cache.match(cacheKey);
+          if (cached) return cached;
+          throw new Error('Public page unavailable');
         }
-        return update;
       }),
     );
     return;

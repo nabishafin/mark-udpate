@@ -460,14 +460,17 @@ test('first-visit and repeat-load media stay immediate, resilient, and within pe
   assert.match(products, /visibleProducts = products \?\? PRODUCTS/);
   assert.doesNotMatch(products, /loadingImage/);
   assert.match(productData, /src: image\?\.url \|\| product\.image\.src/);
+  assert.match(productData, /cdn\.shopify\.com/);
+  assert.match(productData, /fallbackSrc: '\/products\/mdrn-life-ddw-glass\.webp'/);
   assert.match(productData, /preferredContentType: WEBP/);
-  assert.match(products, /const image = new Image\(\)/);
   assert.match(products, /data-shopify-image=/);
+  assert.match(products, /onError=/);
   assert.match(products, /aspect-square w-full bg-white object-cover/);
   assert.match(popup, /SHOW_DELAY_MS = 60000/);
   assert.match(nginx, /webm\|mp4\|ogg/);
   assert.match(nginx, /sendfile on/);
   assert.match(nginx, /location = \/sw\.js/);
+  assert.match(nginx, /location = \/favicon\.ico/);
   assert.match(nginx, /open_file_cache max=1000/);
   assert.doesNotMatch(nginx, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
   assert.doesNotMatch(server, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
@@ -513,7 +516,7 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.doesNotMatch(shopify, /channel=buy_button/);
   assert.match(shopify, /cartCreate/);
   assert.match(file('src/lib/products.ts'), /src: image\?\.url \|\| product\.image\.src/);
-  assert.match(file('src/lib/products.ts'), /fallbackSrc: image\?\.url \? product\.image\.src : undefined/);
+  assert.match(file('src/lib/products.ts'), /fallbackSrc: product\.image\.fallbackSrc/);
 
   for (const phrase of ['Meta Pixel', 'Google Analytics 4', 'TikTok Pixel', 'Klaviyo']) {
     assert.match(tracking, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));

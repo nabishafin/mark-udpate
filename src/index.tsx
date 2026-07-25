@@ -39,7 +39,7 @@ if (!redirectShopifyCheckoutPath()) {
     window.addEventListener(
       'load',
       () => {
-        void navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
+        void navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' }).catch(() => {
           // The site remains fully functional when private browsing blocks service workers.
         });
       },
