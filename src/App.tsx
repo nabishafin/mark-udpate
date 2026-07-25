@@ -81,6 +81,7 @@ export function App() {
   return (
     <div className="dark min-h-screen w-full bg-[#050608] text-white antialiased relative">
       <SeoHead />
+      <a href="#main-content" className="hpe-skip-link">Skip to main content</a>
       <div className="fixed inset-0 pointer-events-none -z-10">
         <div className="absolute inset-0 bg-[#050608]" />
         <div className="absolute top-0 left-1/3 w-[800px] h-[800px] hpe-glow-cyan opacity-25" />
@@ -89,7 +90,7 @@ export function App() {
 
       <Nav pathname={pathname} />
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <Suspense fallback={<PageFallback />}>
           {page}
         </Suspense>
@@ -112,8 +113,9 @@ export function App() {
 
 function PageFallback() {
   return (
-    <section className="flex min-h-screen items-center justify-center px-6 pt-28">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-cyan-300" />
+    <section className="flex min-h-screen items-center justify-center px-6 pt-28" role="status" aria-live="polite">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-cyan-300" aria-hidden="true" />
+      <span className="sr-only">Loading page</span>
     </section>
   );
 }

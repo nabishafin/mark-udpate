@@ -1,11 +1,9 @@
-/* global Buffer, process */
 import tls from 'node:tls';
+import { createRateLimiter } from './request-security.js';
 
 const SUPPORT_EMAIL = 'support@orisefinance.com';
 const MAX_BODY_BYTES = 16 * 1024;
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT = 6;
-const attempts = new Map();
+const rateLimit = createRateLimiter({ limit: 6, windowMs: 10 * 60 * 1000 });
 
 function json(response, status, payload) {
   response.statusCode = status;
@@ -64,12 +62,6 @@ function senderName(value) {
   return `"${header(value).replace(/"/g, '\\"')}"`;
 }
 
-function getClientIp(request) {
-  const forwardedFor = request.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor) return forwardedFor.split(',')[0].trim();
-  return request.socket?.remoteAddress || 'unknown';
-}
-
 function allowedOrigins() {
   return new Set([
     'http://localhost:5173',
@@ -102,22 +94,6 @@ function applyCors(request, response) {
   } catch {
     return false;
   }
-}
-
-function rateLimit(request) {
-  const now = Date.now();
-  const ip = getClientIp(request);
-  const entry = attempts.get(ip) || { count: 0, resetAt: now + RATE_WINDOW_MS };
-
-  if (entry.resetAt <= now) {
-    entry.count = 0;
-    entry.resetAt = now + RATE_WINDOW_MS;
-  }
-
-  entry.count += 1;
-  attempts.set(ip, entry);
-
-  return entry.count <= RATE_LIMIT;
 }
 
 function smtpConfig() {
@@ -192,19 +168,19 @@ function dotStuff(value) {
 
 function buildEmail({ email, page, sessionId }, config) {
   const boundary = `mdrn_signup_${Date.now().toString(36)}`;
-  const subject = 'New wellness opportunity signup';
+  const subject = 'New Mdrn-Life DDW information request';
   const text = [
-    `New lead email: ${email}`,
+    `New information request email: ${email}`,
     page ? `Page: ${page}` : '',
     sessionId ? `Session: ${sessionId}` : '',
     '',
-    'Source: Unlock a world of opportunities popup',
+    'Source: Mdrn-Life DDW information request',
   ].filter((line) => line !== '').join('\n');
   const html = `
-    <p><strong>New lead email:</strong> ${escapeHtml(email)}</p>
+    <p><strong>New information request email:</strong> ${escapeHtml(email)}</p>
     ${page ? `<p><strong>Page:</strong> ${escapeHtml(page)}</p>` : ''}
     ${sessionId ? `<p><strong>Session:</strong> ${escapeHtml(sessionId)}</p>` : ''}
-    <p><strong>Source:</strong> Unlock a world of opportunities popup</p>
+    <p><strong>Source:</strong> Mdrn-Life DDW information request</p>
   `.trim();
 
   return [

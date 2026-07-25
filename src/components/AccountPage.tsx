@@ -195,7 +195,7 @@ function RegisterForm({ onSession }: { onSession: (session: CustomerSession) => 
       </div>
       <TextField label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
       <TextField label="Phone" type="tel" value={phone} onChange={setPhone} autoComplete="tel" />
-      <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
+      <TextField label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={12} revealable />
       <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm text-white/58">
         <input
           type="checkbox"
@@ -320,8 +320,8 @@ function ResetPasswordForm({ onSession }: { onSession: (session: CustomerSession
       <FormHeader icon={KeyRound} title="Reset password" body="Set a new password from the secure link sent to your email." />
       {resetUrl ? (
         <form onSubmit={submit} className="grid gap-4">
-          <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
-          <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
+          <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={12} revealable />
+          <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={12} revealable />
           <Feedback error={error} status={status} />
           {status ? (
             <a href="/account" className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium">
@@ -550,8 +550,8 @@ function PasswordForm({ session, onSessionChange }: { session: CustomerSession; 
   return (
     <form onSubmit={submit} className="hpe-glass grid gap-4 rounded-2xl p-6 sm:p-8">
       <FormHeader icon={KeyRound} title="Change password" body="Update your account password." />
-      <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={5} revealable />
-      <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={5} revealable />
+      <TextField label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required minLength={12} revealable />
+      <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required minLength={12} revealable />
       <Feedback error={error} status={status} />
       <button type="submit" disabled={submitting} className="hpe-btn-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium disabled:opacity-50">
         {submitting ? 'Changing...' : 'Change password'} <ArrowRight size={14} />
@@ -615,6 +615,7 @@ function TextField({
           onChange={(event) => onChange(event.target.value)}
           required={required}
           minLength={minLength}
+          maxLength={type === 'password' ? 128 : undefined}
           autoComplete={autoComplete}
           className={`w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-cyan-300/60 ${revealable ? 'pr-12' : ''}`}
         />
@@ -636,7 +637,7 @@ function TextField({
 function Feedback({ error, status }: { error: string; status: string }) {
   if (!error && !status) return null;
   return (
-    <div className={`rounded-xl border p-3 text-sm ${error ? 'border-red-300/20 bg-red-300/[0.06] text-red-100' : 'border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-100'}`}>
+    <div role={error ? 'alert' : 'status'} aria-live={error ? 'assertive' : 'polite'} className={`rounded-xl border p-3 text-sm ${error ? 'border-red-300/20 bg-red-300/[0.06] text-red-100' : 'border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-100'}`}>
       {error || status}
     </div>
   );

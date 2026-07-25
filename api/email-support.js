@@ -1,12 +1,10 @@
-/* global Buffer, process */
 import tls from 'node:tls';
+import { createRateLimiter } from './request-security.js';
 
 const SUPPORT_EMAIL = 'support@orisefinance.com';
 const MAX_BODY_BYTES = 48 * 1024;
 const MAX_MESSAGE_LENGTH = 4000;
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT = 5;
-const attempts = new Map();
+const rateLimit = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
 
 function json(response, status, payload) {
   response.statusCode = status;
@@ -69,12 +67,6 @@ function senderName(value) {
   return `"${header(value).replace(/"/g, '\\"')}"`;
 }
 
-function getClientIp(request) {
-  const forwardedFor = request.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor) return forwardedFor.split(',')[0].trim();
-  return request.socket?.remoteAddress || 'unknown';
-}
-
 function allowedOrigins() {
   return new Set([
     'http://localhost:5173',
@@ -107,22 +99,6 @@ function applyCors(request, response) {
   } catch {
     return false;
   }
-}
-
-function rateLimit(request) {
-  const now = Date.now();
-  const ip = getClientIp(request);
-  const entry = attempts.get(ip) || { count: 0, resetAt: now + RATE_WINDOW_MS };
-
-  if (entry.resetAt <= now) {
-    entry.count = 0;
-    entry.resetAt = now + RATE_WINDOW_MS;
-  }
-
-  entry.count += 1;
-  attempts.set(ip, entry);
-
-  return entry.count <= RATE_LIMIT;
 }
 
 function smtpConfig() {

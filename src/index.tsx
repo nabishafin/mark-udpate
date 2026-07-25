@@ -29,6 +29,9 @@ if (!redirectShopifyCheckoutPath()) {
   if (!container) {
     throw new Error('Root element #root was not found.');
   }
+  // Build-time SEO markup is useful to crawlers and no-JS clients. React owns
+  // the root after startup, so remove the static shell before mounting.
+  container.replaceChildren();
   const root = createRoot(container);
   root.render(<App />);
 }

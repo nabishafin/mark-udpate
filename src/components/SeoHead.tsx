@@ -76,7 +76,7 @@ function setJsonLd(schemaBlocks: Record<string, unknown>[]) {
     const script = document.createElement('script');
     script.type = 'application/ld+json';
     script.dataset.managed = managedSchemaId;
-    script.text = JSON.stringify(schema);
+    script.text = JSON.stringify(schema).replace(/</g, '\\u003c');
     document.head.appendChild(script);
   });
 }

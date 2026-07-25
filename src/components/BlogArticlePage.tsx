@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, BookOpen, Loader2 } from 'lucide-react';
 import { BlogArticle, FALLBACK_ARTICLES, getBlogArticle, getRecommendedBlogArticles } from '../lib/blog';
+import { sanitizeHtml } from '../lib/sanitizeHtml';
 
 type Props = { handle: string };
 
@@ -13,9 +14,15 @@ export function BlogArticlePage({ handle }: Props) {
     FALLBACK_ARTICLES.filter((a) => a.handle !== handle).slice(0, 3),
   );
   const [loading, setLoading] = useState(true);
+  const safeArticleContent = useMemo(() => sanitizeHtml(article?.content || ''), [article?.content]);
 
   useEffect(() => {
     const controller = new AbortController();
+    // The route component is reused during client-side navigation. Reset the
+    // displayed state before fetching so a previous article cannot flash under
+    // the new URL while its request is still pending.
+    setArticle(FALLBACK_ARTICLES.find((a) => a.handle === handle) || null);
+    setLoading(true);
     getBlogArticle(handle, controller.signal)
       .then((a) => { if (a) setArticle(a); })
       .catch(() => undefined)
@@ -25,6 +32,7 @@ export function BlogArticlePage({ handle }: Props) {
 
   useEffect(() => {
     const controller = new AbortController();
+    setRecommended(FALLBACK_ARTICLES.filter((a) => a.handle !== handle).slice(0, 3));
     getRecommendedBlogArticles(handle, controller.signal)
       .then(setRecommended)
       .catch(() => setRecommended(FALLBACK_ARTICLES.filter((a) => a.handle !== handle).slice(0, 3)));
@@ -33,8 +41,9 @@ export function BlogArticlePage({ handle }: Props) {
 
   if (!article && loading) {
     return (
-      <section className="flex min-h-screen items-center justify-center pt-32">
-        <Loader2 className="animate-spin text-cyan-300" size={28} />
+      <section className="flex min-h-screen items-center justify-center pt-32" role="status" aria-live="polite">
+        <Loader2 className="animate-spin text-cyan-300" size={28} aria-hidden="true" />
+        <span className="sr-only">Loading article</span>
       </section>
     );
   }
@@ -97,6 +106,8 @@ export function BlogArticlePage({ handle }: Props) {
             <img
               src={article.image.src}
               alt={article.image.alt}
+              loading="eager"
+              decoding="async"
               className="aspect-[21/9] w-full object-cover"
             />
           </motion.div>
@@ -114,10 +125,10 @@ export function BlogArticlePage({ handle }: Props) {
             </div>
           )}
 
-          {article.content ? (
+          {safeArticleContent ? (
             <div
               className="hpe-policy-content text-base leading-relaxed sm:text-[17px]"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: safeArticleContent }}
             />
           ) : (
             <p className="text-lg leading-relaxed text-white/65">{article.excerpt}</p>

@@ -31,17 +31,17 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 $plain = implode("\n", array_filter([
-  'New lead email: ' . $email,
+  'New information request email: ' . $email,
   $page !== '' ? 'Page: ' . $page : '',
   $sessionId !== '' ? 'Session: ' . $sessionId : '',
   '',
-  'Source: Unlock a world of opportunities popup',
+  'Source: Mdrn-Life DDW information request',
 ], fn($line) => $line !== null));
 
-$html = '<p><strong>New lead email:</strong> ' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</p>'
+$html = '<p><strong>New information request email:</strong> ' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</p>'
   . ($page !== '' ? '<p><strong>Page:</strong> ' . htmlspecialchars($page, ENT_QUOTES, 'UTF-8') . '</p>' : '')
   . ($sessionId !== '' ? '<p><strong>Session:</strong> ' . htmlspecialchars($sessionId, ENT_QUOTES, 'UTF-8') . '</p>' : '')
-  . '<p><strong>Source:</strong> Unlock a world of opportunities popup</p>';
+  . '<p><strong>Source:</strong> Mdrn-Life DDW information request</p>';
 
-send_smtp_email('MARKETING_SIGNUP_TO', $email, 'New wellness opportunity signup', $plain, $html);
+send_smtp_email('MARKETING_SIGNUP_TO', $email, 'New Mdrn-Life DDW information request', $plain, $html);
 api_json(200, ['ok' => true]);

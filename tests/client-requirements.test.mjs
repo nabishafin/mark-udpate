@@ -123,7 +123,9 @@ test('site is routed as a multipage experience instead of one long homepage', ()
   assert.doesNotMatch(nav, /label:\s*'Lab Testing'/);
   assert.match(science, /href="\/science\/lab-testing"[\s\S]*View Lab Testing/);
   assert.match(app, /case '\/products\/cart':\s*return <CartPage \/>/);
-  assert.match(app, /<main>\s*<Suspense fallback=\{<PageFallback \/>}>\s*\{page\}\s*<\/Suspense>\s*<CTAFooter \/>\s*<\/main>/);
+  assert.match(app, /<main(?:\s+[^>]*)?>\s*<Suspense fallback=\{<PageFallback \/>}>\s*\{page\}\s*<\/Suspense>\s*<CTAFooter \/>\s*<\/main>/);
+  assert.match(app, /href="#main-content"/);
+  assert.match(app, /<main id="main-content" tabIndex=\{-1\}>/);
   assert.doesNotMatch(app, /pathname !== '\/contact'/);
   assert.doesNotMatch(app, /<main>\s*<Hero[\s\S]*<ScienceSection \/>[\s\S]*<LabTesting \/>[\s\S]*<Benefits \/>/);
   assert.match(file('src/index.tsx'), /redirectShopifyCheckoutPath/);
@@ -575,7 +577,7 @@ test('support widget provides WhatsApp and email support without Shopify Admin t
   assert.doesNotMatch(envExample, /read_customers, write_customers, read_orders/);
 });
 
-test('opportunity email popup submits leads through the secure SMTP backend', () => {
+test('information-request popup submits leads through the secure SMTP backend', () => {
   const popup = file('src/components/EmailPopup.tsx');
   const marketing = file('src/lib/marketing.ts');
   const api = file('api/marketing-signup.js');
@@ -584,18 +586,20 @@ test('opportunity email popup submits leads through the secure SMTP backend', ()
   const envExample = file('.env.example');
   const htaccess = file('public/.htaccess');
 
-  assert.match(popup, /Unlock a world of opportunities for wellness and prosperity!/);
+  assert.match(popup, /Learn more about Mdrn-Life DDW\./);
+  assert.match(popup, /Request information/);
+  assert.match(popup, /DISMISS_FOR_MS/);
+  assert.match(popup, /SUBSCRIBE_FOR_MS/);
   assert.match(popup, /subscribeEmailToMarketing/);
   assert.match(popup, /name="website"/);
   assert.match(popup, /getSessionId/);
   assert.match(popup, /Saving\.\.\./);
   assert.doesNotMatch(popup, /ðŸš€|Savingâ€¦/);
   assert.match(marketing, /\/api\/marketing-signup/);
-  assert.match(marketing, /\/api\/contact/);
-  assert.match(marketing, /import\.meta\.env\.PROD/);
-  assert.match(marketing, /route not found/);
-  assert.match(marketing, /Website lead/);
   assert.match(marketing, /acceptsMarketing/);
+  assert.match(marketing, /status: 'received'/);
+  assert.doesNotMatch(marketing, /\/api\/contact/);
+  assert.doesNotMatch(marketing, /import\.meta\.env\.PROD/);
   assert.doesNotMatch(marketing, /customerCreate/);
   assert.doesNotMatch(marketing, /shopifyStorefrontFetch/);
   assert.match(api, /node:tls/);
@@ -604,6 +608,10 @@ test('opportunity email popup submits leads through the secure SMTP backend', ()
   assert.match(api, /rateLimit/);
   assert.match(api, /website/);
   assert.match(api, /Reply-To/);
+  assert.match(api, /New Mdrn-Life DDW information request/);
+  assert.doesNotMatch(api, /wellness opportunity/);
+  assert.match(phpApi, /New Mdrn-Life DDW information request/);
+  assert.doesNotMatch(phpApi, /wellness opportunity/);
   assert.match(phpApi, /send_smtp_email\('MARKETING_SIGNUP_TO'/);
   assert.match(htaccess, /RewriteRule \^api\/marketing-signup\/\?\$ \/api\/marketing-signup\.php/);
   assert.match(vite, /\/api\/marketing-signup/);
@@ -742,7 +750,7 @@ test('side panel content matches the client PDF copy and keeps internal labels o
   assert.match(panel, /organ\.microCta &&/);
   assert.match(panel, /organ\.image &&/);
   assert.doesNotMatch(mouthBlock, /microCta/);
-  assert.match(mouthBlock, /mouth-throat-cellular-absorption\.png/);
+  assert.match(mouthBlock, /mouth-throat-cellular-absorption\.webp/);
   assert.doesNotMatch(lungsBlock, /microCta/);
 });
 
@@ -751,18 +759,18 @@ test('side panel uses real client-PDF organ images instead of abstract generated
   const panel = file('src/components/OrganPanel.tsx');
 
   for (const image of [
-    '/organ-panels/brain-nervous-system.png',
-    '/organ-panels/eyes-visual-system.png',
-    '/organ-panels/mouth-throat-cellular-absorption.png',
-    '/organ-panels/heart-circulation.png',
-    '/organ-panels/lungs-oxygen-delivery.png',
-    '/organ-panels/liver-detox-support.png',
-    '/organ-panels/gut-microbiome.png',
-    '/organ-panels/kidneys-filtration.png',
-    '/organ-panels/muscles-recovery.png',
-    '/organ-panels/joints-cartilage.png',
-    '/organ-panels/skin-healthy-aging.png',
-    '/organ-panels/mitochondria-cellular-energy.png',
+    '/organ-panels/brain-nervous-system.webp',
+    '/organ-panels/eyes-visual-system.webp',
+    '/organ-panels/mouth-throat-cellular-absorption.webp',
+    '/organ-panels/heart-circulation.webp',
+    '/organ-panels/lungs-oxygen-delivery.webp',
+    '/organ-panels/liver-detox-support.webp',
+    '/organ-panels/gut-microbiome.webp',
+    '/organ-panels/kidneys-filtration.webp',
+    '/organ-panels/muscles-recovery.webp',
+    '/organ-panels/joints-cartilage.webp',
+    '/organ-panels/skin-healthy-aging.webp',
+    '/organ-panels/mitochondria-cellular-energy.webp',
   ]) {
     assert.match(organData, new RegExp(`src:\\s*'${image.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
   }

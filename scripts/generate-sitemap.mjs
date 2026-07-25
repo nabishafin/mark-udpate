@@ -32,8 +32,27 @@ function extractSingleQuotedValues(source, key) {
   return unique([...source.matchAll(pattern)].map((match) => match[1]));
 }
 
-const blogHandles = extractSingleQuotedValues(readSource('src/lib/blog.ts'), 'handle');
-const learnSlugs = extractSingleQuotedValues(readSource('src/components/LearnPage.tsx'), 'slug');
+const registry = JSON.parse(readSource('src/data/content-registry.json'));
+const blogHandles = registry
+  .filter((entry) => entry.contentType === 'blog' && entry.indexable)
+  .map((entry) => entry.slug);
+const learnSlugs = registry
+  .filter((entry) => entry.contentType === 'learn' && entry.indexable)
+  .map((entry) => entry.slug);
+
+const implementedBlogHandles = extractSingleQuotedValues(readSource('src/lib/blog.ts'), 'handle');
+const implementedLearnSlugs = extractSingleQuotedValues(readSource('src/components/LearnPage.tsx'), 'slug');
+
+for (const handle of blogHandles) {
+  if (!implementedBlogHandles.includes(handle)) {
+    throw new Error(`Content registry blog route is not implemented: ${handle}`);
+  }
+}
+for (const slug of learnSlugs) {
+  if (!implementedLearnSlugs.includes(slug)) {
+    throw new Error(`Content registry Learn route is not implemented: ${slug}`);
+  }
+}
 
 const blogRoutes = blogHandles.map((handle) => `/blogs/news/${handle}`);
 const learnRoutes = learnSlugs.map((slug) => `/learn/${slug}`);
@@ -70,8 +89,8 @@ const htaccessPath = resolve(root, 'public/.htaccess');
 const htaccess = readFileSync(htaccessPath, 'utf8');
 const generatedRules = [
   '# BEGIN GENERATED SEO ROUTES',
-  ...blogRoutes.map((route) => `RewriteRule ^${route.slice(1)}/?$ /index.html [L,QSA]`),
-  ...learnRoutes.map((route) => `RewriteRule ^${route.slice(1)}/?$ /index.html [L,QSA]`),
+  ...blogRoutes.map((route) => `RewriteRule ^${route.slice(1)}/?$ /${route.slice(1)}/index.html [L,QSA]`),
+  ...learnRoutes.map((route) => `RewriteRule ^${route.slice(1)}/?$ /${route.slice(1)}/index.html [L,QSA]`),
   '# END GENERATED SEO ROUTES',
 ].join('\n');
 writeFileSync(

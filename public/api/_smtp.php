@@ -49,24 +49,43 @@ function same_origin_allowed(): bool {
 }
 
 function rate_limit(string $bucket, int $limit = 6, int $windowSeconds = 600): bool {
-  $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-  $ip = trim(explode(',', $ip)[0]);
-  $key = preg_replace('/[^a-zA-Z0-9_.-]/', '_', $bucket . '_' . $ip);
-  $file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mdrn_' . $key . '.json';
+  $remote = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+  $trustedProxy = in_array($remote, ['127.0.0.1', '::1'], true)
+    || getenv('TRUST_PROXY_HEADERS') === 'true';
+  $forwarded = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '')[0]);
+  $realIp = trim($_SERVER['HTTP_X_REAL_IP'] ?? '');
+  $candidate = $realIp !== '' ? $realIp : $forwarded;
+  $ip = $trustedProxy && filter_var($candidate, FILTER_VALIDATE_IP) ? $candidate : $remote;
+  $key = hash('sha256', $bucket . '|' . $ip);
+  $file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mdrn_rate_' . $key . '.json';
   $now = time();
   $entry = ['count' => 0, 'resetAt' => $now + $windowSeconds];
 
-  if (is_file($file)) {
-    $existing = json_decode(file_get_contents($file) ?: '', true);
-    if (is_array($existing)) $entry = array_merge($entry, $existing);
-  }
+  $handle = fopen($file, 'c+');
+  if ($handle === false || !flock($handle, LOCK_EX)) return false;
+  $existing = json_decode(stream_get_contents($handle) ?: '', true);
+  if (is_array($existing)) $entry = array_merge($entry, $existing);
 
   if (($entry['resetAt'] ?? 0) <= $now) {
     $entry = ['count' => 0, 'resetAt' => $now + $windowSeconds];
   }
 
   $entry['count'] = (int)($entry['count'] ?? 0) + 1;
-  file_put_contents($file, json_encode($entry), LOCK_EX);
+  rewind($handle);
+  ftruncate($handle, 0);
+  fwrite($handle, json_encode($entry));
+  fflush($handle);
+  flock($handle, LOCK_UN);
+  fclose($handle);
+
+  if (random_int(1, 100) === 1) {
+    foreach (glob(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mdrn_rate_*.json') ?: [] as $candidateFile) {
+      if (is_file($candidateFile) && filemtime($candidateFile) < $now - ($windowSeconds * 2)) {
+        @unlink($candidateFile);
+      }
+    }
+  }
+
   return $entry['count'] <= $limit;
 }
 

@@ -356,8 +356,13 @@ export function onCustomerSessionChange(callback: () => void) {
 
 export function getStoredCustomerSession(): CustomerSession | null {
   try {
-    const raw = window.localStorage.getItem(CUSTOMER_SESSION_KEY);
-    if (!raw) return null;
+    const raw = window.sessionStorage.getItem(CUSTOMER_SESSION_KEY);
+    if (!raw) {
+      // Remove legacy persistent sessions. A server-managed HttpOnly session is
+      // the production target; sessionStorage is a safer interim migration.
+      window.localStorage.removeItem(CUSTOMER_SESSION_KEY);
+      return null;
+    }
     const session = JSON.parse(raw) as CustomerSession;
     if (!session.accessToken || new Date(session.expiresAt).getTime() <= Date.now()) {
       clearCustomerSession();
@@ -370,12 +375,14 @@ export function getStoredCustomerSession(): CustomerSession | null {
 }
 
 export function saveCustomerSession(session: CustomerSession) {
-  window.localStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(session));
+  window.localStorage.removeItem(CUSTOMER_SESSION_KEY);
+  window.sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(session));
   emitAuthChange();
 }
 
 export function clearCustomerSession() {
   window.localStorage.removeItem(CUSTOMER_SESSION_KEY);
+  window.sessionStorage.removeItem(CUSTOMER_SESSION_KEY);
   emitAuthChange();
 }
 

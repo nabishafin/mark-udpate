@@ -119,6 +119,7 @@ function hasErrors(errors: ContactErrors) {
 
 export function ContactPage() {
   const [values, setValues] = useState(initialValues);
+  const [website, setWebsite] = useState('');
   const [errors, setErrors] = useState(initialErrors);
   const [alert, setAlert] = useState<AlertState>(null);
   const [loading, setLoading] = useState(false);
@@ -161,6 +162,7 @@ export function ContactPage() {
           phone: values.phone.trim(),
           subject: values.subject.trim(),
           message: values.message.trim(),
+          website,
         }),
       });
 
@@ -266,6 +268,15 @@ export function ContactPage() {
             onSubmit={handleSubmit}
             noValidate
           >
+            <input
+              className="hidden"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              name="website"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
+            />
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block text-sm font-medium text-white/74">
                 Name

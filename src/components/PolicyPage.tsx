@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FileText } from 'lucide-react';
 import policyData from '../data/policies.json';
+import { sanitizeHtml } from '../lib/sanitizeHtml';
 
 type PolicyRecord = {
   slug: string;
@@ -9,9 +11,22 @@ type PolicyRecord = {
 };
 
 const POLICIES = policyData as PolicyRecord[];
+const SUPPORT_EMAIL = 'support@orisefinance.com';
+
+function removePolicyTemplateText(html: string) {
+  return html
+    .replace(/<p>Include any other pertinent information[\s\S]*?<\/p>/gi, '')
+    .replace(/<p>Summarize your return policy here[\s\S]*?<\/p>/gi, '')
+    .replace(/support@email\.com/gi, SUPPORT_EMAIL)
+    .replace(/If you(?:'|’|\u0027)re using calculated shipping rates:\s*/gi, '');
+}
 
 export function PolicyPage({ slug }: { slug: string }) {
   const policy = POLICIES.find((item) => item.slug === slug) || POLICIES[0];
+  const safePolicyHtml = useMemo(
+    () => sanitizeHtml(removePolicyTemplateText(policy.html)),
+    [policy.html],
+  );
 
   return (
     <section className="relative min-h-screen overflow-hidden pb-24 pt-36 sm:pt-44">
@@ -29,7 +44,7 @@ export function PolicyPage({ slug }: { slug: string }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.08 }}
           className="hpe-glass hpe-policy-content mt-10 rounded-3xl p-6 sm:p-10 lg:p-14"
-          dangerouslySetInnerHTML={{ __html: policy.html }}
+          dangerouslySetInnerHTML={{ __html: safePolicyHtml }}
         />
       </div>
     </section>

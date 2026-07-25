@@ -1,4 +1,3 @@
-/* global process */
 import { createServer } from 'node:http';
 import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize, resolve } from 'node:path';
@@ -10,6 +9,20 @@ import marketingSignupHandler from './api/marketing-signup.js';
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const distDir = resolve(__dirname, 'dist');
 const SHOPIFY_CHECKOUT_ORIGIN = 'https://orise-6796.myshopify.com';
+const legacyRedirects = new Map([
+  ['/pages/q-a-how-to-deplete-deuterium-from-water', '/science'],
+  ['/pages/deuterium', '/science'],
+  ['/pages/about-us', '/founder'],
+  ['/pages/scientific-studies', '/research'],
+  ['/pages/faq', '/science'],
+  ['/pages/subscription-policy', '/policies/subscription-policy'],
+  ['/pages/sca-affiliate-empty-page', '/science'],
+  ['/pages/ccpa-opt-out', '/policies/privacy-policy'],
+  ['/pages/collab', '/contact'],
+  ['/collections/all', '/products'],
+  ['/products/mdrn-life-ddw', '/products'],
+  ['/products/mdrn-life-ddw-pet-plastic', '/products'],
+]);
 const routeManifest = loadRouteManifest();
 
 function loadEnvFile(filename) {
@@ -95,11 +108,13 @@ function setSecurityHeaders(response) {
   response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   response.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  response.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  response.setHeader('Cross-Origin-Resource-Policy', 'same-site');
   response.setHeader(
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      "script-src 'self'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: https://cdn.shopify.com",
@@ -108,6 +123,7 @@ function setSecurityHeaders(response) {
       "form-action 'self' https://orise-6796.myshopify.com",
       "base-uri 'self'",
       "object-src 'none'",
+      "frame-ancestors 'self'",
       'upgrade-insecure-requests',
     ].join('; '),
   );
@@ -137,6 +153,14 @@ function serveFile(filePath, response, statusCode = 200) {
   response.statusCode = statusCode;
   setSecurityHeaders(response);
   response.setHeader('Content-Type', contentTypes[extname(filePath)] || 'application/octet-stream');
+  const extension = extname(filePath);
+  const isBuildAsset = filePath.startsWith(join(distDir, 'assets'));
+  const cacheControl = ['.html', '.xml', '.txt', '.json'].includes(extension)
+    ? 'no-cache, no-store, must-revalidate'
+    : isBuildAsset
+      ? 'public, max-age=31536000, immutable'
+      : 'public, max-age=2592000';
+  response.setHeader('Cache-Control', cacheControl);
   createReadStream(filePath).pipe(response);
 }
 
@@ -184,6 +208,15 @@ const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || '/', `http://${request.headers.host || 'localhost'}`);
 
+    const legacyDestination = legacyRedirects.get(normalizeAppPath(url.pathname));
+    if (legacyDestination) {
+      response.statusCode = 301;
+      setSecurityHeaders(response);
+      response.setHeader('Location', legacyDestination);
+      response.end();
+      return;
+    }
+
     if (isShopifyPath(url.pathname)) {
       response.statusCode = 302;
       setSecurityHeaders(response);
@@ -193,16 +226,19 @@ const server = createServer(async (request, response) => {
     }
 
     if (url.pathname === '/api/email-support') {
+      setSecurityHeaders(response);
       await emailSupportHandler(request, response);
       return;
     }
 
     if (url.pathname === '/api/contact') {
+      setSecurityHeaders(response);
       await contactHandler(request, response);
       return;
     }
 
     if (url.pathname === '/api/marketing-signup') {
+      setSecurityHeaders(response);
       await marketingSignupHandler(request, response);
       return;
     }
@@ -218,12 +254,22 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    serveFile(join(distDir, 'index.html'), response, isAppRoute(normalizeAppPath(url.pathname)) ? 200 : 404);
-  } catch (error) {
+    const appPath = normalizeAppPath(url.pathname);
+    if (isAppRoute(appPath)) {
+      const prerendered = appPath === '/'
+        ? join(distDir, 'index.html')
+        : join(distDir, appPath.slice(1), 'index.html');
+      serveFile(existsSync(prerendered) ? prerendered : join(distDir, 'index.html'), response);
+      return;
+    }
+
+    serveFile(join(distDir, 'index.html'), response, 404);
+  } catch {
     json(response, 500, { success: false, message: 'Server error.' });
   }
 });
 
-server.listen(port, () => {
-  console.log(`Mdrn-Life DDW server running on port ${port}`);
+const host = process.env.HOST || '127.0.0.1';
+server.listen(port, host, () => {
+  console.log(`Mdrn-Life DDW server running on http://${host}:${port}`);
 });

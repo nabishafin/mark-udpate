@@ -17,6 +17,9 @@ if (!rate_limit('contact', 5)) {
 }
 
 $body = read_json_body();
+if (clean_value($body['website'] ?? '', 200) !== '') {
+  api_json(200, ['success' => true, 'message' => 'Your message has been sent successfully.']);
+}
 $name = clean_value($body['name'] ?? '', 160);
 $email = strtolower(clean_value($body['email'] ?? '', 254));
 $phone = clean_value($body['phone'] ?? '', 80);

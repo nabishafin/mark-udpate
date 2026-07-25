@@ -5,7 +5,9 @@ import { subscribeEmailToMarketing } from '../lib/marketing';
 
 const STORAGE_KEY = 'mdrn-life-ddw-email-popup';
 const SESSION_KEY = 'mdrn-life-ddw-marketing-session';
-const SHOW_DELAY_MS = 1400;
+const SHOW_DELAY_MS = 12000;
+const DISMISS_FOR_MS = 30 * 24 * 60 * 60 * 1000;
+const SUBSCRIBE_FOR_MS = 365 * 24 * 60 * 60 * 1000;
 
 // Don't interrupt active commerce / account flows with the marketing popup.
 const SUPPRESSED_PATHS = [
@@ -20,24 +22,33 @@ const SUPPRESSED_PATHS = [
 ];
 
 const BENEFITS = [
-  'Access wholesale pricing on our pure deuterium-depleted water',
-  'Earn generous commissions',
-  'Receive top-notch training and support',
-  'Join a vibrant community of wellness enthusiasts',
-  'Achieve financial stability while promoting wellness',
+  'Request information about product and wholesale options',
+  'Receive product education and company updates',
+  'Learn about available training and support',
+  'Connect with the Mdrn-Life DDW community',
 ];
 
 function alreadyHandled() {
   try {
-    return Boolean(window.localStorage.getItem(STORAGE_KEY));
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const stored = JSON.parse(raw) as { expiresAt?: number };
+    if (!stored.expiresAt || stored.expiresAt <= Date.now()) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return false;
+    }
+    return true;
   } catch {
-    return false;
+    return Boolean(window.localStorage.getItem(STORAGE_KEY));
   }
 }
 
-function remember(value: string) {
+function remember(value: 'dismissed' | 'subscribed', durationMs: number) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, value);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      value,
+      expiresAt: Date.now() + durationMs,
+    }));
   } catch {
     /* ignore storage failures */
   }
@@ -48,7 +59,8 @@ function getSessionId() {
     const existing = window.localStorage.getItem(SESSION_KEY);
     if (existing) return existing;
 
-    const sessionId = `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+    const randomId = window.crypto?.randomUUID?.() || `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+    const sessionId = `lead_${randomId}`;
     window.localStorage.setItem(SESSION_KEY, sessionId);
     return sessionId;
   } catch {
@@ -65,8 +77,6 @@ export function EmailPopup() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Only stop showing once the visitor has actually subscribed. Otherwise the
-    // popup returns on every reload to keep collecting the email.
     if (alreadyHandled()) return;
     if (SUPPRESSED_PATHS.some((pattern) => pattern.test(window.location.pathname))) return;
 
@@ -81,12 +91,10 @@ export function EmailPopup() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const dismiss = () => {
-    // Intentionally not persisted: the popup should reappear on the next reload
-    // until the visitor subscribes.
+    remember('dismissed', DISMISS_FOR_MS);
     setOpen(false);
   };
 
@@ -103,7 +111,7 @@ export function EmailPopup() {
         sessionId: getSessionId(),
       });
       setDone(true);
-      remember('subscribed');
+      remember('subscribed', SUBSCRIBE_FOR_MS);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save your email. Please try again.');
     } finally {
@@ -152,9 +160,9 @@ export function EmailPopup() {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-300/[0.1] text-cyan-200">
                   <Check size={26} />
                 </div>
-                <h2 className="mt-6 text-2xl font-medium text-white">You're on the list.</h2>
+                <h2 className="mt-6 text-2xl font-medium text-white">Request received.</h2>
                 <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/60">
-                  Thanks for joining. Watch your inbox for wholesale pricing, training, and Mdrn-Life DDW updates.
+                  Thanks. We received your email and interest in future Mdrn-Life DDW updates.
                 </p>
                 <button
                   type="button"
@@ -167,7 +175,7 @@ export function EmailPopup() {
             ) : (
               <>
                 <h2 id="email-popup-title" className="pr-8 text-2xl font-medium leading-tight tracking-tight text-white sm:text-3xl">
-                  Unlock a world of opportunities for wellness and prosperity!
+                  Learn more about Mdrn-Life DDW.
                 </h2>
 
                 <ul className="mt-5 space-y-2.5">
@@ -194,6 +202,9 @@ export function EmailPopup() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="Email address"
+                    aria-label="Email address"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'email-popup-error' : 'email-popup-consent'}
                     autoComplete="email"
                     className="w-full rounded-xl border border-white/12 bg-white/[0.05] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-cyan-300/55 focus:ring-1 focus:ring-cyan-300/25"
                   />
@@ -207,12 +218,12 @@ export function EmailPopup() {
                         <Loader2 size={15} className="animate-spin" /> Saving...
                       </>
                     ) : (
-                      'Start earning today'
+                      'Request information'
                     )}
                   </button>
 
                   {error && (
-                    <p className="mt-3 rounded-xl border border-red-300/20 bg-red-300/[0.06] p-3 text-xs leading-relaxed text-red-200">
+                    <p id="email-popup-error" role="alert" className="mt-3 rounded-xl border border-red-300/20 bg-red-300/[0.06] p-3 text-xs leading-relaxed text-red-200">
                       {error}
                     </p>
                   )}
@@ -224,8 +235,8 @@ export function EmailPopup() {
                   >
                     No thanks
                   </button>
-                  <p className="mt-3 text-center text-[11px] leading-relaxed text-white/35">
-                    You are signing up to receive communication via email and can unsubscribe at any time.
+                  <p id="email-popup-consent" className="mt-3 text-center text-[11px] leading-relaxed text-white/65">
+                    By submitting, you request information by email. You can ask us to stop future messages at any time.
                   </p>
                 </form>
               </>

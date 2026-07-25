@@ -5,11 +5,23 @@ RewriteEngine On
   Header always set X-Frame-Options "DENY"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  Header always set Cross-Origin-Resource-Policy "same-site"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.shopify.com; connect-src 'self' https://orise-6796.myshopify.com https://mdrnlifeddw.com; frame-src 'self'; form-action 'self' https://orise-6796.myshopify.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
 </IfModule>
 
 # Shopify Storefront checkout URLs may use the primary domain. On Hostinger,
 # those paths must go back to Shopify before the React app fallback runs.
-RewriteRule ^products/?$ /index.html [L,QSA]
+RewriteRule ^pages/(q-a-how-to-deplete-deuterium-from-water|deuterium|faq|sca-affiliate-empty-page)/?$ /science [R=301,L]
+RewriteRule ^pages/about-us/?$ /founder [R=301,L]
+RewriteRule ^pages/scientific-studies/?$ /research [R=301,L]
+RewriteRule ^pages/subscription-policy/?$ /policies/subscription-policy [R=301,L]
+RewriteRule ^pages/ccpa-opt-out/?$ /policies/privacy-policy [R=301,L]
+RewriteRule ^pages/collab/?$ /contact [R=301,L]
+RewriteRule ^collections/all/?$ /products [R=301,L]
+RewriteRule ^products/(mdrn-life-ddw|mdrn-life-ddw-pet-plastic)/?$ /products [R=301,L]
+RewriteRule ^products/?$ /products/index.html [L,QSA]
 RewriteRule ^account/reset/(.*)$ /index.html [L,QSA]
 RewriteRule ^cart/c/(.*)$ https://orise-6796.myshopify.com/cart/c/$1 [R=302,L,QSA]
 RewriteRule ^cart/([0-9].*)$ https://orise-6796.myshopify.com/cart/$1 [R=302,L,QSA]
@@ -26,22 +38,23 @@ RewriteRule ^api/marketing-signup/?$ /api/marketing-signup.php [L,QSA]
 
 # Known React/Vite routes. Unknown paths return a real 404 instead of the home page.
 RewriteRule ^$ /index.html [L,QSA]
-RewriteRule ^(science|science/lab-testing|benefits|athletes-recovery|healthy-aging|shop|products|cart|products/cart|checkout|login|register|forgot-password|reset-password|account|account/orders|research|blogs|blogs/news|contact|learn|founder|pages/refund)/?$ /index.html [L,QSA]
+RewriteRule ^(science|science/lab-testing|benefits|athletes-recovery|healthy-aging|research|blogs/news|products|contact|learn|founder)/?$ /$1/index.html [L,QSA]
+RewriteRule ^(shop|cart|products/cart|checkout|login|register|forgot-password|reset-password|account|account/orders|blogs|pages/refund)/?$ /index.html [L,QSA]
 RewriteRule ^(account/orders/.+|account/reset/.+|policies/.+)/?$ /index.html [L,QSA]
 
 # BEGIN GENERATED SEO ROUTES
-RewriteRule ^blogs/news/deuterium-depleted-water-immune-support/?$ /index.html [L,QSA]
-RewriteRule ^blogs/news/can-deuterium-depleted-water-improve-recovery/?$ /index.html [L,QSA]
-RewriteRule ^blogs/news/deuterium-depleted-water-anti-aging/?$ /index.html [L,QSA]
-RewriteRule ^blogs/news/deuterium-depleted-water-for-brain-fog/?$ /index.html [L,QSA]
-RewriteRule ^blogs/news/does-deuterium-depleted-water-support-metabolism/?$ /index.html [L,QSA]
-RewriteRule ^blogs/news/deuterium-depleted-water-for-mitochondria/?$ /index.html [L,QSA]
-RewriteRule ^learn/deuterium-mitochondria/?$ /index.html [L,QSA]
-RewriteRule ^learn/hydration-recovery/?$ /index.html [L,QSA]
-RewriteRule ^learn/hydration-brain-function/?$ /index.html [L,QSA]
-RewriteRule ^learn/hydration-gut-health/?$ /index.html [L,QSA]
-RewriteRule ^learn/hydration-healthy-aging/?$ /index.html [L,QSA]
-RewriteRule ^learn/cellular-energy-performance/?$ /index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-immune-support/?$ /blogs/news/deuterium-depleted-water-immune-support/index.html [L,QSA]
+RewriteRule ^blogs/news/can-deuterium-depleted-water-improve-recovery/?$ /blogs/news/can-deuterium-depleted-water-improve-recovery/index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-anti-aging/?$ /blogs/news/deuterium-depleted-water-anti-aging/index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-for-brain-fog/?$ /blogs/news/deuterium-depleted-water-for-brain-fog/index.html [L,QSA]
+RewriteRule ^blogs/news/does-deuterium-depleted-water-support-metabolism/?$ /blogs/news/does-deuterium-depleted-water-support-metabolism/index.html [L,QSA]
+RewriteRule ^blogs/news/deuterium-depleted-water-for-mitochondria/?$ /blogs/news/deuterium-depleted-water-for-mitochondria/index.html [L,QSA]
+RewriteRule ^learn/deuterium-mitochondria/?$ /learn/deuterium-mitochondria/index.html [L,QSA]
+RewriteRule ^learn/hydration-recovery/?$ /learn/hydration-recovery/index.html [L,QSA]
+RewriteRule ^learn/hydration-brain-function/?$ /learn/hydration-brain-function/index.html [L,QSA]
+RewriteRule ^learn/hydration-gut-health/?$ /learn/hydration-gut-health/index.html [L,QSA]
+RewriteRule ^learn/hydration-healthy-aging/?$ /learn/hydration-healthy-aging/index.html [L,QSA]
+RewriteRule ^learn/cellular-energy-performance/?$ /learn/cellular-energy-performance/index.html [L,QSA]
 # END GENERATED SEO ROUTES
 
 RewriteCond %{REQUEST_FILENAME} !-f

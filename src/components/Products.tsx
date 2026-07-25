@@ -57,14 +57,31 @@ export function Products() {
               <br />
               <span className="text-white/80">Two packaging options.</span>
             </h1>
-            <p className="mt-5 text-white/60 text-base sm:text-lg leading-relaxed">
-              Mdrn-Life DDW is offered at 5 ppm in Glass and PET Plastic bottles.
-              Every product mention points back to the same{' '}
-              <a href="/science/lab-testing" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
-                independently verified
-              </a>{' '}
-              DDW standard.
-            </p>
+            <div className="mt-5 space-y-4 text-base leading-relaxed text-white/60 sm:text-lg">
+              <p>
+                Mdrn-Life DDW is produced to a target deuterium concentration of 5 parts per
+                million and is available in glass and PET packaging. Current pricing,
+                subscription options, inventory, and checkout availability come directly from
+                the official Shopify storefront.
+              </p>
+              <p>
+                Every purchase option refers to the same{' '}
+                <a href="/science/lab-testing" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+                  independently verified
+                </a>{' '}
+                DDW standard. Review the{' '}
+                <a href="/science" className="text-cyan-200 underline decoration-cyan-300/40 underline-offset-4 hover:text-white">
+                  science overview
+                </a>{' '}
+                to understand the proposed mechanisms and the limits of current evidence.
+              </p>
+              <p>
+                Glass may suit customers who prefer a reusable, rigid container, while PET
+                offers a lighter shipping format. Packaging choice does not change the stated
+                5 ppm specification. Mdrn-Life DDW is sold as packaged water, not as a medicine
+                or a replacement for medical care.
+              </p>
+            </div>
           </div>
 
           <a
@@ -87,6 +104,7 @@ export function Products() {
               key={product.id}
               product={product}
               delay={i * 0.1}
+              priority={i === 0}
               loadingImage={loadingProducts}
               onCartCountChange={() => setCartCount(getCartCount())}
             />
@@ -106,11 +124,13 @@ export function Products() {
 function ProductCard({
   product,
   delay,
+  priority,
   loadingImage,
   onCartCountChange,
 }: {
   product: Product;
   delay: number;
+  priority: boolean;
   loadingImage: boolean;
   onCartCountChange: () => void;
 }) {
@@ -190,7 +210,8 @@ function ProductCard({
           <img
             src={product.image.src}
             alt={product.image.alt}
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
             decoding="async"
             className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
           />

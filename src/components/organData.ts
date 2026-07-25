@@ -49,7 +49,7 @@ export const ORGANS: Organ[] = [
       { label: 'Balance', value: 'Oxidative' },
     ],
     image: {
-      src: '/organ-panels/brain-nervous-system.png',
+      src: '/organ-panels/brain-nervous-system.webp',
       alt: 'Brain and nervous system educational infographic',
       position: 'center',
     },
@@ -80,7 +80,7 @@ export const ORGANS: Organ[] = [
       { label: 'Stress', value: 'Reduced' },
     ],
     image: {
-      src: '/organ-panels/eyes-visual-system.png',
+      src: '/organ-panels/eyes-visual-system.webp',
       alt: 'Eyes and visual system educational infographic',
       position: 'center',
     },
@@ -111,7 +111,7 @@ export const ORGANS: Organ[] = [
       { label: 'Balance', value: 'Metabolic' },
     ],
     image: {
-      src: '/organ-panels/mouth-throat-cellular-absorption.png',
+      src: '/organ-panels/mouth-throat-cellular-absorption.webp',
       alt: 'Mouth, throat and cellular absorption educational infographic',
       position: 'center',
     },
@@ -143,7 +143,7 @@ export const ORGANS: Organ[] = [
       { label: 'Flow', value: 'Healthy' },
     ],
     image: {
-      src: '/organ-panels/heart-circulation.png',
+      src: '/organ-panels/heart-circulation.webp',
       alt: 'Heart and circulation educational infographic',
       position: 'center',
     },
@@ -173,7 +173,7 @@ export const ORGANS: Organ[] = [
       { label: 'Recovery', value: 'Physical' },
     ],
     image: {
-      src: '/organ-panels/lungs-oxygen-delivery.png',
+      src: '/organ-panels/lungs-oxygen-delivery.webp',
       alt: 'Lungs and oxygen delivery educational infographic',
       position: 'center',
     },
@@ -202,7 +202,7 @@ export const ORGANS: Organ[] = [
       { label: 'Balance', value: 'Metabolic' },
     ],
     image: {
-      src: '/organ-panels/liver-detox-support.png',
+      src: '/organ-panels/liver-detox-support.webp',
       alt: 'Liver and detox support educational infographic',
       position: 'center',
     },
@@ -236,7 +236,7 @@ export const ORGANS: Organ[] = [
       { label: 'Comfort', value: 'Digestive' },
     ],
     image: {
-      src: '/organ-panels/gut-microbiome.png',
+      src: '/organ-panels/gut-microbiome.webp',
       alt: 'Gut and microbiome educational infographic',
       position: 'center',
     },
@@ -260,7 +260,7 @@ export const ORGANS: Organ[] = [
       { label: 'Stability', value: 'Metabolic' },
     ],
     image: {
-      src: '/organ-panels/kidneys-filtration.png',
+      src: '/organ-panels/kidneys-filtration.webp',
       alt: 'Kidneys and filtration educational infographic',
       position: 'center',
     },
@@ -292,7 +292,7 @@ export const ORGANS: Organ[] = [
       { label: 'Endurance', value: 'Focus' },
     ],
     image: {
-      src: '/organ-panels/muscles-recovery.png',
+      src: '/organ-panels/muscles-recovery.webp',
       alt: 'Muscles and recovery educational infographic',
       position: 'center',
     },
@@ -316,7 +316,7 @@ export const ORGANS: Organ[] = [
       { label: 'Comfort', value: 'Joint' },
     ],
     image: {
-      src: '/organ-panels/joints-cartilage.png',
+      src: '/organ-panels/joints-cartilage.webp',
       alt: 'Joints and cartilage educational infographic',
       position: 'center',
     },
@@ -347,7 +347,7 @@ export const ORGANS: Organ[] = [
       { label: 'Aging', value: 'Healthy' },
     ],
     image: {
-      src: '/organ-panels/skin-healthy-aging.png',
+      src: '/organ-panels/skin-healthy-aging.webp',
       alt: 'Skin and healthy aging educational infographic',
       position: 'center',
     },
@@ -377,7 +377,7 @@ export const ORGANS: Organ[] = [
       { label: 'DDW', value: '5', unit: 'ppm' },
     ],
     image: {
-      src: '/organ-panels/mitochondria-cellular-energy.png',
+      src: '/organ-panels/mitochondria-cellular-energy.webp',
       alt: 'Mitochondria and cellular energy educational infographic',
       position: 'center',
     },

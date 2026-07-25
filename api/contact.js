@@ -1,12 +1,10 @@
-/* global Buffer, process */
 import tls from 'node:tls';
+import { createRateLimiter } from './request-security.js';
 
 const SUPPORT_EMAIL = 'support@orisefinance.com';
 const MAX_BODY_BYTES = 48 * 1024;
 const MAX_MESSAGE_LENGTH = 4000;
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT = 5;
-const attempts = new Map();
+const rateLimit = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
 
 function json(response, status, payload) {
   response.statusCode = status;
@@ -32,14 +30,20 @@ function applyCors(request, response) {
   const origin = request.headers.origin;
   if (!origin) return true;
 
-  const isAllowed = allowedOrigins().has(origin);
-  if (isAllowed) {
-    response.setHeader('Access-Control-Allow-Origin', origin);
-    response.setHeader('Vary', 'Origin');
-    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  try {
+    const originUrl = new URL(origin);
+    const host = request.headers['x-forwarded-host'] || request.headers.host;
+    const isAllowed = allowedOrigins().has(originUrl.origin) || originUrl.host === host;
+    if (isAllowed) {
+      response.setHeader('Access-Control-Allow-Origin', originUrl.origin);
+      response.setHeader('Vary', 'Origin');
+      response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    }
+    return isAllowed;
+  } catch {
+    return false;
   }
-  return isAllowed;
 }
 
 function readBody(request) {
@@ -94,28 +98,6 @@ function encodedHeader(value) {
 
 function senderName(value) {
   return `"${header(value).replace(/"/g, '\\"')}"`;
-}
-
-function getClientIp(request) {
-  const forwardedFor = request.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor) return forwardedFor.split(',')[0].trim();
-  return request.socket?.remoteAddress || 'unknown';
-}
-
-function rateLimit(request) {
-  const now = Date.now();
-  const ip = getClientIp(request);
-  const entry = attempts.get(ip) || { count: 0, resetAt: now + RATE_WINDOW_MS };
-
-  if (entry.resetAt <= now) {
-    entry.count = 0;
-    entry.resetAt = now + RATE_WINDOW_MS;
-  }
-
-  entry.count += 1;
-  attempts.set(ip, entry);
-
-  return entry.count <= RATE_LIMIT;
 }
 
 function validationError(field, message) {
@@ -358,6 +340,10 @@ export default async function handler(request, response) {
 
   try {
     const body = await readBody(request);
+    if (clean(body.website, 200)) {
+      json(response, 200, { success: true, message: 'Your message has been sent successfully.' });
+      return;
+    }
     const { contact, errors } = validateContact(body);
 
     if (errors.length) {
