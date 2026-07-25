@@ -933,6 +933,8 @@ test('technical SEO covers approved metadata, dynamic articles, generated sitema
   assert.doesNotMatch(server, /\/\^\\\/blogs\\\/news\\\/\.\+\$\//);
   assert.doesNotMatch(server, /\/\^\\\/learn\\\/\.\+\$\//);
   assert.match(nginx, /Generated dynamic content routes need Node/);
+  assert.doesNotMatch(nginx, /proxy_pass http:\/\/127\.0\.0\.1:3000/);
+  assert.equal((nginx.match(/proxy_pass http:\/\/127\.0\.0\.1:3001/g) || []).length, 2);
   assert.match(htaccess, /BEGIN GENERATED SEO ROUTES/);
 });
 
