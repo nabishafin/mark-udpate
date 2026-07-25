@@ -428,6 +428,36 @@ test('hero uses a cleaner premium background instead of the rejected grid and pa
   assert.match(css, /\.hpe-body-clean-stage/);
 });
 
+test('first-visit media is prioritized, resilient, and kept within performance budgets', () => {
+  const body = file('src/components/InteractiveBody.tsx');
+  const organPanel = file('src/components/OrganPanel.tsx');
+  const popup = file('src/components/EmailPopup.tsx');
+  const products = file('src/components/Products.tsx');
+  const productData = file('src/lib/products.ts');
+  const html = file('index.html');
+  const nginx = file('deploy/nginx/mdrnlifeddw.com.conf');
+
+  assert.match(html, /rel="preload" href="\/Human\.webm\?v=20260725" as="video"/);
+  assert.match(body, /preload="auto"/);
+  assert.match(body, /Loading interactive model/);
+  assert.match(body, /onCanPlay=\{\(\) => setVideoReady\(true\)\}/);
+  assert.match(organPanel, /loading="eager"/);
+  assert.match(organPanel, /fetchPriority="high"/);
+  assert.match(products, /visibleProducts = products \?\? PRODUCTS/);
+  assert.doesNotMatch(products, /loadingImage/);
+  assert.match(productData, /src: product\.image\.src/);
+  assert.match(popup, /SHOW_DELAY_MS = 60000/);
+  assert.match(nginx, /webm\|mp4\|ogg/);
+  assert.match(nginx, /sendfile on/);
+
+  for (const name of readdirSync(join(rootPath, 'public', 'organ-panels')).filter((name) => name.endsWith('.webp'))) {
+    assert.ok(statSync(join(rootPath, 'public', 'organ-panels', name)).size <= 90_000, `${name} exceeds the 90 KB performance budget`);
+  }
+  for (const name of ['mdrn-life-ddw-glass.webp', 'mdrn-life-ddw-pet.webp']) {
+    assert.ok(statSync(join(rootPath, 'public', 'products', name)).size <= 75_000, `${name} exceeds the 75 KB performance budget`);
+  }
+});
+
 test('products route all commerce actions through Shopify-safe checkout handoff helpers', () => {
   const products = file('src/components/Products.tsx');
   const shopify = file('src/lib/shopify.ts');
@@ -440,8 +470,9 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.match(products, /ShoppingCart/);
   assert.match(products, /\/products\/cart/);
   assert.match(products, /useState<Product\[\] \| null>\(null\)/);
-  assert.match(products, /loadingImage=\{loadingProducts\}/);
-  assert.match(products, /Loading product image/);
+  assert.doesNotMatch(products, /loadingImage=\{loadingProducts\}/);
+  assert.doesNotMatch(products, /Loading product image/);
+  assert.match(products, /visibleProducts = products \?\? PRODUCTS/);
   assert.doesNotMatch(products, />\s*Buy Now\s*</);
   assert.doesNotMatch(products, />\s*Subscribe\s*</);
   assert.doesNotMatch(products, />\s*View\s*</);
@@ -455,6 +486,7 @@ test('products route all commerce actions through Shopify-safe checkout handoff 
   assert.match(shopify, /cartLines\.join\(','\)/);
   assert.doesNotMatch(shopify, /channel=buy_button/);
   assert.match(shopify, /cartCreate/);
+  assert.match(file('src/lib/products.ts'), /src: product\.image\.src/);
 
   for (const phrase of ['Meta Pixel', 'Google Analytics 4', 'TikTok Pixel', 'Klaviyo']) {
     assert.match(tracking, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));

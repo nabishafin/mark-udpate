@@ -268,7 +268,9 @@ function mergeShopifyProduct(product: Product, shopifyProduct?: ShopifyProductNo
     priceCents,
     subscription: mergeSubscriptionPlans(product, variant),
     image: {
-      src: image?.url || product.image.src,
+      // Keep the small, same-origin product artwork visible immediately.
+      // Shopify remains authoritative for price, inventory, and checkout data.
+      src: product.image.src,
       alt: imageAlt,
     },
   };

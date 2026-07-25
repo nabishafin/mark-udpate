@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, CircleDot, X } from 'lucide-react';
 import { Organ, ORGANS } from './organData';
@@ -95,7 +95,7 @@ export function OrganPanel({ organ, onClose, onNavigate }: Props) {
               <p className="mt-1.5 text-[11px] leading-snug text-white/60 sm:mt-2 sm:text-sm">{organ.tagline}</p>
             </div>
 
-            {organ.image && <OrganImage color={color} image={organ.image} />}
+            {organ.image && <OrganImage key={organ.image.src} color={color} image={organ.image} />}
 
             <div className="mt-5 space-y-4 sm:mt-8 sm:space-y-5">
               <div className="space-y-3">
@@ -197,8 +197,17 @@ function OrganImage({
   color: { stroke: string; glow: string; soft: string };
   image: NonNullable<Organ['image']>;
 }) {
+  const [loaded, setLoaded] = useState(false);
+
   return (
     <figure className="relative mt-4 aspect-[4/3] w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] sm:mt-6 sm:aspect-[16/9] sm:rounded-2xl">
+      <div
+        role="status"
+        aria-label="Loading illustration"
+        className={`absolute inset-0 bg-[linear-gradient(110deg,rgba(255,255,255,0.025),rgba(63,184,255,0.12),rgba(255,255,255,0.025))] bg-[length:220%_100%] transition-opacity ${
+          loaded ? 'opacity-0' : 'animate-pulse opacity-100'
+        }`}
+      />
       <div
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
@@ -209,9 +218,13 @@ function OrganImage({
       <img
         src={image.src}
         alt={image.alt}
-        loading="lazy"
+        loading="eager"
+        fetchPriority="high"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover"
+        onLoad={() => setLoaded(true)}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
         style={{
           objectPosition: image.position ?? 'center',
           filter: 'saturate(1.02) contrast(1.03)',

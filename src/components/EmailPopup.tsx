@@ -5,7 +5,9 @@ import { subscribeEmailToMarketing } from '../lib/marketing';
 
 const STORAGE_KEY = 'mdrn-life-ddw-email-popup';
 const SESSION_KEY = 'mdrn-life-ddw-marketing-session';
-const SHOW_DELAY_MS = 12000;
+// Give first-time visitors time to see and use the hero before interrupting
+// them with an optional marketing request.
+const SHOW_DELAY_MS = 60000;
 const DISMISS_FOR_MS = 30 * 24 * 60 * 60 * 1000;
 const SUBSCRIBE_FOR_MS = 365 * 24 * 60 * 60 * 1000;
 

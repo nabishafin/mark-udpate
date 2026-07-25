@@ -8,7 +8,6 @@ import { trackCommerceEvent } from '../lib/tracking';
 export function Products() {
   const [cartCount, setCartCount] = useState(() => getCartCount());
   const [products, setProducts] = useState<Product[] | null>(null);
-  const loadingProducts = products === null;
   const visibleProducts = products ?? PRODUCTS;
 
   useEffect(() => {
@@ -105,7 +104,6 @@ export function Products() {
               product={product}
               delay={i * 0.1}
               priority={i === 0}
-              loadingImage={loadingProducts}
               onCartCountChange={() => setCartCount(getCartCount())}
             />
           ))}
@@ -125,13 +123,11 @@ function ProductCard({
   product,
   delay,
   priority,
-  loadingImage,
   onCartCountChange,
 }: {
   product: Product;
   delay: number;
   priority: boolean;
-  loadingImage: boolean;
   onCartCountChange: () => void;
 }) {
   const [adding, setAdding] = useState(false);
@@ -200,22 +196,14 @@ function ProductCard({
       />
 
       <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
-        {loadingImage ? (
-          <div
-            role="status"
-            aria-label="Loading product image"
-            className="aspect-[16/11] w-full animate-pulse bg-[linear-gradient(110deg,rgba(255,255,255,0.035),rgba(63,184,255,0.10),rgba(255,255,255,0.035))] bg-[length:220%_100%]"
-          />
-        ) : (
-          <img
-            src={product.image.src}
-            alt={product.image.alt}
-            loading={priority ? 'eager' : 'lazy'}
-            fetchPriority={priority ? 'high' : 'auto'}
-            decoding="async"
-            className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
-          />
-        )}
+        <img
+          src={product.image.src}
+          alt={product.image.alt}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          decoding="async"
+          className="aspect-[16/11] w-full bg-white object-contain p-3 sm:p-4"
+        />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050608]/55 via-transparent to-transparent" />
       </div>
 

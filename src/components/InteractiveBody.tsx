@@ -93,10 +93,11 @@ const PREVIEW_SIDE: Record<string, 'left' | 'right'> = {
   skin: 'right',
   mitochondria: 'right'
 };
-const BODY_VID = "/Human.webm";
+const BODY_VID = '/Human.webm?v=20260725';
 
 export function InteractiveBody({ onSelect, active }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
   const hotspotIndex = (id: string) => ORGANS.findIndex((organ) => organ.id === id);
   return (
     <div className="relative w-full h-full flex items-center justify-center">
@@ -108,6 +109,19 @@ export function InteractiveBody({ onSelect, active }: Props) {
           filter: 'drop-shadow(0 26px 50px rgba(0,0,0,0.42))'
         }}>
         
+        <div
+          aria-hidden="true"
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-opacity duration-500 ${
+            videoReady ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
+          <div className="absolute inset-[12%] rounded-[42%] bg-[radial-gradient(circle,rgba(63,184,255,0.16),transparent_66%)] animate-pulse" />
+          <img src="/brand/logo.png" alt="" width="88" height="40" className="relative h-auto w-16 opacity-70 sm:w-20" />
+          <span className="relative text-[10px] font-medium uppercase tracking-[0.22em] text-cyan-100/55">
+            Loading interactive model
+          </span>
+        </div>
+
         {/* Seamless looping video */}
         <video
           src={BODY_VID}
@@ -115,9 +129,13 @@ export function InteractiveBody({ onSelect, active }: Props) {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
+          onLoadedData={() => setVideoReady(true)}
+          onCanPlay={() => setVideoReady(true)}
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+          className={`absolute inset-0 h-full w-full select-none object-contain transition-opacity duration-500 pointer-events-none ${
+            videoReady ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{
             mixBlendMode: 'screen',
             filter: 'saturate(1.15) brightness(1.08) contrast(1.05)'
@@ -259,7 +277,8 @@ export function InteractiveBody({ onSelect, active }: Props) {
                       <img
                         src={organ.image?.src ?? '/brand/logo.png'}
                         alt={organ.image?.alt ?? `${organ.name} preview`}
-                        loading="lazy"
+                        loading="eager"
+                        fetchPriority="high"
                         decoding="async"
                         className="h-full w-full object-cover"
                         style={{ objectPosition: organ.image?.position ?? 'center' }}
