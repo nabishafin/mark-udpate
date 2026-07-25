@@ -11,8 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
-.env.local
 .env.*.local
 # A bare `env` file can be produced by server/PM2 diagnostics and may contain
 # the same secrets as `.env`. Never commit it.
@@ -28,3 +26,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+config.bat
