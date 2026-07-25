@@ -1085,3 +1085,15 @@ test('shop defaults to subscription while preserving one-time purchase checkout'
   assert.match(shopify, /selling_plan/);
   assert.match(shopify, /item\.purchaseOption === 'subscription' && !item\.sellingPlanId/);
 });
+
+test('Shopify subscription customer portal routes through the storefront app proxy', () => {
+  const nginx = file('deploy/nginx/mdrnlifeddw.com.conf');
+
+  assert.match(nginx, /apps\(\?:\/\|\$\)/);
+  assert.match(nginx, /proxy_pass https:\/\/orise-6796\.myshopify\.com/);
+  assert.match(nginx, /proxy_set_header Host \$host/);
+  assert.match(nginx, /proxy_ssl_name orise-6796\.myshopify\.com/);
+  assert.match(nginx, /location \^~ \/cdn\//);
+  assert.match(nginx, /location = \/cart\/update\.js/);
+  assert.doesNotMatch(nginx, /return 30[1278] https:\/\/orise-6796\.myshopify\.com\$request_uri;\s*#.*subscriptions/i);
+});
