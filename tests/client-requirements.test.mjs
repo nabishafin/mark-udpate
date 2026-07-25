@@ -428,19 +428,33 @@ test('hero uses a cleaner premium background instead of the rejected grid and pa
   assert.match(css, /\.hpe-body-clean-stage/);
 });
 
-test('first-visit media is prioritized, resilient, and kept within performance budgets', () => {
+test('first-visit and repeat-load media stay immediate, resilient, and within performance budgets', () => {
   const body = file('src/components/InteractiveBody.tsx');
   const organPanel = file('src/components/OrganPanel.tsx');
   const popup = file('src/components/EmailPopup.tsx');
   const products = file('src/components/Products.tsx');
   const productData = file('src/lib/products.ts');
+  const entry = file('src/index.tsx');
+  const css = file('src/index.css');
   const html = file('index.html');
   const nginx = file('deploy/nginx/mdrnlifeddw.com.conf');
+  const server = file('server.js');
+  const serviceWorker = file('public/sw.js');
 
-  assert.match(html, /rel="preload" href="\/Human\.webm\?v=20260725" as="video"/);
+  assert.match(html, /rel="preload" href="\/human-poster\.webp\?v=20260725b" as="image"/);
+  assert.match(html, /rel="preload" href="\/fonts\/geist-latin\.woff2" as="font"/);
+  assert.doesNotMatch(html, /fonts\.googleapis\.com|fonts\.gstatic\.com|as="video"/);
   assert.match(body, /preload="auto"/);
-  assert.match(body, /Loading interactive model/);
-  assert.match(body, /onCanPlay=\{\(\) => setVideoReady\(true\)\}/);
+  assert.match(body, /poster=\{BODY_POSTER\}/);
+  assert.match(body, /video\.play\(\)/);
+  assert.match(body, /window\.addEventListener\('pageshow', startVideo\)/);
+  assert.doesNotMatch(body, /Loading interactive model/);
+  assert.match(css, /url\('\/fonts\/geist-latin\.woff2'\)/);
+  assert.match(entry, /navigator\.serviceWorker\.register\('\/sw\.js'/);
+  assert.match(serviceWorker, /request\.mode === 'navigate'/);
+  assert.match(serviceWorker, /request\.headers\.has\('range'\)/);
+  assert.match(serviceWorker, /\^\\\/account/);
+  assert.match(serviceWorker, /\^\\\/api/);
   assert.match(organPanel, /loading="eager"/);
   assert.match(organPanel, /fetchPriority="high"/);
   assert.match(products, /visibleProducts = products \?\? PRODUCTS/);
@@ -449,6 +463,14 @@ test('first-visit media is prioritized, resilient, and kept within performance b
   assert.match(popup, /SHOW_DELAY_MS = 60000/);
   assert.match(nginx, /webm\|mp4\|ogg/);
   assert.match(nginx, /sendfile on/);
+  assert.match(nginx, /location = \/sw\.js/);
+  assert.match(nginx, /open_file_cache max=1000/);
+  assert.doesNotMatch(nginx, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
+  assert.doesNotMatch(server, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
+
+  assert.ok(statSync(join(rootPath, 'public', 'human-poster.webp')).size <= 15_000, 'hero poster exceeds the 15 KB performance budget');
+  assert.ok(statSync(join(rootPath, 'public', 'fonts', 'geist-latin.woff2')).size <= 35_000, 'Geist font exceeds the 35 KB performance budget');
+  assert.ok(statSync(join(rootPath, 'public', 'fonts', 'geist-mono-latin.woff2')).size <= 30_000, 'Geist Mono font exceeds the 30 KB performance budget');
 
   for (const name of readdirSync(join(rootPath, 'public', 'organ-panels')).filter((name) => name.endsWith('.webp'))) {
     assert.ok(statSync(join(rootPath, 'public', 'organ-panels', name)).size <= 90_000, `${name} exceeds the 90 KB performance budget`);

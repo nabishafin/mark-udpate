@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ORGANS, Organ } from './organData';
 type Props = {
@@ -93,11 +93,38 @@ const PREVIEW_SIDE: Record<string, 'left' | 'right'> = {
   skin: 'right',
   mitochondria: 'right'
 };
-const BODY_VID = '/Human.webm?v=20260725';
+const BODY_VID = '/Human.webm?v=20260725b';
+const BODY_POSTER = '/human-poster.webp?v=20260725b';
 
 export function InteractiveBody({ onSelect, active }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
-  const [videoReady, setVideoReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const startVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    const playback = video.play();
+    if (playback) {
+      void playback.catch(() => {
+        // The poster remains visible if a browser temporarily blocks autoplay.
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const retries = [0, 250, 1000].map((delay) => window.setTimeout(startVideo, delay));
+    const resumeWhenVisible = () => {
+      if (document.visibilityState === 'visible') startVideo();
+    };
+    window.addEventListener('pageshow', startVideo);
+    document.addEventListener('visibilitychange', resumeWhenVisible);
+    return () => {
+      retries.forEach(window.clearTimeout);
+      window.removeEventListener('pageshow', startVideo);
+      document.removeEventListener('visibilitychange', resumeWhenVisible);
+    };
+  }, [startVideo]);
+
   const hotspotIndex = (id: string) => ORGANS.findIndex((organ) => organ.id === id);
   return (
     <div className="relative w-full h-full flex items-center justify-center">
@@ -109,33 +136,20 @@ export function InteractiveBody({ onSelect, active }: Props) {
           filter: 'drop-shadow(0 26px 50px rgba(0,0,0,0.42))'
         }}>
         
-        <div
-          aria-hidden="true"
-          className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-opacity duration-500 ${
-            videoReady ? 'opacity-0' : 'opacity-100'
-          }`}
-        >
-          <div className="absolute inset-[12%] rounded-[42%] bg-[radial-gradient(circle,rgba(63,184,255,0.16),transparent_66%)] animate-pulse" />
-          <img src="/brand/logo.png" alt="" width="88" height="40" className="relative h-auto w-16 opacity-70 sm:w-20" />
-          <span className="relative text-[10px] font-medium uppercase tracking-[0.22em] text-cyan-100/55">
-            Loading interactive model
-          </span>
-        </div>
-
         {/* Seamless looping video */}
         <video
+          ref={videoRef}
           src={BODY_VID}
+          poster={BODY_POSTER}
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
-          onLoadedData={() => setVideoReady(true)}
-          onCanPlay={() => setVideoReady(true)}
+          onLoadedData={startVideo}
+          onCanPlay={startVideo}
           aria-hidden="true"
-          className={`absolute inset-0 h-full w-full select-none object-contain transition-opacity duration-500 pointer-events-none ${
-            videoReady ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="absolute inset-0 h-full w-full select-none object-contain pointer-events-none"
           style={{
             mixBlendMode: 'screen',
             filter: 'saturate(1.15) brightness(1.08) contrast(1.05)'

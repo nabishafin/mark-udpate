@@ -34,4 +34,16 @@ if (!redirectShopifyCheckoutPath()) {
   container.replaceChildren();
   const root = createRoot(container);
   root.render(<App />);
+
+  if ('serviceWorker' in navigator && import.meta.env.PROD) {
+    window.addEventListener(
+      'load',
+      () => {
+        void navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
+          // The site remains fully functional when private browsing blocks service workers.
+        });
+      },
+      { once: true },
+    );
+  }
 }

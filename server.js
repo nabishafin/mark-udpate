@@ -117,8 +117,8 @@ function setSecurityHeaders(response) {
     [
       "default-src 'self'",
       "script-src 'self'",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com data:",
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self' data:",
       "img-src 'self' data: https://cdn.shopify.com",
       "connect-src 'self' https://orise-6796.myshopify.com https://mdrnlifeddw.com",
       "frame-src 'self'",
@@ -157,8 +157,10 @@ function serveFile(filePath, response, statusCode = 200) {
   response.setHeader('Content-Type', contentTypes[extname(filePath)] || 'application/octet-stream');
   const extension = extname(filePath);
   const isBuildAsset = filePath.startsWith(join(distDir, 'assets'));
-  const cacheControl = ['.html', '.xml', '.txt', '.json'].includes(extension)
+  const cacheControl = filePath === join(distDir, 'sw.js')
     ? 'no-cache, no-store, must-revalidate'
+    : ['.html', '.xml', '.txt', '.json'].includes(extension)
+      ? 'no-cache, no-store, must-revalidate'
     : isBuildAsset
       ? 'public, max-age=31536000, immutable'
       : 'public, max-age=2592000';
