@@ -14,6 +14,9 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+# A bare `env` file can be produced by server/PM2 diagnostics and may contain
+# the same secrets as `.env`. Never commit it.
+/env
 
 # Editor directories and files
 .vscode/*

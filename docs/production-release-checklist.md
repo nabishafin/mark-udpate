@@ -48,6 +48,17 @@ The current VPS runs the hardened application on loopback port `3001`; nginx
 proxies `/api/*` to that port. Ports `3000`, `3001`, and `4173` must not be
 publicly allowed through UFW because nginx is the only public entry point.
 
+After the application is healthy:
+
+- Run `pm2 save` and configure the `pm2-root` systemd service so the cluster
+  returns after a reboot.
+- Keep only SSH and nginx HTTP/HTTPS ports publicly allowed in UFW.
+- Enable the Fail2ban `sshd` jail with escalating bans.
+- Apply Ubuntu security updates and perform a controlled reboot when
+  `/var/run/reboot-required` exists.
+- After a reboot, repeat `nginx -t`, PM2/systemd checks, socket/firewall checks,
+  and `npm.cmd run verify:production`.
+
 Do not send passwords or private keys in chat. Use a temporary collaborator
 account or the platform's secret/credential flow.
 
