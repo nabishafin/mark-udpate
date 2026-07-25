@@ -346,7 +346,10 @@ function render(path) {
     .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(data.title)}</title>`)
     .replace(/<link\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${canonical}" />`)
     .replace(/<script\s+type=["']application\/ld\+json["']>[\s\S]*?<\/script>\s*/gi, '')
-    .replace('<div id="root"></div>', `<div id="root"><main id="main-content" data-prerendered="true"><article><h1>${escapeHtml(data.h1)}</h1>${data.shell}</article></main></div>`);
+    .replace(
+      '<div id="root"></div>',
+      `<div id="root"><main id="main-content" data-prerendered="true"><div class="prerender-loader" aria-hidden="true"><span class="prerender-loader__mark"><img src="/brand/logo.png" alt="" width="42" height="19" /></span><span class="prerender-loader__line"></span></div><article class="prerender-content"><h1>${escapeHtml(data.h1)}</h1>${data.shell}</article></main></div>`,
+    );
 
   html = replaceMeta(html, 'name', 'description', data.description);
   html = replaceMeta(html, 'property', 'og:title', data.title);

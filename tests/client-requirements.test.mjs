@@ -930,6 +930,12 @@ test('technical SEO covers approved metadata, dynamic articles, generated sitema
   assert.match(manifest, /"blogRoutes"/);
   assert.match(manifest, /"learnRoutes"/);
   assert.match(server, /routeManifest/);
+  assert.match(file('index.html'), /id="boot-critical"/);
+  assert.match(file('index.html'), /<html lang="en" class="js">/);
+  assert.match(file('index.html'), /<noscript>/);
+  assert.doesNotMatch(file('index.html'), /document\.documentElement\.classList\.add/);
+  assert.match(file('index.html'), /html\.js \.prerender-content/);
+  assert.match(file('scripts/prerender-seo.mjs'), /class="prerender-loader"/);
   assert.doesNotMatch(server, /\/\^\\\/blogs\\\/news\\\/\.\+\$\//);
   assert.doesNotMatch(server, /\/\^\\\/learn\\\/\.\+\$\//);
   assert.match(nginx, /Generated dynamic content routes need Node/);
